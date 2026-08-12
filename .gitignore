@@ -1,0 +1,16 @@
+node_modules
+.expo
+dist
+web-build
+*.tsbuildinfo
+.env
+.env.local
+.DS_Store
+expo-env.d.ts
+
+# Không push: scripts / test config / Claude local state (giữ lại .claude/skills, dùng chung team)
+scripts/
+test/
+.claude/*
+!.claude/skills
+!.claude/skills/**

@@ -1,0 +1,21 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    // expo/tsconfig.base đặt moduleResolution: "node" (kiểu Node10 cũ, TS đã deprecate,
+    // sẽ ngừng hoạt động ở TS 7.0) — ghi đè sang "bundler", vẫn khớp cách Metro resolve module.
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "Phố Mình",
+    "slug": "pho-minh",
+    "scheme": "phominh",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FAFBFC"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "vn.phominh.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Phố Mình cần vị trí để hiện tin quanh bạn khi mở app.",
+        "NSCameraUsageDescription": "Phố Mình cần camera để chụp ảnh đăng bài trực tiếp."
+      }
+    },
+    "android": {
+      "package": "vn.phominh.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FAFBFC"
+      },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Phố Mình cần camera để chụp ảnh đăng bài trực tiếp."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Phố Mình cần vị trí để hiện tin quanh bạn khi mở app."
+        }
+      ],
+      "expo-notifications",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
