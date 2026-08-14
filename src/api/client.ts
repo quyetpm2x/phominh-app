@@ -98,21 +98,34 @@ export interface UserProfile {
   id: string;
   alias: string;
   realName: string | null;
+  avatarUrl: string | null;
   trustTier: number;
   trustBadgeLabel: string;
   pointsToNextTier: number | null;
   createdAt: string;
 }
 
-export async function verifyOtp(phone: string, otp: string): Promise<UserProfile> {
+export async function verifyOtp(phone: string, otp: string): Promise<{ user: UserProfile; restored: boolean }> {
   const res = await apiClient
     .post('api/mobile/auth/verify-otp', { json: { phone, otp } })
-    .json<Envelope<{ tokens: TokenPair; user: UserProfile }>>();
+    .json<Envelope<{ tokens: TokenPair; user: UserProfile; restored: boolean }>>();
   await saveTokens(res.data.tokens);
-  return res.data.user;
+  return { user: res.data.user, restored: res.data.restored };
 }
 
+// Đăng xuất (mục 72) — PHẢI gọi backend thu hồi refresh token TRƯỚC khi xoá khỏi SecureStore, nếu
+// không backend vẫn coi token đó còn hiệu lực (dùng được tới khi hết hạn tự nhiên, 60 ngày) dù
+// client đã "đăng xuất". Không throw nếu gọi backend lỗi — vẫn phải xoá token cục bộ để user thoát
+// ra được, lỗi mạng không nên chặn đăng xuất.
 export async function logout(): Promise<void> {
+  const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+  if (refreshToken) {
+    try {
+      await apiClient.post('api/mobile/auth/logout', { json: { refreshToken } });
+    } catch {
+      // im lặng — vẫn xoá token cục bộ bên dưới dù backend không gọi được.
+    }
+  }
   await clearTokens();
 }
 
@@ -175,47 +188,8 @@ export async function getFixedAreas(): Promise<FixedArea[]> {
   return res.data;
 }
 
-// ===== Posts: đăng bài (backend/src/modules/posts) =====
-
-// multipart/form-data — React Native FormData nhận object { uri, name, type } trực tiếp, không
-// cần đọc file thành Blob tay như web (khác hẳn cách dùng FormData trên browser).
-export async function uploadPostImage(uri: string): Promise<string> {
-  const formData = new FormData();
-  const extensionMatch = /\.(\w+)$/.exec(uri);
-  const extension = extensionMatch?.[1] ?? 'jpg';
-  formData.append('file', {
-    uri,
-    name: `photo.${extension}`,
-    type: `image/${extension === 'jpg' ? 'jpeg' : extension}`,
-  } as unknown as Blob);
-
-  const res = await apiClient
-    .post('api/mobile/posts/images', { body: formData })
-    .json<Envelope<{ url: string }>>();
-  return res.data.url;
-}
-
-export interface CreatePostInput {
-  postType: 'life' | 'merchant' | 'emergency';
-  content: string;
-  lat: number;
-  lng: number;
-  displayMode: 'alias' | 'real_name';
-  imageUrls?: string[];
-}
-
-export interface CreatedPost {
-  id: string;
-  postType: string;
-  content: string;
-  expiresAt: string | null;
-  createdAt: string;
-}
-
-export async function createPost(input: CreatePostInput): Promise<CreatedPost> {
-  const res = await apiClient.post('api/mobile/posts', { json: input }).json<Envelope<CreatedPost>>();
-  return res.data;
-}
+// Đăng bài/upload ảnh (uploadPostImage, createPost) chuyển sang src/api/endpoints/posts.ts — gộp
+// chung với các hàm đọc bài (fetchNearbyPosts, fetchPost...) đã ở đó từ trước, đỡ tách 2 nơi.
 
 // Đọc message lỗi chuẩn hoá từ HttpExceptionFilter ({ message: string | string[] }) — dùng ở màn
 // hình để hiện đúng lý do lỗi thay vì chuỗi chung chung "Đã có lỗi xảy ra".

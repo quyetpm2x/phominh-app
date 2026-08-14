@@ -1,12 +1,16 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '../../src/components/ui/Avatar';
-import { mutedNeighbors } from '../../src/mocks/phoMinh';
+import { useIgnoredUsers, useUnignoreUser } from '../../src/hooks/useIgnoredUsers';
 
-// on.muted — "Không quan tâm": ẩn bài/bình luận, không phải chặn hẳn.
+// on.muted — "Không quan tâm" (mục 32, 38): ẩn bài của 1 người khỏi feed của chính mình, không phải
+// chặn hẳn — không thông báo cho người bị ẩn.
 export default function MutedScreen() {
+  const { data: ignoredUsers, isLoading } = useIgnoredUsers();
+  const unignoreUser = useUnignoreUser();
+
   return (
     <SafeAreaView className="flex-1 bg-cream">
       <View className="h-[46px] flex-row items-center gap-1.5 px-3 border-b border-border bg-white">
@@ -15,21 +19,31 @@ export default function MutedScreen() {
         </Pressable>
         <Text className="font-sans-semibold text-sm text-ink">Không quan tâm</Text>
         <View className="flex-1" />
-        <Text className="font-mono-medium text-[11px] text-muted">{mutedNeighbors.length}</Text>
+        <Text className="font-mono-medium text-[11px] text-muted">{ignoredUsers?.length ?? 0}</Text>
       </View>
 
       <ScrollView contentContainerClassName="p-4.5">
         <Text className="text-[13px] leading-[20px] text-muted">
-          Chọn ẩn bài viết, ẩn bình luận, hoặc cả hai cho từng người. Họ không được báo là đã bị ẩn.
+          Bài của những người này không hiện ở Dòng tin của bạn nữa. Họ không được báo là đã bị ẩn.
         </Text>
         <View className="mt-3.5 gap-2.5">
-          {mutedNeighbors.map((n) => (
-            <View key={n.id} className="flex-row items-center gap-2.5 rounded-2xl border border-border bg-white px-3.5 py-3">
-              <Avatar initial={n.initial} color={n.color} size={38} radius={12} />
+          {isLoading ? <ActivityIndicator /> : null}
+          {!isLoading && ignoredUsers?.length === 0 ? (
+            <Text className="text-sm text-muted py-6 text-center">Chưa ẩn ai.</Text>
+          ) : null}
+          {ignoredUsers?.map((u) => (
+            <View key={u.id} className="flex-row items-center gap-2.5 rounded-2xl border border-border bg-white px-3.5 py-3">
+              <Avatar initial={u.alias.charAt(0).toUpperCase()} size={38} radius={12} />
               <View className="flex-1">
-                <Text className="font-sans-semibold text-sm text-ink">{n.name}</Text>
-                <Text className="text-[11.5px] text-muted mt-0.5">{n.meta}</Text>
+                <Text className="font-sans-semibold text-sm text-ink">{u.alias}</Text>
               </View>
+              <Pressable
+                onPress={() => void unignoreUser.mutateAsync(u.id)}
+                disabled={unignoreUser.isPending}
+                className="px-2.5 py-1.5 rounded-lg border border-border"
+              >
+                <Text className="text-xs text-muted">Bỏ ẩn</Text>
+              </Pressable>
             </View>
           ))}
         </View>

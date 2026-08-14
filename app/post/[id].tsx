@@ -1,25 +1,52 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { extractErrorMessage } from '../../src/api/client';
 import { CommentComposer } from '../../src/components/CommentComposer';
 import { CommentList, type Comment } from '../../src/components/CommentList';
 import { PostDetailHeader } from '../../src/components/PostDetailHeader';
-import { useComments } from '../../src/hooks/useComments';
-import { usePost } from '../../src/hooks/usePost';
+import { ActionSheetMenu, type ActionSheetItem } from '../../src/components/ui/ActionSheetMenu';
+import {
+  useComments,
+  useDeleteComment,
+  useSetCommentPinned,
+  useUpdateComment,
+} from '../../src/hooks/useComments';
+import { useIgnoreUser } from '../../src/hooks/useIgnoredUsers';
+import { useMe } from '../../src/hooks/useMe';
+import { useDeletePost, usePost } from '../../src/hooks/usePost';
 import { useRealtimeComments } from '../../src/hooks/useRealtimeComments';
 import { formatFreshness } from '../../src/utils/formatFreshness';
 
-function toDisplayComment(c: { id: string; authorDisplayName: string; content: string; createdAt: string }): Comment {
+function toDisplayComment(c: {
+  id: string;
+  authorId: string;
+  authorDisplayName: string;
+  content: string;
+  createdAt: string;
+  isPinned: boolean;
+}): Comment {
   return {
     id: c.id,
+    authorId: c.authorId,
     authorName: c.authorDisplayName,
     initial: c.authorDisplayName.charAt(0).toUpperCase(),
     color: '#1f6f52',
     content: c.content,
     timeAgo: formatFreshness(c.createdAt),
+    isPinned: c.isPinned,
   };
 }
 
@@ -28,8 +55,17 @@ export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: post, isLoading: postLoading } = usePost(id);
   const { data: comments, isLoading: commentsLoading } = useComments(id);
+  const { data: me } = useMe();
   const [voted, setVoted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  const deletePost = useDeletePost(id);
+  const ignoreUser = useIgnoreUser();
+  const updateComment = useUpdateComment(id);
+  const deleteComment = useDeleteComment(id);
+  const setCommentPinned = useSetCommentPinned(id);
+
   const onNewComment = useCallback(() => {
     // Không tự chèn payload thô (thiếu authorDisplayName, không qua kiểm tra visibility/quyền) —
     // refetch lại đúng bằng GET đã có sẵn logic public/private, đơn giản và luôn đúng. Invalidate
@@ -49,6 +85,50 @@ export default function PostDetailScreen() {
 
   const votes = post.voteCount + (voted ? 1 : 0);
   const visibleComments = (comments ?? []).map(toDisplayComment);
+  const isOwnPost = post.authorId === me?.id;
+
+  const onConfirmDeletePost = () => {
+    Alert.alert('Xoá bài đăng?', 'Bài đăng sẽ không còn hiện với ai nữa. Không thể hoàn tác.', [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Xoá',
+        style: 'destructive',
+        onPress: () =>
+          void deletePost.mutateAsync().then(
+            () => router.replace('/(main)/feed'),
+            async (err) => Alert.alert('Không xoá được', await extractErrorMessage(err)),
+          ),
+      },
+    ]);
+  };
+
+  const onIgnoreAuthor = () => {
+    Alert.alert('Không quan tâm người này?', 'Bài của họ sẽ không hiện ở Dòng tin của bạn nữa.', [
+      { text: 'Hủy', style: 'cancel' },
+      {
+        text: 'Xác nhận',
+        onPress: () =>
+          void ignoreUser.mutateAsync(post.authorId).then(() => router.replace('/(main)/feed')),
+      },
+    ]);
+  };
+
+  const headerMenuItems: ActionSheetItem[] = isOwnPost
+    ? [
+        { label: 'Sửa bài đăng', onPress: () => router.push(`/post/edit/${id}`) },
+        { label: 'Xoá bài đăng', destructive: true, onPress: onConfirmDeletePost },
+      ]
+    : [
+        { label: 'Báo cáo bài đăng', onPress: () => router.push({ pathname: '/report/post', params: { postId: id } }) },
+        { label: 'Không quan tâm người này', destructive: true, onPress: onIgnoreAuthor },
+      ];
+
+  const onDeleteComment = (commentId: string) => {
+    Alert.alert('Xoá bình luận?', 'Không thể hoàn tác.', [
+      { text: 'Hủy', style: 'cancel' },
+      { text: 'Xoá', style: 'destructive', onPress: () => void deleteComment.mutateAsync(commentId) },
+    ]);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -59,10 +139,10 @@ export default function PostDetailScreen() {
         <Text className="font-sans-semibold text-sm text-ink">Bài đăng</Text>
         <View className="flex-1" />
         <Pressable
-          onPress={() => router.push('/report/post')}
-          className="h-[30px] rounded-lg border border-border bg-white px-2.5 items-center justify-center"
+          onPress={() => setMenuOpen(true)}
+          className="h-[30px] w-[30px] items-center justify-center"
         >
-          <Text className="text-xs text-muted">Báo cáo</Text>
+          <Text className="text-base text-muted">•••</Text>
         </Pressable>
       </View>
 
@@ -85,12 +165,31 @@ export default function PostDetailScreen() {
           </View>
 
           <View className="px-4 pt-2.5">
-            {commentsLoading ? <ActivityIndicator /> : <CommentList comments={visibleComments} />}
+            {commentsLoading ? (
+              <ActivityIndicator />
+            ) : (
+              <CommentList
+                comments={visibleComments}
+                currentUserId={me?.id}
+                postAuthorId={post.authorId}
+                onEdit={(commentId, content) => void updateComment.mutateAsync({ commentId, content })}
+                onDelete={onDeleteComment}
+                onTogglePin={(commentId, isPinned) => void setCommentPinned.mutateAsync({ commentId, isPinned })}
+                onReport={(commentId, content) =>
+                  router.push({
+                    pathname: '/report/comment',
+                    params: { postId: id, commentId, content, postAuthorId: post.authorId },
+                  })
+                }
+              />
+            )}
           </View>
         </ScrollView>
 
         <CommentComposer postId={id} />
       </KeyboardAvoidingView>
+
+      <ActionSheetMenu visible={menuOpen} onClose={() => setMenuOpen(false)} items={headerMenuItems} />
     </SafeAreaView>
   );
 }

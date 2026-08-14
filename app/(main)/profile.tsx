@@ -4,23 +4,43 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '../../src/components/ui/Avatar';
 import { Chip } from '../../src/components/ui/Chip';
+import { useAccountStatus } from '../../src/hooks/useAccountLifecycle';
+import { useMe } from '../../src/hooks/useMe';
+import { useMyPosts } from '../../src/hooks/useMyPosts';
 import { areas, currentUser } from '../../src/mocks/phoMinh';
 
 const TIER_BARS = 5;
 
+function joinedMonthsAgo(createdAt: string): number {
+  const ms = Date.now() - new Date(createdAt).getTime();
+  return Math.max(0, Math.floor(ms / (30 * 24 * 60 * 60 * 1000)));
+}
+
 // isProfile — "Tôi": hồ sơ, điểm uy tín, lọc dòng tin, hai khu vực, tài khoản.
 export default function ProfileScreen() {
+  const { data: me } = useMe();
+  const { data: myPosts } = useMyPosts();
+  const { data: accountStatus } = useAccountStatus();
+  const displayName = me?.realName ?? me?.alias ?? '...';
+
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
       <ScrollView contentContainerClassName="pb-4">
+        {accountStatus && accountStatus.status !== 'active' ? (
+          <AccountStatusBanner
+            status={accountStatus.status}
+            reason={accountStatus.reason}
+            restrictedUntil={accountStatus.restrictedUntil}
+          />
+        ) : null}
+
         <View className="px-4.5 pt-4 pb-5 bg-white border-b border-border">
           <View className="flex-row items-center gap-3.5">
-            <Avatar initial={currentUser.initial} size={58} radius={18} />
+            <Avatar initial={displayName.charAt(0).toUpperCase()} imageUrl={me?.avatarUrl} size={58} radius={18} />
             <View className="flex-1">
-              <Text className="text-[19px] font-sans-bold text-ink">{currentUser.displayName}</Text>
+              <Text className="text-[19px] font-sans-bold text-ink">{displayName}</Text>
               <Text className="text-[12.5px] text-muted mt-0.5">
-                Tham gia {currentUser.joinedMonths} tháng · {currentUser.postCount} bài · {currentUser.commentCount}{' '}
-                bình luận
+                {me ? `Tham gia ${joinedMonthsAgo(me.createdAt)} tháng` : '...'} · {myPosts?.length ?? 0} bài
               </Text>
             </View>
           </View>
@@ -86,12 +106,36 @@ export default function ProfileScreen() {
             <NavRow label="Bài của tôi" onPress={() => router.push('/profile/my-posts')} />
             <NavRow label="Chỉnh sửa hồ sơ" onPress={() => router.push('/profile/edit')} />
             <NavRow label="Chuyển sang tài khoản chủ quán" onPress={() => router.push('/merchant/signup')} />
-            <NavRow label="Xem hồ sơ hàng xóm (mẫu)" onPress={() => router.push('/profile/lan-t18')} />
             <NavRow label="Cài đặt" onPress={() => router.push('/settings')} last />
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+// Trạng thái/lý do bị khoá/hạn chế (mục 74) — chỉ hiện khi khác 'active'.
+function AccountStatusBanner({
+  status,
+  reason,
+  restrictedUntil,
+}: {
+  status: 'banned' | 'restricted';
+  reason: string | null;
+  restrictedUntil: string | null;
+}) {
+  const title = status === 'banned' ? 'Tài khoản đã bị khoá' : 'Tài khoản đang bị hạn chế';
+  const until = restrictedUntil
+    ? ` Hết hạn chế lúc ${new Date(restrictedUntil).toLocaleString('vi-VN')}.`
+    : '';
+  return (
+    <View className="mx-4.5 mt-3.5 rounded-2xl border-[1.5px] border-danger-200 bg-danger-50 p-3.5">
+      <Text className="font-sans-bold text-sm text-danger-text">{title}</Text>
+      <Text className="mt-1 text-xs leading-[19px] text-danger-text">
+        {reason ?? 'Không có lý do cụ thể.'}
+        {until}
+      </Text>
+    </View>
   );
 }
 

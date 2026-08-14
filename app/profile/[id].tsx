@@ -1,15 +1,31 @@
-import { router } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PostCard } from '../../src/components/PostCard';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { Chip } from '../../src/components/ui/Chip';
-import { otherNeighbor, posts } from '../../src/mocks/phoMinh';
+import { usePostsByAuthor } from '../../src/hooks/useMyPosts';
+import { usePublicProfile } from '../../src/hooks/useUserProfile';
+import { formatFreshness } from '../../src/utils/formatFreshness';
 
-// on.otherProfile — hồ sơ công khai của một hàng xóm khác (mẫu tĩnh, không phân biệt theo id).
+function joinedMonthsAgo(createdAt: string): number {
+  const ms = Date.now() - new Date(createdAt).getTime();
+  return Math.max(0, Math.floor(ms / (30 * 24 * 60 * 60 * 1000)));
+}
+
+// on.otherProfile — hồ sơ công khai của một hàng xóm khác (mục 36).
 export default function OtherProfileScreen() {
-  const otherPosts = posts.slice(1, 3);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: profile, isLoading } = usePublicProfile(id);
+  const { data: posts } = usePostsByAuthor(id);
+
+  if (isLoading || !profile) {
+    return (
+      <SafeAreaView className="flex-1 bg-cream items-center justify-center">
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
@@ -17,43 +33,52 @@ export default function OtherProfileScreen() {
         <Pressable onPress={() => router.back()} className="w-[34px] h-[34px] items-center justify-center">
           <Text className="text-[21px] text-ink">‹</Text>
         </Pressable>
-        <Text className="font-sans-semibold text-sm text-ink">{otherNeighbor.name}</Text>
+        <Text className="font-sans-semibold text-sm text-ink">{profile.alias}</Text>
         <View className="flex-1" />
-        <Pressable
-          onPress={() => router.push('/report/post')}
-          className="h-[30px] rounded-lg border border-border bg-white px-2.5 items-center justify-center"
-        >
-          <Text className="text-xs text-muted">Báo cáo</Text>
-        </Pressable>
       </View>
 
       <ScrollView>
         <View className="px-4.5 pt-4 pb-4 bg-white border-b border-border">
           <View className="flex-row items-center gap-3.5">
-            <Avatar initial={otherNeighbor.initial} color={otherNeighbor.color} size={56} radius={18} />
+            <Avatar
+              initial={profile.alias.charAt(0).toUpperCase()}
+              imageUrl={profile.avatarUrl}
+              size={56}
+              radius={18}
+            />
             <View className="flex-1">
               <View className="flex-row items-center gap-1.5">
-                <Text className="text-lg font-sans-bold text-ink">{otherNeighbor.name}</Text>
-                <Chip label={otherNeighbor.badge} color="green" />
+                <Text className="text-lg font-sans-bold text-ink">{profile.alias}</Text>
+                <Chip label={profile.trustBadgeLabel} color="green" />
               </View>
               <Text className="text-[12.5px] text-muted mt-0.5">
-                Hàng xóm cách bạn {otherNeighbor.distance} · tham gia {otherNeighbor.joinedMonths} tháng
+                Tham gia {joinedMonthsAgo(profile.createdAt)} tháng
               </Text>
             </View>
           </View>
 
           <View className="mt-3.5 flex-row gap-2.5">
-            <Stat value={otherNeighbor.postCount} label="bài đăng" />
-            <Stat value={otherNeighbor.usefulCount} label="lượt hữu ích" />
-            <Stat value={otherNeighbor.reportedCount} label="bị báo cáo" tone="green" />
+            <Stat value={profile.postCount} label="bài đăng" />
           </View>
         </View>
 
         <View className="px-4.5 pt-4 pb-6">
           <Text className="font-mono-medium text-xs tracking-wide text-muted">BÀI CÔNG KHAI CÒN HẠN</Text>
           <View className="mt-2.5 gap-2.5">
-            {otherPosts.map((p) => (
-              <PostCard key={p.id} post={p} />
+            {posts?.length === 0 ? (
+              <Text className="text-sm text-muted py-6 text-center">Chưa có bài nào.</Text>
+            ) : null}
+            {posts?.map((p) => (
+              <Pressable
+                key={p.id}
+                onPress={() => router.push(`/post/${p.id}`)}
+                className="rounded-2xl border border-border bg-white p-3.5"
+              >
+                <Text numberOfLines={2} className="text-[13.5px] leading-[20px] text-ink/85">
+                  {p.content}
+                </Text>
+                <Text className="mt-1.5 font-mono-medium text-[11px] text-muted">{formatFreshness(p.createdAt)}</Text>
+              </Pressable>
             ))}
           </View>
           <View className="mt-4 rounded-2xl border border-border bg-white p-3.5">
@@ -67,10 +92,10 @@ export default function OtherProfileScreen() {
   );
 }
 
-function Stat({ value, label, tone }: { value: number; label: string; tone?: 'green' }) {
+function Stat({ value, label }: { value: number; label: string }) {
   return (
     <View className="flex-1 rounded-xl border border-border p-2.5">
-      <Text className={`font-mono-semibold text-lg ${tone === 'green' ? 'text-primary' : 'text-ink'}`}>{value}</Text>
+      <Text className="font-mono-semibold text-lg text-ink">{value}</Text>
       <Text className="text-[11px] text-muted mt-0.5">{label}</Text>
     </View>
   );

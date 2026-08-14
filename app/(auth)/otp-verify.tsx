@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { extractErrorMessage, sendOtp, verifyOtp } from '../../src/api/client';
@@ -51,8 +51,12 @@ export default function OtpVerifyScreen() {
     setError(null);
     setLoading(true);
     try {
-      await verifyOtp(phone, code);
-      router.push('/(auth)/permissions');
+      const { restored } = await verifyOtp(phone, code);
+      if (restored) {
+        // Đã bấm xoá tài khoản trước đó, đăng nhập lại trong 30 ngày => khôi phục (mục 69/73).
+        Alert.alert('Tài khoản đã được khôi phục', 'Yêu cầu xoá tài khoản trước đó đã được huỷ.');
+      }
+      router.push('/(auth)/terms');
     } catch (err) {
       setError(await extractErrorMessage(err));
       setCode('');

@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { Image, Pressable, Text, View } from 'react-native';
 
 import type { PostDetail } from '../api/endpoints/posts';
+import { fontSizeToStyle } from '../constants/post-style-presets';
 import { formatDistance } from '../utils/formatDistance';
 import { formatFreshness } from '../utils/formatFreshness';
 import { Avatar } from './ui/Avatar';
@@ -31,7 +32,15 @@ export function PostDetailHeader({ post, voted, votes, onToggleVote }: PostDetai
         </View>
       </Pressable>
 
-      <Text className="px-4 pt-3 pb-3.5 text-[15.5px] leading-[24px] text-ink/85">{post.content}</Text>
+      <Text
+        className="px-4 pt-3 pb-3.5 text-ink/85"
+        style={[
+          { color: post.textColor ?? undefined, backgroundColor: post.backgroundColor ?? undefined },
+          fontSizeToStyle(post.fontSize),
+        ]}
+      >
+        {post.content}
+      </Text>
 
       {post.imageUrl ? (
         <Image source={{ uri: post.imageUrl }} style={{ height: 230, width: '100%' }} resizeMode="cover" />

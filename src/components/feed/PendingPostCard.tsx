@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 
 import { colors } from '../../constants/design-tokens';
+import { fontSizeToStyle } from '../../constants/post-style-presets';
 import { submitPendingPost } from '../../lib/submitPendingPost';
 import { usePendingPostStore, type PendingPost } from '../../stores/pendingPostStore';
 import { Avatar } from '../ui/Avatar';
@@ -32,7 +33,15 @@ export function PendingPostCard({ post }: { post: PendingPost }) {
         </View>
 
         {post.content ? (
-          <Text className="px-3.5 pb-3 text-[14.5px] leading-[22px] text-ink/85">{post.content}</Text>
+          <Text
+            className="px-3.5 pb-3 text-ink/85"
+            style={[
+              { color: post.textColor ?? undefined, backgroundColor: post.backgroundColor ?? undefined },
+              fontSizeToStyle(post.fontSize),
+            ]}
+          >
+            {post.content}
+          </Text>
         ) : null}
 
         <Image

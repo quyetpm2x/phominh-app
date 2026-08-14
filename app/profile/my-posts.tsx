@@ -1,18 +1,19 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PostCard } from '../../src/components/PostCard';
 import { FilterChip } from '../../src/components/ui/Chip';
-import { currentUser, posts } from '../../src/mocks/phoMinh';
+import { useMyPosts } from '../../src/hooks/useMyPosts';
+import { formatFreshness } from '../../src/utils/formatFreshness';
 
 const TABS = ['Đang hiện', 'Đã hết hạn'];
 
-// on.myPosts — bài của tôi, tách đang hiện / đã hết hạn.
+// on.myPosts — bài của tôi, tách đang hiện / đã hết hạn (mục 35).
 export default function MyPostsScreen() {
   const [tab, setTab] = useState(TABS[0]);
-  const mine = posts.filter((p) => p.author === currentUser.displayName || p.id === 'p3');
+  const { data: posts, isLoading } = useMyPosts();
+  const shown = posts?.filter((p) => (tab === TABS[0] ? p.status === 'active' : p.status === 'expired'));
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
@@ -30,11 +31,27 @@ export default function MyPostsScreen() {
           ))}
         </View>
         <View className="mt-3 gap-2.5">
-          {tab === TABS[0] ? (
-            mine.map((p) => <PostCard key={p.id} post={p} />)
-          ) : (
-            <Text className="text-sm text-muted py-6 text-center">Chưa có bài nào hết hạn.</Text>
-          )}
+          {isLoading ? <ActivityIndicator /> : null}
+          {!isLoading && shown?.length === 0 ? (
+            <Text className="text-sm text-muted py-6 text-center">
+              {tab === TABS[0] ? 'Chưa có bài nào đang hiện.' : 'Chưa có bài nào hết hạn.'}
+            </Text>
+          ) : null}
+          {shown?.map((p) => (
+            <Pressable
+              key={p.id}
+              onPress={() => router.push(`/post/${p.id}`)}
+              className="rounded-2xl border border-border bg-white p-3.5"
+            >
+              <Text numberOfLines={2} className="text-[13.5px] leading-[20px] text-ink/85">
+                {p.content}
+              </Text>
+              <View className="mt-1.5 flex-row items-center gap-2.5">
+                <Text className="font-mono-medium text-[11px] text-muted">{formatFreshness(p.createdAt)}</Text>
+                <Text className="text-[11px] text-muted">{p.voteCount} hữu ích · {p.commentCount} bình luận</Text>
+              </View>
+            </Pressable>
+          ))}
         </View>
         <Text className="mt-3.5 text-xs leading-[19px] text-muted">
           Bài hết hạn chỉ mình bạn xem lại được. Hàng xóm không còn thấy trong feed hay tìm kiếm.

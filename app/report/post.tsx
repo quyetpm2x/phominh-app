@@ -1,13 +1,37 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { extractErrorMessage } from '../../src/api/client';
+import { TextInput } from '../../src/components/ui/TextInput';
+import { useCreateReport } from '../../src/hooks/useReports';
 
 const REASONS = ['Thông tin sai sự thật', 'Quấy rối / xúc phạm', 'Ảnh không phải chụp tại chỗ', 'Spam / quảng cáo', 'Khác'];
 
 // on.reportPost — báo cáo ẩn danh, người đăng không biết ai đã báo cáo.
 export default function ReportPostScreen() {
+  const { postId } = useLocalSearchParams<{ postId: string }>();
   const [reason, setReason] = useState<string | null>(null);
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const createReport = useCreateReport();
+
+  const onSubmit = async () => {
+    if (!reason || !postId || createReport.isPending) return;
+    setError(null);
+    try {
+      await createReport.mutateAsync({
+        targetType: 'post',
+        targetId: postId,
+        reason,
+        description: description.trim() || undefined,
+      });
+      router.back();
+    } catch (err) {
+      setError(await extractErrorMessage(err));
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
@@ -36,14 +60,25 @@ export default function ReportPostScreen() {
             </Pressable>
           ))}
         </View>
-        <View className="mt-3.5 rounded-[13px] border border-border bg-white p-3.5 min-h-[88px]">
-          <Text className="text-[13.5px] text-muted-light">Mô tả thêm (không bắt buộc)…</Text>
+        <View className="mt-3.5">
+          <TextInput
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Mô tả thêm (không bắt buộc)…"
+            multiline
+            style={{ minHeight: 88 }}
+          />
         </View>
+        {error ? <Text className="mt-2 text-xs text-danger">{error}</Text> : null}
       </ScrollView>
 
       <View className="px-4.5 pt-3.5 pb-6 border-t border-border">
-        <Pressable onPress={() => router.back()} className="h-[52px] rounded-2xl bg-danger items-center justify-center">
-          <Text className="font-sans-semibold text-[15.5px] text-white">Gửi báo cáo</Text>
+        <Pressable
+          onPress={() => void onSubmit()}
+          disabled={!reason || createReport.isPending}
+          className={`h-[52px] rounded-2xl items-center justify-center ${reason ? 'bg-danger' : 'bg-border'}`}
+        >
+          <Text className={`font-sans-semibold text-[15.5px] ${reason ? 'text-white' : 'text-muted'}`}>Gửi báo cáo</Text>
         </Pressable>
       </View>
     </SafeAreaView>

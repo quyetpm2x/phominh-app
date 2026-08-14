@@ -47,6 +47,12 @@
           "locationWhenInUsePermission": "Phố Mình cần vị trí để hiện tin quanh bạn khi mở app."
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Phố Mình cần quyền truy cập thư viện ảnh để đổi ảnh đại diện."
+        }
+      ],
       "expo-notifications",
       "expo-font"
     ],

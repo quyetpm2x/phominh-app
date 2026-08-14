@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PostStyleTools } from '../../../src/components/PostStyleTools';
 import { FilterChip } from '../../../src/components/ui/Chip';
+import { fontSizeToStyle } from '../../../src/constants/post-style-presets';
 import { composeTypeChips } from '../../../src/mocks/phoMinh';
 import { usePostDraftStore } from '../../../src/stores/postDraftStore';
 
@@ -12,7 +14,21 @@ import { usePostDraftStore } from '../../../src/stores/postDraftStore';
 // (mục 22). composeTypeChips là nhãn UI, KHÔNG có field tương ứng ở backend (postType chỉ có
 // life/merchant/emergency) — chọn chip chỉ để user tự phân loại, không gửi lên server riêng.
 export default function CaptionScreen() {
-  const { photoUri, lat, lng, content, category, setContent, setCategory } = usePostDraftStore();
+  const {
+    photoUri,
+    lat,
+    lng,
+    content,
+    category,
+    textColor,
+    backgroundColor,
+    fontSize,
+    setContent,
+    setCategory,
+    setTextColor,
+    setBackgroundColor,
+    setFontSize,
+  } = usePostDraftStore();
   const [addressText, setAddressText] = useState('Đang tìm địa chỉ…');
 
   useEffect(() => {
@@ -74,9 +90,22 @@ export default function CaptionScreen() {
             placeholderTextColor="#a8a297"
             multiline
             maxLength={2000}
-            className="flex-1 text-[14.5px] leading-[21px] text-ink"
+            style={[
+              { flex: 1, color: textColor ?? undefined, backgroundColor: backgroundColor ?? undefined },
+              fontSizeToStyle(fontSize),
+            ]}
+            className={backgroundColor ? 'rounded-lg px-2 py-1' : undefined}
           />
         </View>
+
+        <PostStyleTools
+          textColor={textColor}
+          backgroundColor={backgroundColor}
+          fontSize={fontSize}
+          onTextColorChange={setTextColor}
+          onBackgroundColorChange={setBackgroundColor}
+          onFontSizeChange={setFontSize}
+        />
 
         <Text className="mt-4 font-mono-medium text-xs tracking-wide text-muted">LOẠI BÀI</Text>
         <View className="mt-2.5 flex-row flex-wrap gap-2">

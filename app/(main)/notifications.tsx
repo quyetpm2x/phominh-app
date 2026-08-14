@@ -1,11 +1,25 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { areas, notifDigestHome, notifDigestWork } from '../../src/mocks/phoMinh';
+import type { AppNotification } from '../../src/api/endpoints/notifications';
+import { useMarkNotificationAsRead, useNotifications } from '../../src/hooks/useNotifications';
+import { formatFreshness } from '../../src/utils/formatFreshness';
 
-// on.notifications — bản tin tuần gom theo khu vực + cảnh báo khẩn cấp gửi ngay.
+// on.notifications — danh sách thông báo (mục 47): bình luận mới trên bài mình, kết quả xử lý
+// report đã gửi (mục 49). Không còn gom "bản tin tuần theo khu vực" như bản mock gốc — đó là 1 hệ
+// thống digest riêng (job nền BullMQ, xem notifications.service.ts) chưa nằm trong phạm vi lần này.
 export default function NotificationsScreen() {
+  const { data: notifications, isLoading } = useNotifications();
+  const markAsRead = useMarkNotificationAsRead();
+
+  const onPress = (n: AppNotification) => {
+    if (!n.isRead) void markAsRead.mutateAsync(n.id);
+    if (n.type === 'comment_on_post' && n.referenceId) {
+      router.push(`/post/${n.referenceId}`);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
       <View className="h-[46px] flex-row items-center gap-1.5 px-3 border-b border-border bg-white">
@@ -20,46 +34,31 @@ export default function NotificationsScreen() {
       </View>
 
       <ScrollView contentContainerClassName="p-4">
+        {isLoading ? <ActivityIndicator /> : null}
+        {!isLoading && notifications?.length === 0 ? (
+          <Text className="text-sm text-muted py-10 text-center">Chưa có thông báo nào.</Text>
+        ) : null}
+
         <View className="rounded-2xl border border-border bg-white overflow-hidden">
-          <View className="px-3.5 py-3 bg-primary-50 border-b border-primary-100 flex-row items-center gap-2">
-            <View className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <Text className="font-sans-semibold text-xs text-primary">
-              Bản tin tuần này · Nhà · {areas.home.place}
-            </Text>
-          </View>
-          {notifDigestHome.map((n, i) => (
-            <View key={n.title} className={`px-3.5 py-3 ${i < notifDigestHome.length - 1 ? 'border-b border-border-soft' : ''}`}>
-              <Text className="font-sans-semibold text-[13.5px] text-ink">{n.title}</Text>
-              <Text className="text-[11.5px] text-muted mt-0.5">{n.meta}</Text>
-            </View>
+          {notifications?.map((n, i) => (
+            <Pressable
+              key={n.id}
+              onPress={() => onPress(n)}
+              className={`px-3.5 py-3 flex-row gap-2.5 items-start ${
+                i < notifications.length - 1 ? 'border-b border-border-soft' : ''
+              } ${n.isRead ? '' : 'bg-primary-50'}`}
+            >
+              {n.isRead ? null : <View className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />}
+              <View className="flex-1">
+                <Text className="font-sans-semibold text-[13.5px] text-ink">{n.title}</Text>
+                <Text className="text-[11.5px] text-muted mt-0.5">{n.body}</Text>
+                <Text className="font-mono-medium text-[10.5px] text-muted-light mt-1">
+                  {formatFreshness(n.createdAt)}
+                </Text>
+              </View>
+            </Pressable>
           ))}
         </View>
-
-        <View className="mt-3 rounded-2xl border border-border bg-white overflow-hidden">
-          <View className="px-3.5 py-3 bg-accent-50 border-b border-accent-200 flex-row items-center gap-2">
-            <View className="w-1.5 h-1.5 rounded-full bg-accent-300" />
-            <Text className="font-sans-semibold text-xs text-accent-text">Bản tin tuần này · Chỗ làm</Text>
-          </View>
-          {notifDigestWork.map((n) => (
-            <View key={n.title} className="px-3.5 py-3">
-              <Text className="font-sans-semibold text-[13.5px] text-ink">{n.title}</Text>
-              <Text className="text-[11.5px] text-muted mt-0.5">{n.meta}</Text>
-            </View>
-          ))}
-        </View>
-
-        <Text className="mt-4 font-mono-medium text-xs tracking-wide text-muted">GỬI NGAY</Text>
-        <View className="mt-2.5 rounded-2xl border-[1.5px] border-danger-200 bg-white overflow-hidden">
-          <View className="h-1 bg-danger" />
-          <View className="px-3.5 py-3">
-            <Text className="font-sans-semibold text-[13.5px] text-ink">Ngập cổng Times City</Text>
-            <Text className="text-xs text-muted mt-0.5">3 hàng xóm đã xác nhận · 4 phút trước</Text>
-          </View>
-        </View>
-
-        <Text className="mt-3.5 text-xs leading-[19px] text-muted">
-          Chỉ tin khẩn cấp đủ xác nhận mới báo ngay. Tin thường gom vào bản tin tuần.
-        </Text>
       </ScrollView>
     </SafeAreaView>
   );

@@ -10,6 +10,7 @@ import { getMe, type UserProfile } from '../../../src/api/client';
 import { GradientButton } from '../../../src/components/ui/Button';
 import { Avatar } from '../../../src/components/ui/Avatar';
 import { colors } from '../../../src/constants/design-tokens';
+import { fontSizeToStyle } from '../../../src/constants/post-style-presets';
 import { submitPendingPost } from '../../../src/lib/submitPendingPost';
 import { usePendingPostStore } from '../../../src/stores/pendingPostStore';
 import { usePostDraftStore } from '../../../src/stores/postDraftStore';
@@ -18,7 +19,19 @@ import { usePostDraftStore } from '../../../src/stores/postDraftStore';
 // danh/tên thật (mục 23) đặt ở đây — không có màn nào khác trong flow phù hợp hơn để hỏi việc này.
 export default function ConfirmScreen() {
   const queryClient = useQueryClient();
-  const { photoUri, lat, lng, content, displayMode, setDisplayMode, reset } = usePostDraftStore();
+  const {
+    photoUri,
+    lat,
+    lng,
+    isMockLocation,
+    content,
+    displayMode,
+    textColor,
+    backgroundColor,
+    fontSize,
+    setDisplayMode,
+    reset,
+  } = usePostDraftStore();
   const addPending = usePendingPostStore((s) => s.addPending);
   const [addressText, setAddressText] = useState('Đang tìm địa chỉ…');
   const [me, setMe] = useState<UserProfile | null>(null);
@@ -66,9 +79,13 @@ export default function ConfirmScreen() {
       content,
       lat,
       lng,
+      isMockLocation,
       displayMode,
       authorDisplayName: displayName,
       status: 'uploading' as const,
+      textColor,
+      backgroundColor,
+      fontSize,
     };
     addPending(pending);
     // Điều hướng TRƯỚC, reset() SAU — reset() làm photoUri về null, nếu gọi trước điều hướng thì
@@ -104,7 +121,12 @@ export default function ConfirmScreen() {
               </View>
             </View>
 
-            <Text className="px-3.5 pb-3 text-[14.5px] leading-[22px] text-ink/85">{content}</Text>
+            <Text
+              className="px-3.5 pb-3 text-ink/85"
+              style={[{ color: textColor ?? undefined, backgroundColor: backgroundColor ?? undefined }, fontSizeToStyle(fontSize)]}
+            >
+              {content}
+            </Text>
 
             <Image source={{ uri: photoUri }} style={{ height: 220, width: '100%' }} resizeMode="cover" />
           </View>

@@ -51,7 +51,7 @@ export default function CameraScreen() {
         format: ImageManipulator.SaveFormat.JPEG,
       });
 
-      setPhoto(compressed.uri, pos.coords.latitude, pos.coords.longitude);
+      setPhoto(compressed.uri, pos.coords.latitude, pos.coords.longitude, pos.mocked ?? false);
       router.push('/post/create/review');
     } finally {
       setCapturing(false);

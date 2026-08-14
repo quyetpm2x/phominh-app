@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+import type { PostFontSize } from '../constants/post-style-presets';
+
 // Bài đang đăng (chưa có id thật từ server) — hiện thẻ "Đang đăng…" đầu Dòng tin kiểu Facebook,
 // sống độc lập với postDraftStore vì phải tồn tại sau khi draft đã reset() và màn hình đã đổi.
 export interface PendingPost {
@@ -8,10 +10,14 @@ export interface PendingPost {
   content: string;
   lat: number;
   lng: number;
+  isMockLocation: boolean;
   displayMode: 'alias' | 'real_name';
   authorDisplayName: string;
   status: 'uploading' | 'error';
   errorMessage?: string;
+  textColor: string | null;
+  backgroundColor: string | null;
+  fontSize: PostFontSize | null;
 }
 
 interface PendingPostState {

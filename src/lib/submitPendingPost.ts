@@ -1,6 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query';
 
-import { createPost, extractErrorMessage, uploadPostImage } from '../api/client';
+import { extractErrorMessage } from '../api/client';
+import { createPost, uploadPostImage } from '../api/endpoints/posts';
 import { usePendingPostStore, type PendingPost } from '../stores/pendingPostStore';
 
 // Chạy nền, độc lập vòng đời màn hình — gọi 1 lần lúc "Đăng lên xóm" (confirm.tsx, không await
@@ -17,6 +18,10 @@ export async function submitPendingPost(queryClient: QueryClient, pending: Pendi
       lng: pending.lng,
       displayMode: pending.displayMode,
       imageUrls,
+      isMockLocation: pending.isMockLocation,
+      textColor: pending.textColor ?? undefined,
+      backgroundColor: pending.backgroundColor ?? undefined,
+      fontSize: pending.fontSize ?? undefined,
     });
     // Làm mới danh sách feed đang cache — bài mới tự lên đầu qua đúng thuật toán xếp hạng, không
     // cần chèn tay (xem giải thích chi tiết cũ ở confirm.tsx trước khi tách hàm này ra).
