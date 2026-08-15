@@ -2,16 +2,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Location from 'expo-location';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { getFixedAreas, type FixedArea } from '../../src/api/client';
+import { extractErrorMessage, getFixedAreas, type FixedArea } from '../../src/api/client';
 import type { NearbyPost } from '../../src/api/endpoints/posts';
 import { colors } from '../../src/constants/design-tokens';
 import { CreateSheet } from '../../src/components/feed/CreateSheet';
 import { FeedBody } from '../../src/components/feed/FeedBody';
 import { UnderlineTabs, type UnderlineTabOption } from '../../src/components/ui/UnderlineTabs';
+import { useMe } from '../../src/hooks/useMe';
 import { usePosts } from '../../src/hooks/usePosts';
+import { useCastPostVote } from '../../src/hooks/useVotes';
 import { formatDistance } from '../../src/utils/formatDistance';
 import { formatExpiry, formatTimeAgo } from '../../src/lib/format';
 import { filterByPostType, sortNearbyPosts } from '../../src/lib/postListFilters';
@@ -30,6 +32,7 @@ const POST_TYPE_TAG: Record<NearbyPost['postType'], { label: PostTag; color: UIP
 function toUIPost(p: NearbyPost, area: AreaKey): UIPost {
   return {
     id: p.id,
+    authorId: p.authorId,
     area,
     variant: 'full',
     author: p.authorDisplayName,
@@ -48,6 +51,7 @@ function toUIPost(p: NearbyPost, area: AreaKey): UIPost {
     lat: p.lat,
     lng: p.lng,
     votes: p.voteCount,
+    hasVoted: p.hasVoted,
     comments: p.commentCount,
     expiry: formatExpiry(p.expiresAt),
     mediaNote: p.imageUrl ? 'ảnh chụp tại chỗ' : '',
@@ -61,8 +65,15 @@ export default function FeedScreen() {
   const [area, setArea] = useState<AreaKey>('home');
   const [mapOn, setMapOn] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [favToast, setFavToast] = useState(false);
   const [postedToast, setPostedToast] = useState(!!justPosted);
+
+  const { data: me } = useMe();
+  const castPostVote = useCastPostVote();
+  const onVotePost = (postId: string) => {
+    void castPostVote.mutateAsync(postId).catch(async (err) => {
+      Alert.alert('Không vote được', await extractErrorMessage(err));
+    });
+  };
 
   const pendingPosts = usePendingPostStore((s) => s.pendingPosts);
   const [fixedAreas, setFixedAreas] = useState<FixedArea[] | null>(null);
@@ -176,8 +187,8 @@ export default function FeedScreen() {
         area={area}
         areaPosts={areaPosts}
         pendingPosts={pendingPosts}
-        favToast={favToast}
-        setFavToast={setFavToast}
+        currentUserId={me?.id}
+        onVotePost={onVotePost}
         postedToast={postedToast}
         setPostedToast={setPostedToast}
         setSheetOpen={setSheetOpen}

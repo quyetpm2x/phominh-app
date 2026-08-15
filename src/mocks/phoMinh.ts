@@ -22,6 +22,7 @@ export type PostTag =
 
 export interface UIPost {
   id: string;
+  authorId?: string; // chỉ có ở data thật (feed.tsx) — dùng để khoá nút vote trên bài của chính mình
   area: AreaKey;
   variant: 'compact' | 'full';
   author: string;

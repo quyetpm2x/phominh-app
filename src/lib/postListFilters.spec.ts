@@ -15,6 +15,7 @@ function makePost(overrides: Partial<NearbyPost>): NearbyPost {
     displayMode: 'alias',
     isLibraryPhoto: false,
     voteCount: 0,
+    hasVoted: false,
     commentCount: 0,
     expiresAt: null,
     createdAt: '2026-01-01T00:00:00.000Z',

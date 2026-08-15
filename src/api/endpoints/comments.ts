@@ -12,6 +12,8 @@ export interface PostComment {
   content: string;
   visibility: 'public' | 'private';
   isPinned: boolean;
+  voteCount: number;
+  hasVoted: boolean;
   createdAt: string;
 }
 

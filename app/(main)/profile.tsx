@@ -105,6 +105,7 @@ export default function ProfileScreen() {
           <View className="mt-2.5 rounded-2xl border border-border bg-white overflow-hidden">
             <NavRow label="Bài của tôi" onPress={() => router.push('/profile/my-posts')} />
             <NavRow label="Chỉnh sửa hồ sơ" onPress={() => router.push('/profile/edit')} />
+            <NavRow label="Ví thưởng" onPress={() => router.push('/rewards')} />
             <NavRow label="Chuyển sang tài khoản chủ quán" onPress={() => router.push('/merchant/signup')} />
             <NavRow label="Cài đặt" onPress={() => router.push('/settings')} last />
           </View>

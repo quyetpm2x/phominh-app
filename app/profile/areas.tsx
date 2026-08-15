@@ -1,16 +1,42 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GradientButton } from '../../src/components/ui/Button';
 import { MapPlaceholder } from '../../src/components/ui/MapPlaceholder';
 import { RadiusCircle, RadiusSlider } from '../../src/components/ui/RadiusSlider';
-import { areas } from '../../src/mocks/phoMinh';
+import { useEditAreaRadius } from '../../src/hooks/useEditAreaRadius';
 
-// isAreas — sửa bán kính khu vực "Nhà" đã lưu, mở từ hồ sơ.
+// isAreas — sửa bán kính khu vực "Nhà" đã lưu, mở từ hồ sơ. Trước đây nút "Lưu khu vực" chỉ
+// router.push (không gọi API nào) và cả màn hiện dữ liệu giả từ mocks/phoMinh — đã nối lại bằng
+// useEditAreaRadius (đọc/ghi thật qua getFixedAreas/setFixedArea đã có sẵn ở api/client.ts).
 export default function AreasScreen() {
-  const [radius, setRadius] = useState(areas.home.radiusKm);
+  const { area, radiusKm, setRadiusKm, loading, saving, error, save } = useEditAreaRadius('home');
+
+  const onSave = () => {
+    void save().then((ok) => {
+      if (ok) router.push('/(main)/profile');
+      else if (error) Alert.alert('Không lưu được', error);
+    });
+  };
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-cream items-center justify-center">
+        <ActivityIndicator />
+      </SafeAreaView>
+    );
+  }
+
+  if (!area) {
+    return (
+      <SafeAreaView className="flex-1 bg-cream items-center justify-center px-6">
+        <Text className="text-center text-sm text-muted">
+          Chưa đặt khu vực "Nhà" — vào onboarding hoặc liên hệ hỗ trợ để đặt lại.
+        </Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
@@ -23,17 +49,17 @@ export default function AreasScreen() {
 
       <ScrollView contentContainerClassName="p-4.5">
         <View className="h-[180px] rounded-2xl overflow-hidden border border-strong">
-          <MapPlaceholder place={areas.home.place}>
-            <RadiusCircle valueKm={radius} />
+          <MapPlaceholder place={area.addressText}>
+            <RadiusCircle valueKm={radiusKm} />
           </MapPlaceholder>
         </View>
 
         <View className="mt-4 flex-row items-baseline justify-between">
           <Text className="font-sans-semibold text-sm text-ink">Bán kính hiển thị</Text>
-          <Text className="font-mono-semibold text-[15px] text-primary">{radius} km</Text>
+          <Text className="font-mono-semibold text-[15px] text-primary">{radiusKm} km</Text>
         </View>
         <View className="mt-2.5">
-          <RadiusSlider valueKm={radius} onChange={setRadius} />
+          <RadiusSlider valueKm={radiusKm} onChange={setRadiusKm} />
         </View>
         <Text className="mt-2.5 text-xs leading-[19px] text-muted">
           Nội đô Hà Nội đủ dày dân để bán kính nhỏ vẫn có tin. Nới rộng quá thì mất cảm giác hàng xóm.
@@ -51,7 +77,7 @@ export default function AreasScreen() {
         </View>
 
         <View className="mt-5.5">
-          <GradientButton label="Lưu khu vực" onPress={() => router.push('/(main)/profile')} />
+          <GradientButton label={saving ? 'Đang lưu…' : 'Lưu khu vực'} onPress={onSave} disabled={saving} />
         </View>
       </ScrollView>
     </SafeAreaView>

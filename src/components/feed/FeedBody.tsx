@@ -26,8 +26,8 @@ interface FeedBodyProps {
   area: AreaKey;
   areaPosts: UIPost[];
   pendingPosts: PendingPost[];
-  favToast: boolean;
-  setFavToast: (v: boolean) => void;
+  currentUserId?: string;
+  onVotePost: (postId: string) => void;
   postedToast: boolean;
   setPostedToast: (v: boolean) => void;
   setSheetOpen: (v: boolean) => void;
@@ -43,8 +43,8 @@ export function FeedBody({
   area,
   areaPosts,
   pendingPosts,
-  favToast,
-  setFavToast,
+  currentUserId,
+  onVotePost,
   postedToast,
   setPostedToast,
   setSheetOpen,
@@ -78,15 +78,6 @@ export function FeedBody({
           {postedToast ? (
             <ToastStrip variant="success" text="Đã đăng bài lên xóm" onDismiss={() => setPostedToast(false)} />
           ) : null}
-          {favToast ? (
-            <ToastStrip
-              variant="fav"
-              text="Đã thêm chị Lan vào Người quen"
-              actionLabel="Xem danh sách"
-              onAction={() => router.push('/profile/favorites')}
-              onDismiss={() => setFavToast(false)}
-            />
-          ) : null}
           <ComposerBar
             initial={currentUser.initial}
             onPressInput={() => router.push('/post/create/status')}
@@ -99,7 +90,13 @@ export function FeedBody({
           ))}
         </View>
       }
-      renderItem={({ item }) => <PostCard post={item} onVote={() => setFavToast(true)} />}
+      renderItem={({ item }) => (
+        <PostCard
+          post={item}
+          onVote={() => onVotePost(item.id)}
+          canVote={item.authorId !== currentUserId}
+        />
+      )}
       ListEmptyComponent={
         pendingPosts.length === 0 ? (
           <EmptyFeedState place={active.place} onCompose={() => setSheetOpen(true)} onWiden={() => undefined} />

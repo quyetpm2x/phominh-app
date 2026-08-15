@@ -26,10 +26,11 @@ const STRIP_COLOR: Record<UIPost['tagColor'], string> = {
 interface PostCardProps {
   post: UIPost;
   onVote?: () => void;
+  canVote?: boolean;
   onConfirmUrgent?: () => void;
 }
 
-export function PostCard({ post, onVote, onConfirmUrgent }: PostCardProps) {
+export function PostCard({ post, onVote, canVote = true, onConfirmUrgent }: PostCardProps) {
   const open = () => router.push(`/post/${post.id}`);
 
   if (post.variant === 'compact') {
@@ -108,7 +109,11 @@ export function PostCard({ post, onVote, onConfirmUrgent }: PostCardProps) {
       </View>
 
       <View className="border-t border-border-soft flex-row items-center px-1.5 py-1">
-        <Pressable onPress={onVote} className="flex-1 h-10 items-center justify-center flex-row gap-1.5">
+        <Pressable
+          onPress={onVote}
+          disabled={post.hasVoted || !canVote}
+          className={`flex-1 h-10 items-center justify-center flex-row gap-1.5 ${!canVote ? 'opacity-50' : ''}`}
+        >
           <Text className={post.hasVoted ? 'text-primary' : 'text-muted'}>▲</Text>
           <Text className={`font-sans-semibold text-[13.5px] ${post.hasVoted ? 'text-primary' : 'text-muted'}`}>
             Hữu ích

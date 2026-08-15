@@ -10,12 +10,12 @@ import { Chip } from './ui/Chip';
 
 interface PostDetailHeaderProps {
   post: PostDetail;
-  voted: boolean;
-  votes: number;
-  onToggleVote: () => void;
+  canVote: boolean;
+  onVote: () => void;
 }
 
-export function PostDetailHeader({ post, voted, votes, onToggleVote }: PostDetailHeaderProps) {
+export function PostDetailHeader({ post, canVote, onVote }: PostDetailHeaderProps) {
+  const voted = post.hasVoted;
   return (
     <>
       <Pressable
@@ -59,14 +59,15 @@ export function PostDetailHeader({ post, voted, votes, onToggleVote }: PostDetai
 
       <View className="px-4 pt-3.5 pb-2 flex-row gap-2">
         <Pressable
-          onPress={onToggleVote}
+          onPress={onVote}
+          disabled={voted || !canVote}
           className={`h-9 rounded-[10px] px-3.5 flex-row items-center gap-1.5 ${
             voted ? 'bg-primary' : 'border border-border bg-white'
-          }`}
+          } ${!canVote ? 'opacity-50' : ''}`}
         >
           <Text className={voted ? 'text-white' : 'text-ink'}>▲</Text>
           <Text className={`font-sans-semibold text-[13px] ${voted ? 'text-white' : 'text-ink'}`}>
-            Hữu ích · {votes}
+            Hữu ích · {post.voteCount}
           </Text>
         </Pressable>
       </View>

@@ -28,6 +28,7 @@ import { useIgnoreUser } from '../../src/hooks/useIgnoredUsers';
 import { useMe } from '../../src/hooks/useMe';
 import { useDeletePost, usePost } from '../../src/hooks/usePost';
 import { useRealtimeComments } from '../../src/hooks/useRealtimeComments';
+import { useCastCommentVote, useCastPostVote } from '../../src/hooks/useVotes';
 import { formatFreshness } from '../../src/utils/formatFreshness';
 
 function toDisplayComment(c: {
@@ -37,6 +38,8 @@ function toDisplayComment(c: {
   content: string;
   createdAt: string;
   isPinned: boolean;
+  voteCount: number;
+  hasVoted: boolean;
 }): Comment {
   return {
     id: c.id,
@@ -47,6 +50,8 @@ function toDisplayComment(c: {
     content: c.content,
     timeAgo: formatFreshness(c.createdAt),
     isPinned: c.isPinned,
+    voteCount: c.voteCount,
+    hasVoted: c.hasVoted,
   };
 }
 
@@ -56,7 +61,6 @@ export default function PostDetailScreen() {
   const { data: post, isLoading: postLoading } = usePost(id);
   const { data: comments, isLoading: commentsLoading } = useComments(id);
   const { data: me } = useMe();
-  const [voted, setVoted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -65,6 +69,8 @@ export default function PostDetailScreen() {
   const updateComment = useUpdateComment(id);
   const deleteComment = useDeleteComment(id);
   const setCommentPinned = useSetCommentPinned(id);
+  const castPostVote = useCastPostVote();
+  const castCommentVote = useCastCommentVote(id);
 
   const onNewComment = useCallback(() => {
     // Không tự chèn payload thô (thiếu authorDisplayName, không qua kiểm tra visibility/quyền) —
@@ -83,9 +89,20 @@ export default function PostDetailScreen() {
     );
   }
 
-  const votes = post.voteCount + (voted ? 1 : 0);
   const visibleComments = (comments ?? []).map(toDisplayComment);
   const isOwnPost = post.authorId === me?.id;
+
+  const onVotePost = () => {
+    void castPostVote.mutateAsync(post.id).catch(async (err) => {
+      Alert.alert('Không vote được', await extractErrorMessage(err));
+    });
+  };
+
+  const onVoteComment = (commentId: string) => {
+    void castCommentVote.mutateAsync(commentId).catch(async (err) => {
+      Alert.alert('Không vote được', await extractErrorMessage(err));
+    });
+  };
 
   const onConfirmDeletePost = () => {
     Alert.alert('Xoá bài đăng?', 'Bài đăng sẽ không còn hiện với ai nữa. Không thể hoàn tác.', [
@@ -155,7 +172,7 @@ export default function PostDetailScreen() {
         keyboardVerticalOffset={46} // = chiều cao header cố định phía trên (mục đo bằng h-[46px])
       >
         <ScrollView contentContainerClassName="pb-6" keyboardShouldPersistTaps="handled">
-          <PostDetailHeader post={post} voted={voted} votes={votes} onToggleVote={() => setVoted((v) => !v)} />
+          <PostDetailHeader post={post} canVote={!isOwnPost} onVote={onVotePost} />
 
           <View className="h-px bg-border-soft mx-4 my-3" />
 
@@ -181,6 +198,7 @@ export default function PostDetailScreen() {
                     params: { postId: id, commentId, content, postAuthorId: post.authorId },
                   })
                 }
+                onVote={onVoteComment}
               />
             )}
           </View>

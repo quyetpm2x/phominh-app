@@ -18,6 +18,7 @@ export interface NearbyPost {
   displayMode: 'alias' | 'real_name';
   isLibraryPhoto: boolean;
   voteCount: number;
+  hasVoted: boolean;
   commentCount: number;
   expiresAt: string | null;
   createdAt: string;
@@ -53,6 +54,7 @@ export interface PostDetail {
   displayMode: 'alias' | 'real_name';
   isLibraryPhoto: boolean;
   voteCount: number;
+  hasVoted: boolean;
   commentCount: number;
   expiresAt: string | null;
   createdAt: string;

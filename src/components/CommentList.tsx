@@ -14,6 +14,8 @@ export interface Comment {
   content: string;
   timeAgo: string;
   isPinned: boolean;
+  voteCount: number;
+  hasVoted: boolean;
 }
 
 interface CommentListProps {
@@ -24,6 +26,7 @@ interface CommentListProps {
   onDelete: (commentId: string) => void;
   onTogglePin: (commentId: string, isPinned: boolean) => void;
   onReport: (commentId: string, content: string) => void;
+  onVote: (commentId: string) => void;
 }
 
 // Danh sách bình luận trong màn chi tiết bài — dựng bằng View thường (không FlatList) vì luôn nằm
@@ -36,6 +39,7 @@ export function CommentList({
   onDelete,
   onTogglePin,
   onReport,
+  onVote,
 }: CommentListProps) {
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -105,6 +109,19 @@ export function CommentList({
             ) : (
               <Text className="mt-0.5 text-[13.5px] leading-[20px] text-ink/85">{c.content}</Text>
             )}
+            <Pressable
+              onPress={() => onVote(c.id)}
+              disabled={c.hasVoted || c.authorId === currentUserId}
+              hitSlop={6}
+              className="mt-1 self-start flex-row items-center gap-1"
+            >
+              <Text className={`text-[11px] ${c.hasVoted ? 'text-primary' : 'text-muted-light'}`}>▲</Text>
+              <Text
+                className={`text-[11px] ${c.hasVoted ? 'text-primary font-sans-semibold' : 'text-muted-light'}`}
+              >
+                Hữu ích{c.voteCount > 0 ? ` · ${c.voteCount}` : ''}
+              </Text>
+            </Pressable>
           </View>
         </View>
       ))}
