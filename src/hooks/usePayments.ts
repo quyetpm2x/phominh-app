@@ -5,6 +5,7 @@ import {
   fetchMyPayoutRequests,
   linkBankAccount,
   requestPayout,
+  unlinkBankAccount,
   type LinkBankAccountInput,
   type RequestPayoutInput,
 } from '../api/endpoints/payments';
@@ -17,6 +18,14 @@ export function useLinkBankAccount() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: LinkBankAccountInput) => linkBankAccount(input),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['payments', 'bankAccounts'] }),
+  });
+}
+
+export function useUnlinkBankAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => unlinkBankAccount(id),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['payments', 'bankAccounts'] }),
   });
 }

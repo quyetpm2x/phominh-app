@@ -1,5 +1,6 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
+import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -7,13 +8,14 @@ import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GradientButton } from '../../../src/components/ui/Button';
+import { useMyMerchantProfile } from '../../../src/hooks/useMerchant';
 import { usePostDraftStore } from '../../../src/stores/postDraftStore';
 
 function formatClock(date: Date): string {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-// isCam — chụp ảnh tại chỗ, không chọn được từ thư viện (mục 19 tai-lieu-chi-tiet-chuc-nang.md).
+// isCam — chụp ảnh tại chỗ, không chọn được từ thư viện (mục 19 tai-lieu-chuc-nang.md).
 // Nén ngay sau khi chụp (mục 21) + gắn GPS thật lúc bấm chụp, không phải lúc mở màn (mục 19 DTO
 // backend: "GPS THẬT lúc bấm đăng").
 export default function CameraScreen() {
@@ -22,6 +24,10 @@ export default function CameraScreen() {
   const [overlayText, setOverlayText] = useState('Đang định vị…');
   const cameraRef = useRef<CameraView>(null);
   const setPhoto = usePostDraftStore((s) => s.setPhoto);
+  // Ngoại lệ chọn ảnh từ thư viện — CHỈ tài khoản quán ĐÃ XÁC MINH (mục 19). Backend tự chặn lại
+  // lần nữa (assertVerifiedForLibraryPhoto) nếu ai đó lách qua cờ này.
+  const { data: merchant } = useMyMerchantProfile();
+  const canPickFromLibrary = merchant?.isVerified === true;
 
   useEffect(() => {
     if (!permission?.granted) return;
@@ -52,6 +58,28 @@ export default function CameraScreen() {
       });
 
       setPhoto(compressed.uri, pos.coords.latitude, pos.coords.longitude, pos.mocked ?? false);
+      router.push('/post/create/review');
+    } finally {
+      setCapturing(false);
+    }
+  };
+
+  const handlePickFromLibrary = async () => {
+    if (capturing) return;
+    const libPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!libPermission.granted) return;
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
+    if (result.canceled || !result.assets[0]) return;
+
+    setCapturing(true);
+    try {
+      const pos = await Location.getCurrentPositionAsync({});
+      const compressed = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 1080 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
+      );
+      setPhoto(compressed.uri, pos.coords.latitude, pos.coords.longitude, pos.mocked ?? false, true);
       router.push('/post/create/review');
     } finally {
       setCapturing(false);
@@ -97,7 +125,9 @@ export default function CameraScreen() {
           className="absolute left-4 right-4 top-4 rounded-xl bg-white/10 border border-white/20 px-3.5 py-2.5"
         >
           <Text className="text-[12.5px] leading-[19px] text-[#e9e6df]">
-            Không chọn được ảnh từ thư viện. Ảnh phải chụp ngay lúc này để không ai đăng lại ảnh cũ như tin mới.
+            {canPickFromLibrary
+              ? 'Tài khoản quán đã xác minh — có thể chọn ảnh có sẵn từ thư viện.'
+              : 'Không chọn được ảnh từ thư viện. Ảnh phải chụp ngay lúc này để không ai đăng lại ảnh cũ như tin mới.'}
           </Text>
         </View>
         <View pointerEvents="none" className="absolute left-4 bottom-4 rounded-md bg-ink/55 px-2 py-1">
@@ -115,6 +145,12 @@ export default function CameraScreen() {
           />
         )}
       </View>
+
+      {canPickFromLibrary ? (
+        <Pressable onPress={() => void handlePickFromLibrary()} className="items-center pb-6">
+          <Text className="text-white/80 text-[13.5px] font-sans-semibold">Chọn ảnh từ thư viện</Text>
+        </Pressable>
+      ) : null}
     </SafeAreaView>
   );
 }

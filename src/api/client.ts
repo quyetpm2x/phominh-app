@@ -99,6 +99,10 @@ export interface UserProfile {
   alias: string;
   realName: string | null;
   avatarUrl: string | null;
+  // Bắt buộc điền lúc onboarding (quyết định 2026-08-20) — null nghĩa là user CŨ chưa từng điền,
+  // xem isProfileComplete() ở src/lib/profileCompleteness.ts.
+  dateOfBirth: string | null;
+  gender: 'male' | 'female' | 'other' | null;
   trustTier: number;
   trustBadgeLabel: string;
   pointsToNextTier: number | null;
@@ -137,20 +141,21 @@ export async function getMe(): Promise<UserProfile> {
 // Gọi lúc mở app (app/index.tsx) để biết còn phiên đăng nhập hợp lệ không, tránh bắt nhập lại SĐT
 // mỗi lần mở app. GET /auth/me yêu cầu JWT hợp lệ — nếu access token hết hạn, hook afterResponse
 // trong apiClient (đã có sẵn ở trên) tự thử refresh bằng refresh token trước khi trả lỗi, nên hàm
-// này tự động "chịu" được trường hợp access token hết hạn nhưng refresh token vẫn còn.
-export async function checkSession(): Promise<boolean> {
+// này tự động "chịu" được trường hợp access token hết hạn nhưng refresh token vẫn còn. Trả về
+// UserProfile (không chỉ boolean) để index.tsx tự kiểm tra isProfileComplete() mà không cần gọi
+// getMe() lần 2.
+export async function checkSession(): Promise<UserProfile | null> {
   const [accessToken, refreshToken] = await Promise.all([
     SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
     SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
   ]);
-  if (!accessToken && !refreshToken) return false;
+  if (!accessToken && !refreshToken) return null;
 
   try {
-    await getMe();
-    return true;
+    return await getMe();
   } catch {
     await clearTokens();
-    return false;
+    return null;
   }
 }
 

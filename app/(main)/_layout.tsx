@@ -4,18 +4,20 @@ import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '../../src/constants/design-tokens';
+import { useAppSessionTracking } from '../../src/hooks/useAppSessionTracking';
 
 // Tab bar dưới cùng đúng theo thiết kế: Dòng tin / Thông báo / [+ mở camera ngay] / Quán / Tôi
 // ({{ tabBar }} trong Phố Mình.dc.html — nút giữa là camera trực tiếp, không phải sheet chọn loại
 // bài, theo đúng biến thể "B" đã chốt dùng trong 1a). Nhà/Chỗ làm/Quanh đây là tab gạch chân NẰM
-// TRONG màn Feed, không phải tab dưới cùng. "Nhắn hỏi" không phải tab chính — chỉ mở từ một bài
-// đăng cụ thể (mục đích thiết kế), nên được tách ra khỏi (main) thành route riêng.
+// TRONG màn Feed, không phải tab dưới cùng. App KHÔNG có tính năng nhắn tin riêng tư — chỉ tương
+// tác qua bình luận công khai/riêng-tư-1-chiều trên bài đăng (mục 26), đã chốt với người dùng.
 //
 // Dùng tabBarButton tự viết cho MỌI tab (không chỉ nút "+") thay vì tabBarIcon/title mặc định của
 // react-navigation — nhãn tiếng Việt có dấu (Dòng tin, Thông báo) bị cắt mất phần dấu/chân chữ khi
 // dùng label mặc định vì khối nhãn nội bộ của react-navigation có chiều cao cố định, không co giãn
 // theo lineHeight mình đặt trong tabBarLabelStyle. Tự vẽ Text mới kiểm soát được lineHeight thật.
 export default function MainTabsLayout() {
+  useAppSessionTracking();
   const insets = useSafeAreaInsets();
   const barHeight = 66 + insets.bottom;
 

@@ -128,6 +128,18 @@ export default function MerchantTabScreen() {
             <Text className="font-sans-semibold text-[13.5px] text-ink">Thống kê</Text>
           </Pressable>
         </View>
+        <Pressable
+          onPress={() => router.push('/merchant/menu-photos')}
+          className="mt-2.5 h-11 rounded-xl border border-border bg-white items-center justify-center"
+        >
+          <Text className="font-sans-semibold text-[13.5px] text-ink">Quản lý ảnh Menu</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push('/merchant/payments')}
+          className="mt-2.5 h-11 rounded-xl border border-border bg-white items-center justify-center"
+        >
+          <Text className="font-sans-semibold text-[13.5px] text-ink">Lịch sử thanh toán gói</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );

@@ -40,6 +40,14 @@ export async function fetchNearbyPosts(params: {
   return res.data;
 }
 
+// SĐT/Zalo của quán, CHỈ có giá trị khi postType==='merchant' VÀ đang trong khung giờ merchant tự
+// chọn hiện số (mục 43) — null vừa có nghĩa "không phải bài merchant" vừa có nghĩa "đang ẩn/ngoài
+// giờ", FE không cần phân biệt 2 trường hợp đó vì cách hiển thị (không hiện nút Gọi/Zalo) là như nhau.
+export interface MerchantContact {
+  phoneNumber: string;
+  zaloEnabled: boolean;
+}
+
 // Chi tiết 1 bài (Tầng 2 task 11) — không có distanceMeters/score (cần toạ độ người xem, không áp
 // dụng cho màn chi tiết).
 export interface PostDetail {
@@ -62,6 +70,7 @@ export interface PostDetail {
   textColor: string | null;
   backgroundColor: string | null;
   fontSize: 'small' | 'medium' | 'large' | null;
+  merchantContact: MerchantContact | null;
 }
 
 export async function fetchPost(id: string): Promise<PostDetail> {
@@ -149,6 +158,9 @@ export interface CreatePostInput {
   fontSize?: 'small' | 'medium' | 'large';
   // Chống giả mạo GPS (mục 7a) — expo-location LocationObject.mocked lúc chụp ảnh.
   isMockLocation?: boolean;
+  // Ảnh thư viện thay vì chụp trực tiếp — CHỈ hợp lệ cho merchant đã xác minh (mục 19), backend tự
+  // kiểm tra lại (MerchantsService.assertVerifiedForLibraryPhoto).
+  isLibraryPhoto?: boolean;
 }
 
 export interface CreatedPost {

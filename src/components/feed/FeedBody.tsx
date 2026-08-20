@@ -23,6 +23,8 @@ interface FeedBodyProps {
   missingAreaMessage: string | null;
   active: ActiveArea | null;
   isLoading: boolean;
+  refreshing: boolean;
+  onRefresh: () => void;
   area: AreaKey;
   areaPosts: UIPost[];
   pendingPosts: PendingPost[];
@@ -40,6 +42,8 @@ export function FeedBody({
   missingAreaMessage,
   active,
   isLoading,
+  refreshing,
+  onRefresh,
   area,
   areaPosts,
   pendingPosts,
@@ -71,6 +75,8 @@ export function FeedBody({
     <FlatList
       data={areaPosts}
       keyExtractor={(p) => p.id}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
       contentContainerClassName="px-3.5 pt-3 gap-3 pb-2"
       ListHeaderComponent={
         <View className="gap-3 mb-3">

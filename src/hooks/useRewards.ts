@@ -4,8 +4,10 @@ import {
   fetchEarnSettings,
   fetchLeaderboardHistory,
   fetchLiveLeaderboard,
+  fetchMyReferrals,
   fetchReferralCode,
   fetchWallet,
+  redeemReferralCode,
   updateEarnSettings,
   type EarnSettings,
 } from '../api/endpoints/rewards';
@@ -29,6 +31,14 @@ export function useWallet() {
 
 export function useReferralCode() {
   return useQuery({ queryKey: ['rewards', 'referralCode'], queryFn: fetchReferralCode });
+}
+
+export function useRedeemReferralCode() {
+  return useMutation({ mutationFn: (code: string) => redeemReferralCode(code) });
+}
+
+export function useMyReferrals() {
+  return useQuery({ queryKey: ['rewards', 'myReferrals'], queryFn: fetchMyReferrals });
 }
 
 // enabled: false khi chưa biết tier (VD đang chờ useMe load) — tránh gọi API với tier=NaN.

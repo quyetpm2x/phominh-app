@@ -12,13 +12,14 @@ export async function submitPendingPost(queryClient: QueryClient, pending: Pendi
   try {
     const imageUrls = [await uploadPostImage(pending.photoUri)];
     await createPost({
-      postType: 'life',
+      postType: pending.postType,
       content: pending.content,
       lat: pending.lat,
       lng: pending.lng,
       displayMode: pending.displayMode,
       imageUrls,
       isMockLocation: pending.isMockLocation,
+      isLibraryPhoto: pending.isLibraryPhoto,
       textColor: pending.textColor ?? undefined,
       backgroundColor: pending.backgroundColor ?? undefined,
       fontSize: pending.fontSize ?? undefined,

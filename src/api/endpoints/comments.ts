@@ -14,7 +14,10 @@ export interface PostComment {
   isPinned: boolean;
   voteCount: number;
   hasVoted: boolean;
+  parentCommentId: string | null;
   createdAt: string;
+  // Reply trực tiếp — chỉ 1 cấp (không có "replies của replies", xem CommentsService phía backend).
+  replies: PostComment[];
 }
 
 // Trước đây thiếu prefix "api/" (gọi nhầm "mobile/posts/...") — mọi route backend đều mount dưới
@@ -29,6 +32,8 @@ export async function fetchComments(postId: string): Promise<PostComment[]> {
 export interface CreateCommentInput {
   content: string;
   visibility?: 'public' | 'private';
+  // Trả lời 1 bình luận — chỉ gửi cho bình luận GỐC (UI không cho trả lời 1 reply, xem CommentList).
+  parentCommentId?: string;
 }
 
 export async function createComment(postId: string, input: CreateCommentInput): Promise<void> {

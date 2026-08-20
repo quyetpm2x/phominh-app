@@ -1,22 +1,10 @@
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { View } from 'react-native';
 
 import { ActionSheetMenu, type ActionSheetItem } from './ui/ActionSheetMenu';
-import { Avatar } from './ui/Avatar';
-import { TextInput } from './ui/TextInput';
+import { CommentRow, type Comment } from './CommentRow';
 
-export interface Comment {
-  id: string;
-  authorId: string;
-  authorName: string;
-  initial: string;
-  color: string;
-  content: string;
-  timeAgo: string;
-  isPinned: boolean;
-  voteCount: number;
-  hasVoted: boolean;
-}
+export type { Comment } from './CommentRow';
 
 interface CommentListProps {
   comments: Comment[];
@@ -27,10 +15,12 @@ interface CommentListProps {
   onTogglePin: (commentId: string, isPinned: boolean) => void;
   onReport: (commentId: string, content: string) => void;
   onVote: (commentId: string) => void;
+  onReply: (commentId: string, authorName: string) => void;
 }
 
 // Danh sách bình luận trong màn chi tiết bài — dựng bằng View thường (không FlatList) vì luôn nằm
-// trong một ScrollView cha (tránh lỗi list-trong-list của React Native).
+// trong một ScrollView cha (tránh lỗi list-trong-list của React Native). Reply lồng nhau 1 cấp,
+// thụt lề dưới đúng bình luận gốc.
 export function CommentList({
   comments,
   currentUserId,
@@ -40,12 +30,14 @@ export function CommentList({
   onTogglePin,
   onReport,
   onVote,
+  onReply,
 }: CommentListProps) {
   const [menuFor, setMenuFor] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
 
-  const menuComment = comments.find((c) => c.id === menuFor);
+  const allComments = comments.flatMap((c) => [c, ...c.replies]);
+  const menuComment = allComments.find((c) => c.id === menuFor);
   const menuItems = menuComment ? buildMenuItems(menuComment) : [];
 
   function buildMenuItems(c: Comment): ActionSheetItem[] {
@@ -73,56 +65,36 @@ export function CommentList({
     return [...editItems, ...pinItem, ...reportItem];
   }
 
+  const sharedRowProps = {
+    currentUserId,
+    editingId,
+    draft,
+    onDraftChange: setDraft,
+    onStartEdit: (id: string, content: string) => {
+      setEditingId(id);
+      setDraft(content);
+    },
+    onCancelEdit: () => setEditingId(null),
+    onSaveEdit: (id: string) => {
+      if (draft.trim()) onEdit(id, draft.trim());
+      setEditingId(null);
+    },
+    onOpenMenu: setMenuFor,
+    onVote,
+  };
+
   return (
     <View className="gap-3.5">
       {comments.map((c) => (
-        <View key={c.id} className="flex-row gap-2.5">
-          <Avatar initial={c.initial} color={c.color} size={32} radius={10} />
-          <View className="flex-1">
-            <View className="flex-row items-baseline gap-1.5">
-              <Text className="font-sans-semibold text-[13px] text-ink">{c.authorName}</Text>
-              {c.isPinned ? <Text className="text-[11px] text-primary">· đã ghim</Text> : null}
-              <Text className="text-[11px] text-muted-light">{c.timeAgo}</Text>
-              <View className="flex-1" />
-              <Pressable onPress={() => setMenuFor(c.id)} hitSlop={8}>
-                <Text className="text-muted text-xs">•••</Text>
-              </Pressable>
+        <View key={c.id} className="gap-3">
+          <CommentRow comment={c} isReply={false} onReply={onReply} {...sharedRowProps} />
+          {c.replies.length > 0 && (
+            <View className="ml-[42px] gap-3">
+              {c.replies.map((r) => (
+                <CommentRow key={r.id} comment={r} isReply {...sharedRowProps} />
+              ))}
             </View>
-            {editingId === c.id ? (
-              <View className="mt-1 gap-1.5">
-                <TextInput value={draft} onChangeText={setDraft} placeholder="Sửa bình luận…" />
-                <View className="flex-row gap-2">
-                  <Pressable onPress={() => setEditingId(null)} className="px-2.5 py-1 rounded-lg border border-border">
-                    <Text className="text-xs text-muted">Hủy</Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => {
-                      if (draft.trim()) onEdit(c.id, draft.trim());
-                      setEditingId(null);
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-ink"
-                  >
-                    <Text className="text-xs text-white">Lưu</Text>
-                  </Pressable>
-                </View>
-              </View>
-            ) : (
-              <Text className="mt-0.5 text-[13.5px] leading-[20px] text-ink/85">{c.content}</Text>
-            )}
-            <Pressable
-              onPress={() => onVote(c.id)}
-              disabled={c.hasVoted || c.authorId === currentUserId}
-              hitSlop={6}
-              className="mt-1 self-start flex-row items-center gap-1"
-            >
-              <Text className={`text-[11px] ${c.hasVoted ? 'text-primary' : 'text-muted-light'}`}>▲</Text>
-              <Text
-                className={`text-[11px] ${c.hasVoted ? 'text-primary font-sans-semibold' : 'text-muted-light'}`}
-              >
-                Hữu ích{c.voteCount > 0 ? ` · ${c.voteCount}` : ''}
-              </Text>
-            </Pressable>
-          </View>
+          )}
         </View>
       ))}
 

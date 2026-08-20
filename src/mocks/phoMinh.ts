@@ -31,6 +31,9 @@ export interface UIPost {
   badge?: string;
   createdAt?: string; // ISO — chỉ có ở data thật (feed.tsx), dùng cho FreshnessBorder + sort
   expiresAt?: string | null;
+  // Chỉ báo bí danh/tên thật (mục 14) — chỉ có ở data thật, mock demo không cần set (mặc định coi
+  // như bí danh khi hiện badge, xem PostCard.tsx).
+  displayMode?: 'alias' | 'real_name';
   lat?: number;
   lng?: number;
   isFaved?: boolean;
@@ -227,60 +230,6 @@ export const trustHistory = [
   { label: 'Bài "Còn 12 suất bún chả" được 8 người thấy hữu ích', time: 'hôm qua', delta: '+8' },
   { label: 'Bình luận được cảm ơn', time: '3 ngày trước', delta: '+1' },
   { label: 'Lên bậc Người thân quen', time: '2 tuần trước', delta: '' },
-];
-
-export interface ChatThread {
-  id: string;
-  peer: string;
-  initial: string;
-  color: string;
-  postTitle: string;
-  distance: string;
-  lastMessage: string;
-  time: string;
-  unread?: boolean;
-  locked?: boolean;
-}
-
-export const chatThreads: ChatThread[] = [
-  {
-    id: 't1',
-    peer: 'Bún chả Hàng Quạt',
-    initial: 'H',
-    color: '#c9a227',
-    postTitle: 'Còn 12 suất',
-    distance: '240 m',
-    lastMessage: 'Dạ còn ạ, anh qua lấy nhé!',
-    time: '2 phút',
-    unread: true,
-  },
-  {
-    id: 't2',
-    peer: 'Chị Lan T18',
-    initial: 'L',
-    color: '#1f6f52',
-    postTitle: 'Mất điện toà T4',
-    distance: '620 m',
-    lastMessage: 'Điện có lại chưa chị ơi?',
-    time: '1 giờ',
-  },
-  {
-    id: 't3',
-    peer: 'Anh Tuấn ngõ 12',
-    initial: 'T',
-    color: '#a8801a',
-    postTitle: 'Cho đồ chơi trẻ con',
-    distance: '410 m',
-    lastMessage: 'Bài đã hết hạn — cuộc trò chuyện đã đóng',
-    time: 'hôm qua',
-    locked: true,
-  },
-];
-
-export const chatBubbles = [
-  { fromMe: false, text: 'Chào shop, còn suất bún chả không ạ?', time: '20:10' },
-  { fromMe: true, text: 'Dạ còn ạ, anh qua lấy nhé!', time: '20:11' },
-  { fromMe: false, text: 'Em qua trong 5 phút nhé', time: '20:12' },
 ];
 
 export const notifDigestHome = [

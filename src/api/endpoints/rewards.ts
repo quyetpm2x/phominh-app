@@ -57,6 +57,29 @@ export async function fetchReferralCode(): Promise<{ code: string }> {
   return res.data;
 }
 
+// Nhập mã của người mời (mục 55 — khép vòng lặp, trước đây mobile chưa có UI nào gọi tới dù backend
+// đã có sẵn). Backend tự chặn: mã không tồn tại (404), tự dùng mã của chính mình (400).
+export async function redeemReferralCode(code: string): Promise<void> {
+  await apiClient.post('api/mobile/rewards/referral-code/redeem', { json: { code } });
+}
+
+// Danh sách người đã giới thiệu thành công (mục 56) — qualified=true nghĩa là người được mời đã
+// hoạt động thật trong 7 ngày đầu (ReferralQualificationCronService xét hàng ngày).
+export interface MyReferralItem {
+  id: string;
+  invitedUserAlias: string;
+  createdAt: string;
+  qualified: boolean;
+  rewardGranted: boolean;
+}
+
+export async function fetchMyReferrals(): Promise<MyReferralItem[]> {
+  const res = await apiClient
+    .get('api/mobile/rewards/referral-code/redemptions')
+    .json<Envelope<MyReferralItem[]>>();
+  return res.data;
+}
+
 // ===== Bảng xếp hạng (mục 57) =====
 
 export interface LeaderboardEntry {

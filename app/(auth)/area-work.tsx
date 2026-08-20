@@ -17,7 +17,7 @@ export default function AreaWorkScreen() {
 
   const onSave = async () => {
     const ok = await save();
-    if (ok) router.push('/(auth)/done');
+    if (ok) router.push('/(auth)/personal-info');
   };
 
   return (
@@ -28,7 +28,7 @@ export default function AreaWorkScreen() {
         </Pressable>
         <Text className="font-sans-semibold text-sm text-ink">Khu vực 2 / 2</Text>
         <View className="flex-1" />
-        <Pressable onPress={() => router.push('/(auth)/done')}>
+        <Pressable onPress={() => router.push('/(auth)/personal-info')}>
           <Text className="text-[13.5px] text-muted">Bỏ qua</Text>
         </Pressable>
       </View>

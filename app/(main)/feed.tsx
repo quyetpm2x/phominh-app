@@ -1,5 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import * as Location from 'expo-location';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, Text, View } from 'react-native';
@@ -48,6 +47,7 @@ function toUIPost(p: NearbyPost, area: AreaKey): UIPost {
     timeAgo: formatTimeAgo(p.createdAt),
     createdAt: p.createdAt,
     expiresAt: p.expiresAt,
+    displayMode: p.displayMode,
     lat: p.lat,
     lng: p.lng,
     votes: p.voteCount,
@@ -121,7 +121,12 @@ export default function FeedScreen() {
     return null;
   }, [area, homeArea, workArea, nearbyPoint, nearbyPlace, filterStore.radiusOverrideKm]);
 
-  const { data: nearbyPosts, isLoading } = usePosts(
+  const {
+    data: nearbyPosts,
+    isLoading,
+    isRefetching,
+    refetch,
+  } = usePosts(
     active
       ? { lat: active.lat, lng: active.lng, radiusKm: active.radiusKm }
       : { lat: Number.NaN, lng: Number.NaN, radiusKm: 0 },
@@ -161,12 +166,6 @@ export default function FeedScreen() {
           </View>
           <View className="flex-row items-center gap-2">
             <Pressable
-              onPress={() => router.push('/messages')}
-              className="w-[30px] h-[30px] rounded-[9px] border border-strong bg-white items-center justify-center"
-            >
-              <Ionicons name="chatbubble-outline" size={15} color={colors.ink.DEFAULT} />
-            </Pressable>
-            <Pressable
               onPress={() => setMapOn((v) => !v)}
               className="h-[30px] rounded-[9px] border border-strong bg-white px-2.5 items-center justify-center"
             >
@@ -184,6 +183,8 @@ export default function FeedScreen() {
         missingAreaMessage={missingAreaMessage}
         active={active}
         isLoading={isLoading}
+        refreshing={isRefetching}
+        onRefresh={() => void refetch()}
         area={area}
         areaPosts={areaPosts}
         pendingPosts={pendingPosts}

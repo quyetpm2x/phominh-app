@@ -8,9 +8,11 @@ export interface PendingPost {
   localId: string;
   photoUri: string;
   content: string;
+  postType: 'life' | 'emergency';
   lat: number;
   lng: number;
   isMockLocation: boolean;
+  isLibraryPhoto: boolean;
   displayMode: 'alias' | 'real_name';
   authorDisplayName: string;
   status: 'uploading' | 'error';

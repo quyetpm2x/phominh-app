@@ -10,15 +10,26 @@ interface PostDraftState {
   lat: number | null;
   lng: number | null;
   isMockLocation: boolean; // chống giả mạo GPS (mục 7a) — expo-location LocationObject.mocked, chỉ đáng tin trên Android
+  // Ảnh chọn từ thư viện thay vì chụp trực tiếp — CHỈ hợp lệ cho merchant đã xác minh (mục 19),
+  // backend tự chặn lại lần nữa (MerchantsService.assertVerifiedForLibraryPhoto) nếu không phải.
+  isLibraryPhoto: boolean;
   capturedAt: number | null; // epoch ms, lúc chụp — hiển thị "chụp lúc HH:mm"
   content: string;
-  category: string; // nhãn UI (composeTypeChips) — CHƯA có field tương ứng ở backend, chỉ hiển thị
+  // Nhãn UI (composeTypeChips) — map sang postType thật qua mapCategoryToPostType() ở confirm.tsx
+  // (mục 19 phát hiện: trước đây KHÔNG map, nên không ai tạo được bài 'emergency' qua luồng chính).
+  category: string;
   displayMode: 'alias' | 'real_name';
   // Style toàn bộ nội dung (mục 22) — null = mặc định, không gửi field style lên server.
   textColor: string | null;
   backgroundColor: string | null;
   fontSize: PostFontSize | null;
-  setPhoto: (uri: string, lat: number, lng: number, isMockLocation: boolean) => void;
+  setPhoto: (
+    uri: string,
+    lat: number,
+    lng: number,
+    isMockLocation: boolean,
+    isLibraryPhoto?: boolean,
+  ) => void;
   clearPhoto: () => void;
   setContent: (content: string) => void;
   setCategory: (category: string) => void;
@@ -34,6 +45,7 @@ const initialState = {
   lat: null,
   lng: null,
   isMockLocation: false,
+  isLibraryPhoto: false,
   capturedAt: null,
   content: '',
   category: '',
@@ -45,9 +57,10 @@ const initialState = {
 
 export const usePostDraftStore = create<PostDraftState>((set) => ({
   ...initialState,
-  setPhoto: (uri, lat, lng, isMockLocation) =>
-    set({ photoUri: uri, lat, lng, isMockLocation, capturedAt: Date.now() }),
-  clearPhoto: () => set({ photoUri: null, lat: null, lng: null, isMockLocation: false, capturedAt: null }),
+  setPhoto: (uri, lat, lng, isMockLocation, isLibraryPhoto = false) =>
+    set({ photoUri: uri, lat, lng, isMockLocation, isLibraryPhoto, capturedAt: Date.now() }),
+  clearPhoto: () =>
+    set({ photoUri: null, lat: null, lng: null, isMockLocation: false, isLibraryPhoto: false, capturedAt: null }),
   setContent: (content) => set({ content }),
   setCategory: (category) => set({ category }),
   setDisplayMode: (displayMode) => set({ displayMode }),

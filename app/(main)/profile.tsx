@@ -4,12 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '../../src/components/ui/Avatar';
 import { Chip } from '../../src/components/ui/Chip';
+import { TrustBadgeCard } from '../../src/components/TrustBadgeCard';
 import { useAccountStatus } from '../../src/hooks/useAccountLifecycle';
+import { useFixedAreas } from '../../src/hooks/useFixedAreas';
 import { useMe } from '../../src/hooks/useMe';
 import { useMyPosts } from '../../src/hooks/useMyPosts';
-import { areas, currentUser } from '../../src/mocks/phoMinh';
+import type { FixedArea } from '../../src/api/client';
 
-const TIER_BARS = 5;
+const AREA_COLOR: Record<FixedArea['label'], string> = { home: '#1f6f52', work: '#c9a227' };
+const AREA_TITLE: Record<FixedArea['label'], string> = { home: 'Nhà', work: 'Chỗ làm' };
 
 function joinedMonthsAgo(createdAt: string): number {
   const ms = Date.now() - new Date(createdAt).getTime();
@@ -21,7 +24,10 @@ export default function ProfileScreen() {
   const { data: me } = useMe();
   const { data: myPosts } = useMyPosts();
   const { data: accountStatus } = useAccountStatus();
+  const { data: fixedAreas } = useFixedAreas();
   const displayName = me?.realName ?? me?.alias ?? '...';
+  const home = fixedAreas?.find((a) => a.label === 'home');
+  const work = fixedAreas?.find((a) => a.label === 'work');
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
@@ -45,34 +51,22 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <Pressable
-            onPress={() => router.push('/profile/trust')}
-            className="mt-4 rounded-2xl border border-border bg-cream p-3.5"
-          >
-            <View className="flex-row items-center gap-2.5">
-              <Chip label={currentUser.trustTier} color="green" size="md" />
-              <Text className="text-[12.5px] text-muted">
-                bậc {currentUser.trustTierIndex} / {currentUser.trustTierMax}
-              </Text>
-            </View>
-            <View className="mt-3 flex-row gap-1.5">
-              {Array.from({ length: TIER_BARS }).map((_, i) => (
-                <View
-                  key={i}
-                  className={`flex-1 h-1.5 rounded-full ${i < currentUser.trustTierIndex ? 'bg-primary' : 'bg-border'}`}
-                />
-              ))}
-            </View>
-            <Text className="mt-2.5 text-xs leading-[19px] text-muted">
-              Còn <Text className="font-sans-bold text-ink">{currentUser.nextTierIn} lượt hữu ích</Text> nữa để lên
-              bậc "Kỳ cựu". Điểm chỉ tăng, không ai hạ được điểm của bạn.
-            </Text>
-          </Pressable>
+          {me ? (
+            <Pressable
+              onPress={() => router.push('/profile/trust')}
+              className="mt-4 rounded-2xl border border-border bg-cream p-3.5"
+            >
+              <TrustBadgeCard
+                trustBadgeLabel={me.trustBadgeLabel}
+                trustTier={me.trustTier}
+                pointsToNextTier={me.pointsToNextTier}
+              />
+            </Pressable>
+          ) : null}
 
           <View className="mt-3 flex-row flex-wrap gap-2">
             <Chip label="Xác thực SĐT" color="green" />
-            <Chip label="Tài khoản > 6 tháng" color="gray" />
-            <Chip label="12 tin được xác nhận" color="gold" />
+            {me && joinedMonthsAgo(me.createdAt) >= 6 ? <Chip label="Tài khoản > 6 tháng" color="gray" /> : null}
           </View>
         </View>
 
@@ -97,8 +91,8 @@ export default function ProfileScreen() {
 
           <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">KHU VỰC CỦA TÔI</Text>
           <View className="mt-2.5 gap-2.5">
-            <AreaRow label={`Nhà · ${areas.home.place}`} meta={`Bán kính ${areas.home.radiusKm} km · nhắc tin mỗi thứ Ba`} dot={areas.home.color} />
-            <AreaRow label={`Chỗ làm · ${areas.work.place}`} meta={`Bán kính ${areas.work.radiusKm} km · nhắc tin mỗi thứ Ba`} dot={areas.work.color} />
+            <AreaRow area={home} label="home" />
+            <AreaRow area={work} label="work" />
           </View>
 
           <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">TÀI KHOẢN</Text>
@@ -140,16 +134,22 @@ function AccountStatusBanner({
   );
 }
 
-function AreaRow({ label, meta, dot }: { label: string; meta: string; dot: string }) {
+function AreaRow({ area, label }: { area: FixedArea | undefined; label: FixedArea['label'] }) {
+  const title = AREA_TITLE[label];
   return (
     <Pressable
       onPress={() => router.push('/profile/areas')}
       className="rounded-[13px] border border-border bg-white px-3.5 py-3 flex-row items-center gap-2.5"
     >
-      <View style={{ backgroundColor: dot }} className="w-2 h-2 rounded-full" />
+      <View style={{ backgroundColor: AREA_COLOR[label] }} className="w-2 h-2 rounded-full" />
       <View className="flex-1">
-        <Text className="font-sans-semibold text-sm text-ink">{label}</Text>
-        <Text className="text-[11.5px] text-muted mt-0.5">{meta}</Text>
+        <Text className="font-sans-semibold text-sm text-ink">
+          {title}
+          {area ? ` · ${area.addressText}` : ''}
+        </Text>
+        <Text className="text-[11.5px] text-muted mt-0.5">
+          {area ? `Bán kính ${area.radiusKm} km` : 'Chưa đặt khu vực'}
+        </Text>
       </View>
       <Text className="text-muted-light">›</Text>
     </Pressable>

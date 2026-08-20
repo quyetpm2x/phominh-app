@@ -10,6 +10,7 @@ export default function AuthLayout() {
       <Stack.Screen name="permissions" />
       <Stack.Screen name="area-home" />
       <Stack.Screen name="area-work" />
+      <Stack.Screen name="personal-info" />
       <Stack.Screen name="done" />
     </Stack>
   );

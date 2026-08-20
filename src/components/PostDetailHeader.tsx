@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Image, Linking, Pressable, Text, View } from 'react-native';
 
 import type { PostDetail } from '../api/endpoints/posts';
 import { fontSizeToStyle } from '../constants/post-style-presets';
@@ -16,6 +16,7 @@ interface PostDetailHeaderProps {
 
 export function PostDetailHeader({ post, canVote, onVote }: PostDetailHeaderProps) {
   const voted = post.hasVoted;
+  const merchantContact = post.merchantContact;
   return (
     <>
       <Pressable
@@ -28,7 +29,9 @@ export function PostDetailHeader({ post, canVote, onVote }: PostDetailHeaderProp
             <Text className="font-sans-semibold text-[14.5px] text-ink">{post.authorDisplayName}</Text>
             <Chip label={post.authorBadge} color="green" />
           </View>
-          <Text className="text-[11.5px] text-muted mt-0.5">{formatFreshness(post.createdAt)}</Text>
+          <Text className="text-[11.5px] text-muted mt-0.5">
+            {formatFreshness(post.createdAt)} · {post.displayMode === 'real_name' ? 'Tên thật' : 'Bí danh'}
+          </Text>
         </View>
       </Pressable>
 
@@ -70,6 +73,28 @@ export function PostDetailHeader({ post, canVote, onVote }: PostDetailHeaderProp
             Hữu ích · {post.voteCount}
           </Text>
         </Pressable>
+        {merchantContact ? (
+          <>
+            <Pressable
+              onPress={() => void Linking.openURL(`tel:${merchantContact.phoneNumber}`)}
+              className="h-9 rounded-[10px] px-3.5 flex-row items-center gap-1.5 bg-primary"
+            >
+              <Text className="font-sans-semibold text-[13px] text-white">
+                Gọi {merchantContact.phoneNumber}
+              </Text>
+            </Pressable>
+            {merchantContact.zaloEnabled ? (
+              <Pressable
+                onPress={() =>
+                  void Linking.openURL(`https://zalo.me/${merchantContact.phoneNumber.replace(/\D/g, '')}`)
+                }
+                className="h-9 rounded-[10px] px-3.5 flex-row items-center gap-1.5 border border-border bg-white"
+              >
+                <Text className="font-sans-semibold text-[13px] text-ink">Nhắn Zalo</Text>
+              </Pressable>
+            ) : null}
+          </>
+        ) : null}
       </View>
     </>
   );

@@ -4,14 +4,23 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { extractErrorMessage } from '../../src/api/client';
+import { fetchPublicProfile } from '../../src/api/endpoints/users';
 import { TextInput } from '../../src/components/ui/TextInput';
 import { useCreateReport } from '../../src/hooks/useReports';
 
 const REASONS = ['Thông tin sai sự thật', 'Quấy rối / xúc phạm', 'Ảnh không phải chụp tại chỗ', 'Spam / quảng cáo', 'Khác'];
 
-// on.reportPost — báo cáo ẩn danh, người đăng không biết ai đã báo cáo.
+// on.reportPost — báo cáo ẩn danh, người đăng không biết ai đã báo cáo. Khi vào từ menu "Báo cáo
+// nghi ngờ bán chuyên nghiệp trá hình" (post/[id].tsx, chỉ hiện cho bài postType='merchant'), gửi
+// targetType='merchant_suspicious' thay vì 'post' (mục 31/98) — cần tra merchantId qua hồ sơ công
+// khai của tác giả (mục 98 mới thêm field `merchantId`), vì report loại này nhắm vào MERCHANT chứ
+// không phải 1 bài đăng cụ thể.
 export default function ReportPostScreen() {
-  const { postId } = useLocalSearchParams<{ postId: string }>();
+  const { postId, suspiciousMerchantAuthorId } = useLocalSearchParams<{
+    postId: string;
+    suspiciousMerchantAuthorId?: string;
+  }>();
+  const isSuspiciousMerchantReport = !!suspiciousMerchantAuthorId;
   const [reason, setReason] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -21,12 +30,23 @@ export default function ReportPostScreen() {
     if (!reason || !postId || createReport.isPending) return;
     setError(null);
     try {
-      await createReport.mutateAsync({
-        targetType: 'post',
-        targetId: postId,
-        reason,
-        description: description.trim() || undefined,
-      });
+      if (isSuspiciousMerchantReport && suspiciousMerchantAuthorId) {
+        const profile = await fetchPublicProfile(suspiciousMerchantAuthorId);
+        if (!profile.merchantId) throw new Error('Không tìm thấy hồ sơ quán của tác giả bài này');
+        await createReport.mutateAsync({
+          targetType: 'merchant_suspicious',
+          targetId: profile.merchantId,
+          reason,
+          description: description.trim() || undefined,
+        });
+      } else {
+        await createReport.mutateAsync({
+          targetType: 'post',
+          targetId: postId,
+          reason,
+          description: description.trim() || undefined,
+        });
+      }
       router.back();
     } catch (err) {
       setError(await extractErrorMessage(err));
@@ -39,12 +59,16 @@ export default function ReportPostScreen() {
         <Pressable onPress={() => router.back()} className="w-[34px] h-[34px] items-center justify-center">
           <Text className="text-[21px] text-ink">‹</Text>
         </Pressable>
-        <Text className="font-sans-semibold text-[14.5px] text-ink">Báo cáo bài đăng</Text>
+        <Text className="font-sans-semibold text-[14.5px] text-ink">
+          {isSuspiciousMerchantReport ? 'Báo cáo nghi ngờ trá hình' : 'Báo cáo bài đăng'}
+        </Text>
       </View>
 
       <ScrollView contentContainerClassName="p-4.5">
         <Text className="text-[13px] leading-[20px] text-muted">
-          Báo cáo được gửi ẩn danh vào hàng đợi kiểm duyệt. Người đăng không biết ai đã báo cáo.
+          {isSuspiciousMerchantReport
+            ? 'Báo cáo quán này nghi ngờ bán chuyên nghiệp nhưng đăng như tài khoản cá nhân để né phí. Gửi ẩn danh, chủ quán không biết ai đã báo cáo.'
+            : 'Báo cáo được gửi ẩn danh vào hàng đợi kiểm duyệt. Người đăng không biết ai đã báo cáo.'}
         </Text>
         <View className="mt-3.5 gap-2.5">
           {REASONS.map((r) => (

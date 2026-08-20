@@ -5,22 +5,36 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { extractErrorMessage } from '../../src/api/client';
+import { DateOfBirthFields } from '../../src/components/DateOfBirthFields';
+import { GenderSelector, type Gender } from '../../src/components/GenderSelector';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { TextInput } from '../../src/components/ui/TextInput';
 import { useMe } from '../../src/hooks/useMe';
 import { useUpdateProfile, useUploadAvatar } from '../../src/hooks/useUserProfile';
+import { toIsoDate, type DateOfBirthParts } from '../../src/lib/dateOfBirth';
 import { areas } from '../../src/mocks/phoMinh';
 
-// on.editProfile — chỉnh sửa tên hiển thị, ảnh đại diện (mục 37), hai khu vực cố định.
+const EMPTY_DOB: DateOfBirthParts = { day: '', month: '', year: '' };
+
+// on.editProfile — chỉnh sửa tên/ảnh/ngày sinh/giới tính (bắt buộc lúc onboarding, sửa lại được
+// sau đó ở đây) + hai khu vực cố định.
 export default function EditProfileScreen() {
   const { data: me } = useMe();
   const updateProfile = useUpdateProfile();
   const uploadAvatar = useUploadAvatar();
   const [realName, setRealName] = useState('');
+  const [dob, setDob] = useState<DateOfBirthParts>(EMPTY_DOB);
+  const [gender, setGender] = useState<Gender | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (me) setRealName(me.realName ?? '');
+    if (!me) return;
+    setRealName(me.realName ?? '');
+    setGender(me.gender);
+    if (me.dateOfBirth) {
+      const [y, m, d] = me.dateOfBirth.split('-');
+      setDob({ day: String(Number(d)), month: String(Number(m)), year: y });
+    }
   }, [me]);
 
   const onPickAvatar = async () => {
@@ -44,8 +58,13 @@ export default function EditProfileScreen() {
 
   const onSave = async () => {
     setError(null);
+    const isoDate = toIsoDate(dob);
     try {
-      await updateProfile.mutateAsync(realName.trim());
+      await updateProfile.mutateAsync({
+        realName: realName.trim(),
+        dateOfBirth: isoDate ?? undefined,
+        gender: gender ?? undefined,
+      });
       router.back();
     } catch (err) {
       setError(await extractErrorMessage(err));
@@ -85,7 +104,7 @@ export default function EditProfileScreen() {
           </Pressable>
         </View>
 
-        <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">TÊN HIỂN THỊ</Text>
+        <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">HỌ VÀ TÊN</Text>
         <View className="mt-2 h-[50px] rounded-[13px] bg-white border-[1.5px] border-primary justify-center px-4">
           <TextInput
             value={realName}
@@ -94,7 +113,20 @@ export default function EditProfileScreen() {
             className="border-0 h-auto px-0 text-[15px] font-sans-medium"
           />
         </View>
-        <Text className="mt-1.5 text-xs text-muted">Không bắt buộc tên thật. Hàng xóm thường đặt theo toà nhà hoặc ngõ.</Text>
+        <Text className="mt-1.5 text-xs text-muted">
+          Bắt buộc điền lúc đăng ký. Bí danh vẫn dùng khi bình luận — tên thật chỉ hiện khi bạn tự chọn cho một bài
+          cụ thể.
+        </Text>
+
+        <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">NGÀY SINH</Text>
+        <View className="mt-2">
+          <DateOfBirthFields value={dob} onChange={setDob} />
+        </View>
+
+        <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">GIỚI TÍNH</Text>
+        <View className="mt-2">
+          <GenderSelector value={gender} onChange={setGender} />
+        </View>
 
         <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">HAI KHU VỰC CỐ ĐỊNH</Text>
         <View className="mt-2.5 gap-2.5">

@@ -1,5 +1,4 @@
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,16 +11,20 @@ const FREQS: { label: string; value: 'daily' | 'weekly' | 'emergency_only' }[] =
   { label: 'Chỉ khẩn cấp', value: 'emergency_only' },
 ];
 
+// Khớp mặc định backend dùng khi user chưa từng tự chọn (quiet-hours.util.ts DEFAULT_QUIET_HOURS_*).
+const DEFAULT_QUIET_START = '22:00';
+const DEFAULT_QUIET_END = '07:00';
+const QUIET_HOURS_PRESETS: { label: string; start: string; end: string }[] = [
+  { label: '22:00 – 07:00', start: '22:00', end: '07:00' },
+  { label: '23:00 – 06:00', start: '23:00', end: '06:00' },
+  { label: '21:00 – 08:00', start: '21:00', end: '08:00' },
+  { label: '00:00 – 06:00', start: '00:00', end: '06:00' },
+];
+
 // on.notifSettings — tần suất bản tin, loại thông báo, giờ yên tĩnh (mục 48).
 export default function NotifSettingsScreen() {
   const { data: settings, isLoading } = useNotificationSettings();
   const updateSettings = useUpdateNotificationSettings();
-  // "Nhắn hỏi mới" chưa có tính năng nhắn tin thật ở backend — giữ local-only, không gửi lên server.
-  const [messagesLocalOnly, setMessagesLocalOnly] = useState(false);
-
-  useEffect(() => {
-    if (settings) setMessagesLocalOnly(false);
-  }, [settings]);
 
   if (isLoading || !settings) {
     return (
@@ -63,15 +66,28 @@ export default function NotifSettingsScreen() {
             on={settings.notifyComments}
             onToggle={() => void updateSettings.mutateAsync({ notifyComments: !settings.notifyComments })}
           />
-          <ToggleRow label="Nhắn hỏi mới" on={messagesLocalOnly} onToggle={() => setMessagesLocalOnly((v) => !v)} />
         </View>
 
         <Text className="mt-5.5 font-mono-medium text-xs tracking-wide text-muted">GIỜ YÊN TĨNH</Text>
-        <View className="mt-2.5 rounded-2xl border border-border bg-white px-3.5 py-3 flex-row items-center">
-          <Text className="flex-1 text-[13.5px] text-ink">Không làm phiền</Text>
-          <Text className="font-mono-semibold text-[13px] text-ink">
-            {settings.quietHoursStart ?? '22:00'} – {settings.quietHoursEnd ?? '07:00'}
-          </Text>
+        <Text className="mt-1 text-xs leading-[18px] text-muted">
+          Không gửi thông báo đẩy (rung/kêu máy) trong khung giờ này — thông báo vẫn được ghi lại,
+          xem được khi mở app.
+        </Text>
+        <View className="mt-2.5 flex-row flex-wrap gap-1.5">
+          {QUIET_HOURS_PRESETS.map((p) => {
+            const start = settings.quietHoursStart ?? DEFAULT_QUIET_START;
+            const end = settings.quietHoursEnd ?? DEFAULT_QUIET_END;
+            return (
+              <FilterChip
+                key={p.label}
+                label={p.label}
+                selected={start === p.start && end === p.end}
+                onPress={() =>
+                  void updateSettings.mutateAsync({ quietHoursStart: p.start, quietHoursEnd: p.end })
+                }
+              />
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>

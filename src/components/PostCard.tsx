@@ -66,7 +66,7 @@ export function PostCard({ post, onVote, canVote = true, onConfirmUrgent }: Post
             {post.isFaved ? <Chip label="★ Người quen" color="green" /> : null}
           </View>
           <Text className="mt-0.5 font-mono-medium text-[11px] text-muted">
-            {post.distance} · {post.timeAgo}
+            {post.distance} · {post.timeAgo} · {post.displayMode === 'real_name' ? 'Tên thật' : 'Bí danh'}
           </Text>
         </View>
         <Chip label={post.tag} color={TAG_COLOR[post.tagColor]} />

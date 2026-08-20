@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { fetchPublicProfile, updateProfile, uploadAvatar } from '../api/endpoints/users';
+import {
+  createPenaltyAppeal,
+  fetchPublicProfile,
+  fetchTrustHistory,
+  updateProfile,
+  uploadAvatar,
+  type UpdateProfileInput,
+} from '../api/endpoints/users';
 
 export function usePublicProfile(userId: string) {
   return useQuery({
@@ -13,7 +20,7 @@ export function usePublicProfile(userId: string) {
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (realName: string) => updateProfile(realName),
+    mutationFn: (input: UpdateProfileInput) => updateProfile(input),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['me'] }),
   });
 }
@@ -23,5 +30,18 @@ export function useUploadAvatar() {
   return useMutation({
     mutationFn: (uri: string) => uploadAvatar(uri),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['me'] }),
+  });
+}
+
+export function useTrustHistory() {
+  return useQuery({ queryKey: ['trustHistory'], queryFn: fetchTrustHistory });
+}
+
+export function useCreatePenaltyAppeal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ historyId, explanation }: { historyId: string; explanation: string }) =>
+      createPenaltyAppeal(historyId, explanation),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['trustHistory'] }),
   });
 }

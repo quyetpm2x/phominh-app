@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { extractErrorMessage } from '../../src/api/client';
 import type { BankAccount } from '../../src/api/endpoints/payments';
 import { TextInput } from '../../src/components/ui/TextInput';
-import { useLinkBankAccount, useMyBankAccounts } from '../../src/hooks/usePayments';
+import { useLinkBankAccount, useMyBankAccounts, useUnlinkBankAccount } from '../../src/hooks/usePayments';
 
 // on.linkBank — liên kết tài khoản ngân hàng qua eKYC (mục 53/54, bussiness §5.1a). eKYC thật
 // (Momo/VNPay) CHƯA tích hợp — verifiedAt do phía vận hành xác thực thủ công ở scaffold này, tài
@@ -14,6 +14,7 @@ import { useLinkBankAccount, useMyBankAccounts } from '../../src/hooks/usePaymen
 export default function LinkBankScreen() {
   const { data: accounts, isLoading } = useMyBankAccounts();
   const linkAccount = useLinkBankAccount();
+  const unlinkAccount = useUnlinkBankAccount();
   const [bankCode, setBankCode] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolderName, setAccountHolderName] = useState('');
@@ -21,6 +22,23 @@ export default function LinkBankScreen() {
 
   const canSubmit =
     bankCode.trim().length > 0 && accountNumber.trim().length > 0 && accountHolderName.trim().length > 0;
+
+  const onUnlink = (account: BankAccount) => {
+    Alert.alert('Gỡ tài khoản ngân hàng?', `${account.bankCode} · ${account.accountHolderName}`, [
+      { text: 'Huỷ', style: 'cancel' },
+      {
+        text: 'Gỡ',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await unlinkAccount.mutateAsync(account.id);
+          } catch (err) {
+            setError(await extractErrorMessage(err));
+          }
+        },
+      },
+    ]);
+  };
 
   const onSubmit = async () => {
     if (!canSubmit) return;
@@ -54,7 +72,12 @@ export default function LinkBankScreen() {
         {accounts && accounts.length > 0 ? (
           <View className="rounded-2xl border border-border bg-white overflow-hidden">
             {accounts.map((account, i) => (
-              <BankAccountRow key={account.id} account={account} last={i === accounts.length - 1} />
+              <BankAccountRow
+                key={account.id}
+                account={account}
+                last={i === accounts.length - 1}
+                onUnlink={() => onUnlink(account)}
+              />
             ))}
           </View>
         ) : null}
@@ -109,9 +132,17 @@ export default function LinkBankScreen() {
   );
 }
 
-function BankAccountRow({ account, last }: { account: BankAccount; last?: boolean }) {
+function BankAccountRow({
+  account,
+  last,
+  onUnlink,
+}: {
+  account: BankAccount;
+  last?: boolean;
+  onUnlink: () => void;
+}) {
   return (
-    <View className={`px-3.5 py-3 flex-row items-center ${last ? '' : 'border-b border-border-soft'}`}>
+    <View className={`px-3.5 py-3 flex-row items-center gap-2 ${last ? '' : 'border-b border-border-soft'}`}>
       <View className="flex-1">
         <Text className="font-sans-semibold text-[13.5px] text-ink">
           {account.bankCode} · {account.accountHolderName}
@@ -125,6 +156,9 @@ function BankAccountRow({ account, last }: { account: BankAccount; last?: boolea
       ) : (
         <Text className="text-[11.5px] font-sans-semibold text-accent-text">Chờ xác thực</Text>
       )}
+      <Pressable onPress={onUnlink} className="ml-1 h-7 w-7 items-center justify-center">
+        <Text className="text-[15px] text-danger">✕</Text>
+      </Pressable>
     </View>
   );
 }

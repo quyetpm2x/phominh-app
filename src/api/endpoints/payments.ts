@@ -34,6 +34,11 @@ export async function fetchMyBankAccounts(): Promise<BankAccount[]> {
   return res.data;
 }
 
+// Gỡ tài khoản (mục 54) — không sửa tại chỗ, xem lý do trong PaymentsService.unlinkBankAccount.
+export async function unlinkBankAccount(id: string): Promise<void> {
+  await apiClient.delete(`api/mobile/users/me/bank-accounts/${id}`);
+}
+
 // ===== Rút thưởng (mục 59/60) =====
 
 export type PayoutStatus = 'pending' | 'processing' | 'success' | 'failed';

@@ -11,6 +11,7 @@ import { GradientButton } from '../../../src/components/ui/Button';
 import { Avatar } from '../../../src/components/ui/Avatar';
 import { colors } from '../../../src/constants/design-tokens';
 import { fontSizeToStyle } from '../../../src/constants/post-style-presets';
+import { mapCategoryToPostType } from '../../../src/lib/postCategoryMapping';
 import { submitPendingPost } from '../../../src/lib/submitPendingPost';
 import { usePendingPostStore } from '../../../src/stores/pendingPostStore';
 import { usePostDraftStore } from '../../../src/stores/postDraftStore';
@@ -24,7 +25,9 @@ export default function ConfirmScreen() {
     lat,
     lng,
     isMockLocation,
+    isLibraryPhoto,
     content,
+    category,
     displayMode,
     textColor,
     backgroundColor,
@@ -32,6 +35,7 @@ export default function ConfirmScreen() {
     setDisplayMode,
     reset,
   } = usePostDraftStore();
+  const postType = mapCategoryToPostType(category);
   const addPending = usePendingPostStore((s) => s.addPending);
   const [addressText, setAddressText] = useState('Đang tìm địa chỉ…');
   const [me, setMe] = useState<UserProfile | null>(null);
@@ -77,9 +81,11 @@ export default function ConfirmScreen() {
       localId: `pending-${Date.now()}`,
       photoUri,
       content,
+      postType,
       lat,
       lng,
       isMockLocation,
+      isLibraryPhoto,
       displayMode,
       authorDisplayName: displayName,
       status: 'uploading' as const,
@@ -133,9 +139,19 @@ export default function ConfirmScreen() {
         </View>
 
         <View className="mt-3.5 rounded-2xl border border-border bg-white overflow-hidden">
-          <Row label="Hạn hiển thị" value="48 giờ" mono />
+          <Row label="Hạn hiển thị" value={postType === 'emergency' ? 'Không tự ẩn — cần hàng xóm xác nhận' : '48 giờ'} mono />
           <Row label="Vị trí gắn kèm" value={addressText} last />
         </View>
+
+        {postType === 'emergency' ? (
+          <View className="mt-3.5 rounded-[14px] border border-danger-200 bg-danger-50 px-3.5 py-3 flex-row gap-2.5">
+            <Ionicons name="warning" size={16} color={colors.danger.text} style={{ marginTop: 1 }} />
+            <Text className="flex-1 text-xs leading-[19px] text-danger-text">
+              Bài này được đánh dấu <Text className="font-sans-bold">Khẩn cấp</Text> — sẽ hiện nổi bật và không tự
+              ẩn sau 48 giờ. Cần đủ hàng xóm ở gần xác nhận mới được xác minh chính thức.
+            </Text>
+          </View>
+        ) : null}
 
         <Text className="mt-4 font-mono-medium text-xs tracking-wide text-muted">HIỂN THỊ TÊN</Text>
         <View className="mt-2.5 rounded-2xl border border-border bg-white overflow-hidden">

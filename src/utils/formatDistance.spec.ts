@@ -7,8 +7,8 @@ describe('formatDistance', () => {
     expect(formatDistance(30)).toBe('~1 phút đi bộ');
   });
 
-  it('từ 1000m trở lên → hiện km với 1 chữ số thập phân', () => {
-    expect(formatDistance(1000)).toBe('1.0 km');
-    expect(formatDistance(2538)).toBe('2.5 km');
+  it('từ 1000m trở lên → hiện phút xe máy (350m/phút, làm tròn), không còn hiện km', () => {
+    expect(formatDistance(1000)).toBe('~3 phút xe máy');
+    expect(formatDistance(3500)).toBe('~10 phút xe máy');
   });
 });
