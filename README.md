@@ -19,9 +19,6 @@ Các package đã cài nhưng CHƯA dùng ở 3 màn hiện tại (giữ lại c
 `expo-blur`, `expo-notifications`, `react-native-maps`, `@react-native-community/datetimepicker`,
 `libphonenumber-js`, `@supabase/supabase-js`.
 
-Nút "Gửi mã xác thực" ở màn Nhập số điện thoại hiện điều hướng sang `/(auth)/otp-verify` —
-route này **chưa tồn tại**, cần tạo lại khi làm tiếp luồng đăng ký.
-
 ## Cài đặt & chạy
 
 ```bash
@@ -33,16 +30,6 @@ pnpm lint         # ESLint
 pnpm type-check   # tsc --noEmit
 pnpm test         # Jest
 ```
-
-Cần file `.env` (copy từ `.env.example`), 3 biến:
-- `EXPO_PUBLIC_API_URL` — trỏ đúng cổng backend NestJS đang chạy (`backend/`). Nếu chạy trên
-  thiết bị thật/Simulator khác máy, **không dùng `localhost`**, phải dùng IP LAN của máy chạy
-  backend (`ipconfig getifaddr en0` trên macOS).
-- `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — chỉ dùng cho Supabase
-  Realtime phía client sau này, KHÔNG liên quan đăng nhập/OTP (OTP đi qua NestJS).
-
-Biến `EXPO_PUBLIC_*` được bake vào bundle lúc build — sửa `.env` xong phải chạy lại
-`npx expo start -c` (clear cache), không hot-reload được.
 
 ## Cấu trúc thư mục (đúng thực trạng hiện tại)
 
