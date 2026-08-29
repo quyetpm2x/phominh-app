@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
 import * as Location from 'expo-location';
 import { useEffect, useMemo, useState } from 'react';
@@ -7,9 +9,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { extractErrorMessage, getFixedAreas, type FixedArea } from '../../src/api/client';
 import type { NearbyPost } from '../../src/api/endpoints/posts';
 import { colors } from '../../src/constants/design-tokens';
+import { NEARBY_RADIUS_KM } from '../../src/constants/geo';
+import { AreaTabsBar, type AreaTabOption } from '../../src/components/feed/AreaTabsBar';
 import { CreateSheet } from '../../src/components/feed/CreateSheet';
 import { FeedBody } from '../../src/components/feed/FeedBody';
-import { UnderlineTabs, type UnderlineTabOption } from '../../src/components/ui/UnderlineTabs';
+import { GradientText } from '../../src/components/ui/GradientText';
 import { useMe } from '../../src/hooks/useMe';
 import { usePosts } from '../../src/hooks/usePosts';
 import { useCastPostVote } from '../../src/hooks/useVotes';
@@ -21,7 +25,7 @@ import { useFilterStore } from '../../src/stores/filterStore';
 import { usePendingPostStore } from '../../src/stores/pendingPostStore';
 
 const AREA_LABELS: Record<AreaKey, string> = { home: 'Nhà', work: 'Chỗ làm', nearby: 'Quanh đây' };
-const NEARBY_RADIUS_KM = 1.5;
+
 const POST_TYPE_TAG: Record<NearbyPost['postType'], { label: PostTag; color: UIPost['tagColor'] }> = {
   life: { label: 'Đời sống', color: 'gray' },
   merchant: { label: 'Cửa hàng', color: 'gold' },
@@ -38,6 +42,11 @@ function toUIPost(p: NearbyPost, area: AreaKey): UIPost {
     initial: p.authorDisplayName.charAt(0).toUpperCase(),
     avatarColor: colors.primary.DEFAULT,
     badge: p.authorBadge,
+    // Thiếu từ trước — PostCard.tsx dùng isShop để đổi viền avatar/nút liên hệ quán, không set thì
+    // bài merchant thật không bao giờ hiện đúng kiểu. isUrgent CHƯA set: cần confirmCount thật từ
+    // backend (NearbyPost chưa có field này) mới hiện đúng banner "N người đã xác nhận", set cứng
+    // isUrgent=true lúc này sẽ hiện "undefined người đã xác nhận" — để nguyên tới khi backend bổ sung.
+    isShop: p.postType === 'merchant',
     tag: POST_TYPE_TAG[p.postType].label,
     tagColor: POST_TYPE_TAG[p.postType].color,
     text: p.content,
@@ -62,7 +71,7 @@ function toUIPost(p: NearbyPost, area: AreaKey): UIPost {
 // Nhà/Chỗ làm lấy toạ độ từ FixedArea đã lưu (area-home.tsx/area-work.tsx), Quanh đây lấy GPS sống.
 export default function FeedScreen() {
   const { justPosted } = useLocalSearchParams<{ justPosted?: string }>();
-  const [area, setArea] = useState<AreaKey>('home');
+  const [area, setArea] = useState<AreaKey>('nearby');
   const [mapOn, setMapOn] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [postedToast, setPostedToast] = useState(!!justPosted);
@@ -138,9 +147,15 @@ export default function FeedScreen() {
     return sorted.map((p) => toUIPost(p, area));
   }, [nearbyPosts, area, filterStore.postTypes, filterStore.sortMode]);
 
-  const AREA_OPTIONS: UnderlineTabOption<AreaKey>[] = (['home', 'work', 'nearby'] as AreaKey[]).map((key) => ({
+  const AREA_ICON: Record<AreaKey, keyof typeof Ionicons.glyphMap> = {
+    nearby: 'compass',
+    home: 'home',
+    work: 'briefcase',
+  };
+  const AREA_OPTIONS: AreaTabOption[] = (['nearby', 'home', 'work'] as AreaKey[]).map((key) => ({
     key,
-    label: AREA_LABELS[key],
+    label: key === 'nearby' ? `Quanh đây (${NEARBY_RADIUS_KM}km)` : AREA_LABELS[key],
+    icon: AREA_ICON[key],
   }));
 
   const missingAreaMessage =
@@ -148,33 +163,44 @@ export default function FeedScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream" edges={['top']}>
-      <View className="px-5 pt-0.5 bg-cream border-b border-border">
-        <View className="h-10 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-2">
-            <View className="w-[26px] h-[26px] rounded-[9px] bg-primary items-center justify-center">
-              <Text className="font-sans-bold text-white text-sm">P</Text>
-            </View>
-            <View>
-              <Text className="font-sans-bold text-sm text-ink leading-4">Phố Mình</Text>
+      <View className="border-b border-border bg-cream px-5 pb-3 pt-1">
+        <View className="flex-row items-center justify-between">
+          <View className="flex-1 flex-row items-center gap-3">
+            <LinearGradient
+              colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
+              style={{ width: 40, height: 40, borderRadius: 16, padding: 2 }}
+            >
+              <View className="flex-1 items-center justify-center rounded-[14px] bg-white">
+                <GradientText colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]} className="text-xl font-sans-black">
+                  P
+                </GradientText>
+              </View>
+            </LinearGradient>
+            <View className="flex-1">
               <View className="flex-row items-center gap-1.5">
-                <View className="w-1.5 h-1.5 rounded-full bg-primary" />
-                <Text className="text-[11.5px] text-muted" numberOfLines={1}>
-                  {active ? `${active.place} · ${active.radiusKm} km` : '...'}
+                <Text className="text-[19px] font-sans-black tracking-tight text-ink">Phố Mình</Text>
+                <View className="flex-row items-center gap-0.5 rounded-full border border-accent/25 bg-accent/15 px-1.5 py-0.5">
+                  <Ionicons name="sparkles" size={8} color={colors.accent.DEFAULT} />
+                  <Text className="text-[9px] font-sans-black uppercase tracking-wide text-accent">Live</Text>
+                </View>
+              </View>
+              <View className="mt-0.5 flex-row items-center gap-1">
+                <Ionicons name="location" size={11} color={colors.primary.DEFAULT} />
+                <Text className="flex-1 text-xs font-sans-medium text-muted" numberOfLines={1}>
+                  {active ? `${active.place} · ${active.radiusKm}km` : 'Đang định vị…'}
                 </Text>
               </View>
             </View>
           </View>
-          <View className="flex-row items-center gap-2">
-            <Pressable
-              onPress={() => setMapOn((v) => !v)}
-              className="h-[30px] rounded-[9px] border border-strong bg-white px-2.5 items-center justify-center"
-            >
-              <Text className="font-sans-semibold text-xs text-ink">{mapOn ? 'Danh sách' : 'Bản đồ'}</Text>
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={() => setMapOn((v) => !v)}
+            className="h-9 w-9 items-center justify-center rounded-xl border border-border bg-cream-surface active:scale-95"
+          >
+            <Ionicons name={mapOn ? 'list' : 'map'} size={18} color={colors.primary.DEFAULT} />
+          </Pressable>
         </View>
-        <View className="pt-2.5">
-          <UnderlineTabs options={AREA_OPTIONS} value={area} onChange={setArea} />
+        <View className="mt-3 border-t border-border/60 pt-2.5">
+          <AreaTabsBar options={AREA_OPTIONS} value={area} onChange={setArea} />
         </View>
       </View>
 

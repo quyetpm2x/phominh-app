@@ -1,5 +1,7 @@
 import { Image, Text, View } from 'react-native';
 
+import { colors } from '../../constants/design-tokens';
+
 interface AvatarProps {
   initial: string;
   color?: string;
@@ -9,7 +11,9 @@ interface AvatarProps {
 }
 
 // Bong bóng chữ cái đầu — dùng cho author feed, hồ sơ, chat khi CHƯA có ảnh đại diện thật.
-export function Avatar({ initial, color = '#1f6f52', size = 38, radius = 12, imageUrl }: AvatarProps) {
+// Màu mặc định trước đây hardcode '#1f6f52' (xanh lá thương hiệu CŨ, sót lại từ trước rebrand
+// 2026-08-24) — sửa lại dùng đúng colors.primary.DEFAULT (hồng) hiện tại.
+export function Avatar({ initial, color = colors.primary.DEFAULT, size = 38, radius = 12, imageUrl }: AvatarProps) {
   if (imageUrl) {
     return (
       <Image

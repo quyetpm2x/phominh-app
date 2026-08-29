@@ -1,10 +1,19 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Keyboard,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { extractErrorMessage } from '../../src/api/client';
+import { colors } from '../../src/constants/design-tokens';
 import { DateOfBirthFields } from '../../src/components/DateOfBirthFields';
 import { GenderSelector, type Gender } from '../../src/components/GenderSelector';
 import { Avatar } from '../../src/components/ui/Avatar';
@@ -12,6 +21,7 @@ import { TextInput } from '../../src/components/ui/TextInput';
 import { useMe } from '../../src/hooks/useMe';
 import { useUpdateProfile, useUploadAvatar } from '../../src/hooks/useUserProfile';
 import { toIsoDate, type DateOfBirthParts } from '../../src/lib/dateOfBirth';
+import { sanitizeSpacing } from '../../src/lib/sanitizeSpacing';
 import { areas } from '../../src/mocks/phoMinh';
 
 const EMPTY_DOB: DateOfBirthParts = { day: '', month: '', year: '' };
@@ -26,6 +36,9 @@ export default function EditProfileScreen() {
   const [dob, setDob] = useState<DateOfBirthParts>(EMPTY_DOB);
   const [gender, setGender] = useState<Gender | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [realNameTouched, setRealNameTouched] = useState(false);
+  const [realNameFocused, setRealNameFocused] = useState(false);
+  const realNameInvalid = realNameTouched && realName.trim().length === 0;
 
   useEffect(() => {
     if (!me) return;
@@ -56,7 +69,10 @@ export default function EditProfileScreen() {
     }
   };
 
+  const canSubmit = realName.trim().length > 0;
+
   const onSave = async () => {
+    if (!canSubmit || updateProfile.isPending) return;
     setError(null);
     const isoDate = toIsoDate(dob);
     try {
@@ -79,13 +95,20 @@ export default function EditProfileScreen() {
         </Pressable>
         <Text className="font-sans-semibold text-sm text-ink">Chỉnh sửa hồ sơ</Text>
         <View className="flex-1" />
-        <Pressable onPress={() => void onSave()} className="h-8 rounded-lg bg-ink px-3.5 items-center justify-center">
+        <Pressable
+          onPress={() => void onSave()}
+          disabled={!canSubmit || updateProfile.isPending}
+          className="h-8 rounded-lg bg-ink px-3.5 items-center justify-center"
+          style={{ opacity: !canSubmit || updateProfile.isPending ? 0.5 : 1 }}
+        >
           <Text className="font-sans-semibold text-xs text-white">Lưu</Text>
         </Pressable>
       </View>
 
-      <ScrollView contentContainerClassName="p-4.5">
-        {error ? <Text className="mb-2 text-xs text-danger">{error}</Text> : null}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View className="flex-1">
+          <ScrollView contentContainerClassName="p-4.5">
+            {error ? <Text className="mb-2 text-xs text-danger">{error}</Text> : null}
 
         <View className="flex-row items-center gap-3.5">
           <Avatar
@@ -105,18 +128,44 @@ export default function EditProfileScreen() {
         </View>
 
         <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">HỌ VÀ TÊN</Text>
-        <View className="mt-2 h-[50px] rounded-[13px] bg-white border-[1.5px] border-primary justify-center px-4">
+        <View
+          className={`mt-2 h-[50px] rounded-[13px] bg-white border-[1.5px] justify-center px-4 ${
+            realNameInvalid ? 'border-danger' : 'border-primary'
+          }`}
+          style={
+            realNameFocused
+              ? {
+                  shadowColor: colors.primary.DEFAULT,
+                  shadowOpacity: 0.18,
+                  shadowRadius: 8,
+                  shadowOffset: { width: 0, height: 0 },
+                  elevation: 3,
+                }
+              : undefined
+          }
+        >
           <TextInput
             value={realName}
-            onChangeText={setRealName}
+            onChangeText={(value) => setRealName(sanitizeSpacing(value))}
+            onFocus={() => setRealNameFocused(true)}
+            onBlur={() => {
+              setRealNameFocused(false);
+              setRealNameTouched(true);
+              setRealName((prev) => prev.trim());
+            }}
             placeholder={me?.alias ?? '...'}
+            maxLength={60}
             className="border-0 h-auto px-0 text-[15px] font-sans-medium"
           />
         </View>
-        <Text className="mt-1.5 text-xs text-muted">
-          Bắt buộc điền lúc đăng ký. Bí danh vẫn dùng khi bình luận — tên thật chỉ hiện khi bạn tự chọn cho một bài
-          cụ thể.
-        </Text>
+        {realNameInvalid ? (
+          <Text className="mt-1.5 text-xs text-danger">Vui lòng nhập họ và tên</Text>
+        ) : (
+          <Text className="mt-1.5 text-xs text-muted">
+            Bắt buộc điền lúc đăng ký. Bí danh vẫn dùng khi bình luận — tên thật chỉ hiện khi bạn tự chọn cho một bài
+            cụ thể.
+          </Text>
+        )}
 
         <Text className="mt-5 font-mono-medium text-xs tracking-wide text-muted">NGÀY SINH</Text>
         <View className="mt-2">
@@ -136,7 +185,9 @@ export default function EditProfileScreen() {
         <Text className="mt-3 text-xs leading-[19px] text-muted">
           Chỉ được đổi khu vực 2 lần mỗi tháng — tránh việc nhảy khu liên tục để soi tin khắp nơi.
         </Text>
-      </ScrollView>
+          </ScrollView>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }

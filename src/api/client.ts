@@ -98,6 +98,10 @@ export interface UserProfile {
   id: string;
   alias: string;
   realName: string | null;
+  // Bổ sung 2026-08-25 — KHÁC alias (bí danh tự sinh, cố định vĩnh viễn, bussiness §4.3), user tự
+  // chọn/sửa được bất cứ lúc nào, hiện công khai với hàng xóm.
+  nickname: string | null;
+  bio: string | null;
   avatarUrl: string | null;
   // Bắt buộc điền lúc onboarding (quyết định 2026-08-20) — null nghĩa là user CŨ chưa từng điền,
   // xem isProfileComplete() ở src/lib/profileCompleteness.ts.

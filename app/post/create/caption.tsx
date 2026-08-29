@@ -4,9 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { HighlightToolbar } from '../../../src/components/HighlightToolbar';
 import { PostStyleTools } from '../../../src/components/PostStyleTools';
 import { FilterChip } from '../../../src/components/ui/Chip';
 import { fontSizeToStyle } from '../../../src/constants/post-style-presets';
+import { HIGHLIGHT_MARKER, clearHighlight, wrapHighlight } from '../../../src/lib/highlightMarkup';
 import { composeTypeChips } from '../../../src/mocks/phoMinh';
 import { usePostDraftStore } from '../../../src/stores/postDraftStore';
 
@@ -30,6 +32,7 @@ export default function CaptionScreen() {
     setFontSize,
   } = usePostDraftStore();
   const [addressText, setAddressText] = useState('Đang tìm địa chỉ…');
+  const [selection, setSelection] = useState({ start: 0, end: 0 });
 
   useEffect(() => {
     if (lat === null || lng === null) return;
@@ -86,6 +89,7 @@ export default function CaptionScreen() {
           <TextInput
             value={content}
             onChangeText={setContent}
+            onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
             placeholder="Thêm một dòng…"
             placeholderTextColor="#a8a297"
             multiline
@@ -97,6 +101,13 @@ export default function CaptionScreen() {
             className={backgroundColor ? 'rounded-lg px-2 py-1' : undefined}
           />
         </View>
+
+        <HighlightToolbar
+          hasSelection={selection.end > selection.start}
+          hasHighlight={content.includes(HIGHLIGHT_MARKER)}
+          onHighlight={() => setContent(wrapHighlight(content, selection.start, selection.end))}
+          onClear={() => setContent(clearHighlight(content))}
+        />
 
         <PostStyleTools
           textColor={textColor}

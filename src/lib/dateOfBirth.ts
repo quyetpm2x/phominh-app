@@ -1,4 +1,4 @@
-const MIN_YEAR = 1900;
+export const MIN_YEAR = 1900;
 
 export interface DateOfBirthParts {
   day: string;

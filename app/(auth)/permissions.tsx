@@ -1,38 +1,32 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { AppState, Linking, Platform, Pressable, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, AppState, Easing, Linking, Platform, Pressable, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { registerPushToken } from '../../src/api/client';
-import { GradientButton } from '../../src/components/ui/Button';
+import { colors } from '../../src/constants/design-tokens';
+import { AuthDecorativeBlobs } from '../../src/components/ui/AuthDecorativeBlobs';
+import { GradientSubmitButton } from '../../src/components/ui/GradientSubmitButton';
+import { GradientText } from '../../src/components/ui/GradientText';
+import { PermissionRow } from '../../src/components/PermissionRow';
 
-type PermKey = 'location' | 'camera' | 'notif';
+type PermKey = 'location' | 'notif' | 'camera';
 // blocked = đã từ chối và hệ điều hành không cho hỏi lại nữa (canAskAgain=false) — chỉ còn cách
 // dẫn user qua Settings, gọi request lại lúc này sẽ không hiện popup gì cả.
 type PermState = 'granted' | 'deniable' | 'blocked' | 'undetermined';
 
-const PERMS: { key: PermKey; title: string; body: string; color: string }[] = [
-  {
-    key: 'location',
-    title: 'Vị trí',
-    body: 'Để biết bạn đang ở đâu mà hiện tin quanh đó. Chỉ lấy khi app đang mở.',
-    color: '#e4f0e9',
-  },
-  {
-    key: 'camera',
-    title: 'Camera',
-    body: 'Mọi ảnh phải chụp tại chỗ — không cho chọn ảnh cũ trong máy.',
-    color: '#f6ecd4',
-  },
-  {
-    key: 'notif',
-    title: 'Thông báo',
-    body: 'Gom tin mỗi tuần một lần. Tin khẩn cấp đã xác nhận thì báo ngay.',
-    color: '#eeece6',
-  },
+// Giao diện + text làm lại theo mockup 2026-08-26 — mô tả từng quyền rút gọn hơn bản trước (chi
+// tiết "chỉ lấy khi app đang mở"/"không cho chọn ảnh cũ" vẫn còn nhắc ở khối Nghị định 13/2023 phía
+// dưới, không mất thông tin, chỉ đổi chỗ).
+const PERMS: { key: PermKey; icon: keyof typeof Ionicons.glyphMap; tint: 'primary' | 'accent'; title: string; body: string }[] = [
+  { key: 'location', icon: 'location', tint: 'primary', title: 'Vị trí hiện tại', body: 'Quét tin tức quanh Nhà & Chỗ làm' },
+  { key: 'notif', icon: 'notifications', tint: 'accent', title: 'Thông báo', body: 'Tin khẩn, sự cố mất điện, nước' },
+  { key: 'camera', icon: 'camera', tint: 'primary', title: 'Máy ảnh', body: 'Chụp nhanh ảnh xác thực hiện trường' },
 ];
 
 function toState(status: string, canAskAgain: boolean): PermState {
@@ -91,19 +85,29 @@ async function tryRegisterPushToken(): Promise<void> {
 export default function PermissionsScreen() {
   const [statuses, setStatuses] = useState<Record<PermKey, PermState>>({
     location: 'undetermined',
-    camera: 'undetermined',
     notif: 'undetermined',
+    camera: 'undetermined',
   });
   const [loadingKey, setLoadingKey] = useState<PermKey | null>(null);
+  const dotPulse = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(dotPulse, { toValue: 1, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(dotPulse, { toValue: 0, duration: 700, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      ]),
+    ).start();
+  }, [dotPulse]);
 
   useEffect(() => {
     const refresh = async () => {
-      const [location, camera, notif] = await Promise.all([
+      const [location, notif, camera] = await Promise.all([
         getStatus('location'),
-        getStatus('camera'),
         getStatus('notif'),
+        getStatus('camera'),
       ]);
-      setStatuses({ location, camera, notif });
+      setStatuses({ location, notif, camera });
     };
 
     void refresh(); // lúc vào màn
@@ -137,57 +141,94 @@ export default function PermissionsScreen() {
     }
   };
 
+  const onContinue = () => router.push('/(auth)/area-home');
+
   return (
     <SafeAreaView className="flex-1 bg-cream">
-      <View className="flex-1 px-6 pt-3.5">
-        <Text className="text-[26px] font-sans-bold tracking-tight text-ink">App cần 3 quyền này</Text>
-        <Text className="mt-2 text-sm leading-[22px] text-muted">
-          Từ chối quyền nào cũng được — app vẫn chạy, chỉ mất phần tính năng tương ứng.
-        </Text>
+      <AuthDecorativeBlobs />
 
-        <View className="mt-5 gap-2.5">
-          {PERMS.map((p) => {
-            const state = statuses[p.key];
-            const isGranted = state === 'granted';
-            const isBlocked = state === 'blocked';
-            let buttonLabel = 'Cho phép';
-            if (isGranted) buttonLabel = 'Đã cho phép';
-            else if (isBlocked) buttonLabel = 'Mở Cài đặt';
-            else if (loadingKey === p.key) buttonLabel = '...';
-
-            return (
-              <View key={p.key} className="flex-row items-center gap-3 rounded-2xl border border-border bg-white p-3.5">
-                <View style={{ backgroundColor: p.color }} className="w-11 h-11 rounded-xl" />
-                <View className="flex-1">
-                  <Text className="font-sans-bold text-sm text-ink">{p.title}</Text>
-                  <Text className="mt-0.5 text-xs leading-[18px] text-muted">{p.body}</Text>
-                </View>
-                <Pressable
-                  onPress={() => onPressPerm(p.key)}
-                  disabled={isGranted || loadingKey !== null}
-                  className={`h-8 rounded-lg px-3 items-center justify-center ${
-                    isGranted ? 'bg-primary' : 'border border-border bg-white'
-                  }`}
-                >
-                  <Text className={`font-sans-semibold text-xs ${isGranted ? 'text-white' : 'text-ink'}`}>
-                    {buttonLabel}
-                  </Text>
-                </Pressable>
+      <View className="flex-1 px-6 pt-2">
+        <View className="flex-row items-center justify-between">
+          <Pressable
+            onPress={() => router.back()}
+            className="w-11 h-11 items-center justify-center rounded-2xl bg-white border border-border/80 shadow-sm active:scale-95"
+          >
+            <Ionicons name="arrow-back" size={18} color={colors.ink.DEFAULT} />
+          </Pressable>
+          <View className="rounded-full overflow-hidden border border-primary/15">
+            <LinearGradient colors={['#FF416C1a', '#FF4B2B1a']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+              <View className="flex-row items-center gap-1.5 px-3 py-1.5">
+                <Animated.View
+                  className="w-1.5 h-1.5 rounded-full bg-primary"
+                  style={{ opacity: dotPulse.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }}
+                />
+                <Text className="text-[11px] font-sans-bold uppercase tracking-wider text-primary">Cài đặt thiết bị</Text>
               </View>
-            );
-          })}
+            </LinearGradient>
+          </View>
         </View>
 
-        <View className="mt-4 rounded-2xl bg-primary-50 border border-primary-100 p-3.5">
-          <Text className="text-xs leading-[19px] text-primary">
-            Vị trí chỉ được lấy khi bạn mở app. Không có theo dõi chạy nền — theo Nghị định 13/2023, vị trí thời
-            gian thực là dữ liệu nhạy cảm.
-          </Text>
+        <View className="mt-6 self-start flex-row items-center gap-1.5 px-3 py-1 rounded-xl bg-primary/10">
+          <Ionicons name="lock-open" size={14} color={colors.primary.DEFAULT} />
+          <Text className="text-xs font-sans-bold text-primary">Quyền hệ điều hành</Text>
+        </View>
+
+        <View className="mt-3 flex-row flex-wrap items-baseline">
+          <Text className="text-[28px] leading-[32px] font-sans-black tracking-tight text-ink">Cấp quyền </Text>
+          <GradientText
+            colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
+            className="text-[28px] leading-[32px] font-sans-black tracking-tight"
+          >
+            truy cập
+          </GradientText>
+        </View>
+        <Text className="mt-2 text-sm leading-[22px] font-sans-medium text-muted">
+          Để dòng tin khu phố luôn chính xác và kịp thời, vui lòng cấp một số quyền cơ bản.
+        </Text>
+
+        <View className="mt-6 gap-3.5">
+          {PERMS.map((p) => {
+            const status = statuses[p.key];
+            let rowState: 'granted' | 'actionable' | 'blocked' | 'loading' = 'actionable';
+            if (loadingKey === p.key) rowState = 'loading';
+            else if (status === 'granted') rowState = 'granted';
+            else if (status === 'blocked') rowState = 'blocked';
+
+            return (
+              <PermissionRow
+                key={p.key}
+                icon={p.icon}
+                tint={p.tint}
+                title={p.title}
+                body={p.body}
+                state={rowState}
+                onPress={() => void onPressPerm(p.key)}
+              />
+            );
+          })}
+
+          <View className="flex-row items-start gap-3 rounded-2xl border border-border/80 bg-white/70 p-3.5">
+            <View
+              style={{ borderColor: `${colors.primary.DEFAULT}33`, backgroundColor: `${colors.primary.DEFAULT}1a` }}
+              className="h-11 w-11 items-center justify-center rounded-2xl border"
+            >
+              <Ionicons name="shield-checkmark" size={20} color={colors.primary.DEFAULT} />
+            </View>
+            <Text className="flex-1 text-xs leading-[19px] font-sans-medium text-muted">
+              Theo <Text className="font-sans-bold text-ink">Nghị định 13/2023/NĐ-CP</Text>, vị trí là dữ liệu nhạy
+              cảm — chỉ được lấy khi bạn mở app, không theo dõi chạy nền. Phố Mình cam kết không bao giờ chia sẻ vị
+              trí của bạn cho bất kỳ bên thứ 3 nào.
+            </Text>
+          </View>
         </View>
 
         <View className="flex-1" />
-        <View className="pb-6">
-          <GradientButton label="Tiếp tục" onPress={() => router.push('/(auth)/area-home')} />
+
+        <View className="pt-6 pb-6">
+          <GradientSubmitButton label="Tiếp tục" disabled={false} loading={false} onPress={onContinue} />
+          <Pressable onPress={onContinue} className="mt-2.5 py-2 items-center">
+            <Text className="text-[13px] font-sans-semibold text-muted">Để sau, thiết lập trong Cài đặt</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>

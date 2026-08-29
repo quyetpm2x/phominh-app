@@ -4,8 +4,9 @@ import {
   BeVietnamPro_500Medium,
   BeVietnamPro_600SemiBold,
   BeVietnamPro_700Bold,
+  BeVietnamPro_900Black,
 } from '@expo-google-fonts/be-vietnam-pro';
-import { JetBrainsMono_400Regular, JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
+import { JetBrainsMono_400Regular, JetBrainsMono_500Medium, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -23,8 +24,10 @@ export default function RootLayout() {
     BeVietnamPro_500Medium,
     BeVietnamPro_600SemiBold,
     BeVietnamPro_700Bold,
+    BeVietnamPro_900Black,
     JetBrainsMono_400Regular,
     JetBrainsMono_500Medium,
+    JetBrainsMono_700Bold,
   });
 
   // useFonts đôi khi không bao giờ resolve thành true LẪN không báo lỗi trên 1 số máy thật (gặp

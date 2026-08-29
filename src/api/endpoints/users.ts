@@ -9,6 +9,9 @@ interface Envelope<T> {
 export interface UserPublicProfile {
   id: string;
   alias: string;
+  // Bổ sung 2026-08-25 — KHÁC alias (cố định vĩnh viễn), user tự chọn/sửa được, hiện công khai.
+  nickname: string | null;
+  bio: string | null;
   avatarUrl: string | null;
   trustBadgeLabel: string;
   postCount: number;
@@ -28,6 +31,8 @@ export interface UpdateProfileInput {
   // ISO YYYY-MM-DD.
   dateOfBirth?: string;
   gender?: 'male' | 'female' | 'other';
+  nickname?: string;
+  bio?: string;
 }
 
 export async function updateProfile(input: UpdateProfileInput): Promise<void> {

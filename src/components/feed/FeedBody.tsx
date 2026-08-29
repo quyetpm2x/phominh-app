@@ -84,13 +84,7 @@ export function FeedBody({
           {postedToast ? (
             <ToastStrip variant="success" text="Đã đăng bài lên xóm" onDismiss={() => setPostedToast(false)} />
           ) : null}
-          <ComposerBar
-            initial={currentUser.initial}
-            onPressInput={() => router.push('/post/create/status')}
-            onPressMedia={() => setSheetOpen(true)}
-            onPressStatus={() => router.push('/post/create/status')}
-            onVoice={() => router.push('/post/create/voice')}
-          />
+          <ComposerBar initial={currentUser.initial} onPress={() => setSheetOpen(true)} />
           {pendingPosts.map((p) => (
             <PendingPostCard key={p.localId} post={p} />
           ))}

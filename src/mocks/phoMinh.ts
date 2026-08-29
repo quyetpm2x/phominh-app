@@ -249,10 +249,31 @@ export const faqList = [
   { q: 'Tôi có thể đổi khu vực bao nhiêu lần?', a: 'Tối đa 2 lần mỗi tháng để tránh nhảy khu soi tin khắp nơi.' },
 ];
 
+// icon: tên Ionicons — thêm 2026-08-25 cùng đợt làm lại giao diện (auth)/terms.tsx theo mockup, mỗi
+// mục có icon riêng thay vì chỉ số thứ tự. settings/terms.tsx (màn xem lại sau khi đã đăng ký) vẫn
+// dùng chung mảng này nhưng KHÔNG đọc field icon (giao diện đơn giản hơn, không icon) — thêm field
+// không phá layout ở đó.
 export const termsBlocks = [
-  { title: '1. Tài khoản', body: 'Một số điện thoại chỉ tạo được một tài khoản. Bạn chịu trách nhiệm về nội dung đăng dưới tên mình.' },
-  { title: '2. Nội dung', body: 'Không đăng tin sai sự thật, quấy rối, hoặc vi phạm pháp luật Việt Nam. Vi phạm có thể bị xử lý theo Điều 156 Bộ luật Hình sự.' },
-  { title: '3. Vị trí', body: 'Vị trí chỉ được thu thập khi bạn mở app, dùng để hiện tin quanh bạn — không theo dõi chạy nền.' },
+  {
+    title: '1. Trách nhiệm Nội dung đăng tải',
+    icon: 'warning' as const,
+    body: 'Người dùng hoàn toàn chịu trách nhiệm trước pháp luật về tính xác thực của thông tin chia sẻ. Nghiêm cấm các bài đăng xuyên tạc, quảng cáo cờ bạc, nội dung kích động thù địch hoặc vi phạm thuần phong mỹ tục.',
+  },
+  {
+    title: '2. Bán kính Phát tin & Vị trí',
+    icon: 'location' as const,
+    body: 'Nội dung của bạn sẽ được phân phối đến các cư dân trong bán kính từ 500m đến 5km tuỳ theo cài đặt. Hành vi giả mạo vị trí GPS để quấy rối khu vực khác sẽ bị đình chỉ quyền phát tin.',
+  },
+  {
+    title: '3. Cơ chế Điểm uy tín',
+    icon: 'medal' as const,
+    body: 'Tài khoản có điểm uy tín cao sẽ được mở rộng phạm vi hiển thị và nhận mức thưởng cao hơn. Điểm uy tín bị trừ khi bài đăng bị cư dân xung quanh báo cáo vi phạm chính xác.',
+  },
+  {
+    title: '4. Trả thưởng & Rút tiền',
+    icon: 'cash' as const,
+    body: 'Tiền thưởng từ bài viết hữu ích sẽ được tích luỹ vào Ví thưởng và có thể rút về tài khoản ngân hàng chính chủ với hạn mức theo quy định.',
+  },
 ];
 
 export const privacyBlocks = [

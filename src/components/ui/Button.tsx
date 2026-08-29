@@ -1,6 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, Text, type PressableProps } from 'react-native';
 
+import { colors } from '../../constants/design-tokens';
+
 // Nền React Native Reusables — copy code vào project (giống triết lý shadcn/ui bên Web),
 // không áp đặt màu sắc, tự do style bằng NativeWind (mục 2 tài liệu FE).
 interface ButtonProps extends PressableProps {
@@ -37,14 +39,17 @@ interface GradientButtonProps extends PressableProps {
   className?: string;
 }
 
-// CTA chính trong onboarding — linear-gradient(135deg, primary → ink) theo đúng thiết kế gốc.
+// CTA chính trong onboarding/đăng bài — linear-gradient(primary → accent), khớp rebrand 2026-08-24
+// (trước đó primary → ink, đã đổi hướng gradient theo đúng mockup mới: đổi tông màu chứ không tối
+// dần). Đọc màu từ design-tokens.ts thay vì hardcode hex — sửa 1 chỗ áp dụng cho toàn bộ 13 màn
+// đang dùng component này.
 export function GradientButton({ label, className, disabled, ...props }: GradientButtonProps) {
   return (
     <Pressable className={className} disabled={disabled} {...props}>
       <LinearGradient
-        colors={['#1f6f52', '#17150f']}
+        colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 1, y: 0 }}
         style={{
           height: 54,
           borderRadius: 15,

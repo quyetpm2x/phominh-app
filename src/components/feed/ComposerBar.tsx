@@ -1,43 +1,34 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
+
+import { colors } from '../../constants/design-tokens';
 
 interface ComposerBarProps {
   initial: string;
-  onPressInput: () => void;
-  onPressMedia: () => void;
-  onPressStatus: () => void;
-  onVoice: () => void;
+  onPress: () => void;
 }
 
-// Thanh soạn bài đầu feed — bấm vào ô chữ mở thẳng "Viết trạng thái", bấm Ảnh/Video mở sheet chọn
-// loại bài (đúng phân biệt trong thiết kế: chữ và ảnh/video là hai lối vào khác nhau).
-export function ComposerBar({ initial, onPressInput, onPressMedia, onPressStatus, onVoice }: ComposerBarProps) {
+// Gộp lại thành 1 ô bấm duy nhất theo mockup 2026-08-26 (trước đó có thêm hàng 3 nút tắt Ảnh/Video/
+// Trạng thái + icon mic riêng bên dưới) — bấm vào mở thẳng CreateSheet, nơi đã có đủ cả 4 lối vào
+// (chụp ảnh/Locket/viết trạng thái/giọng nói), không mất tính năng nào, chỉ gọn giao diện.
+export function ComposerBar({ initial, onPress }: ComposerBarProps) {
   return (
-    <View className="rounded-2xl border border-border bg-white p-3">
-      <View className="flex-row items-center gap-2.5">
-        <View className="w-[38px] h-[38px] rounded-xl bg-primary items-center justify-center">
-          <Text className="font-sans-semibold text-white text-[15px]">{initial}</Text>
+    <View className="flex-row items-center gap-3 rounded-2xl border border-border bg-white p-3.5">
+      <View className="w-10 h-10 rounded-xl bg-primary items-center justify-center">
+        <Text className="font-sans-semibold text-white text-[15px]">{initial}</Text>
+      </View>
+      <Pressable
+        onPress={onPress}
+        className="flex-1 h-[42px] flex-row items-center justify-between rounded-xl bg-cream-surface/70 border border-border/60 px-4"
+      >
+        <Text className="flex-1 text-[13px] font-sans-medium text-muted" numberOfLines={1}>
+          Khu bạn có gì mới hôm nay?
+        </Text>
+        <View className="ml-2 flex-row items-center gap-1">
+          <Ionicons name="create-outline" size={14} color={colors.primary.DEFAULT} />
+          <Text className="font-sans-bold text-xs text-primary">Đăng tin</Text>
         </View>
-        <Pressable onPress={onPressInput} className="flex-1 h-[38px] rounded-full bg-cream-dark justify-center px-4">
-          <Text className="text-[13.5px] text-muted-light">Có chuyện gì quanh bạn?</Text>
-        </Pressable>
-        <Pressable onPress={onVoice} className="w-[38px] h-[38px] rounded-xl border border-border bg-white items-center justify-center">
-          <Text>🎙</Text>
-        </Pressable>
-      </View>
-      <View className="mt-2.5 pt-2.5 border-t border-border-soft flex-row gap-1">
-        <Pressable onPress={onPressMedia} className="flex-1 h-9 flex-row items-center justify-center gap-1.5">
-          <View className="w-[15px] h-[15px] rounded bg-primary" />
-          <Text className="font-sans-semibold text-xs text-muted">Ảnh</Text>
-        </Pressable>
-        <Pressable onPress={onPressMedia} className="flex-1 h-9 flex-row items-center justify-center gap-1.5">
-          <View className="w-[15px] h-[15px] rounded bg-danger" />
-          <Text className="font-sans-semibold text-xs text-muted">Video</Text>
-        </Pressable>
-        <Pressable onPress={onPressStatus} className="flex-1 h-9 flex-row items-center justify-center gap-1.5">
-          <View className="w-[15px] h-[15px] rounded bg-accent-300" />
-          <Text className="font-sans-semibold text-xs text-muted">Trạng thái</Text>
-        </Pressable>
-      </View>
+      </Pressable>
     </View>
   );
 }

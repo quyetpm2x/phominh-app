@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { getMe, type UserProfile } from '../../../src/api/client';
 import { GradientButton } from '../../../src/components/ui/Button';
 import { Avatar } from '../../../src/components/ui/Avatar';
+import { HighlightedText } from '../../../src/components/ui/HighlightedText';
 import { colors } from '../../../src/constants/design-tokens';
 import { fontSizeToStyle } from '../../../src/constants/post-style-presets';
 import { mapCategoryToPostType } from '../../../src/lib/postCategoryMapping';
@@ -127,12 +128,11 @@ export default function ConfirmScreen() {
               </View>
             </View>
 
-            <Text
+            <HighlightedText
+              text={content}
               className="px-3.5 pb-3 text-ink/85"
               style={[{ color: textColor ?? undefined, backgroundColor: backgroundColor ?? undefined }, fontSizeToStyle(fontSize)]}
-            >
-              {content}
-            </Text>
+            />
 
             <Image source={{ uri: photoUri }} style={{ height: 220, width: '100%' }} resizeMode="cover" />
           </View>

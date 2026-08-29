@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router, Tabs } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -44,6 +45,7 @@ export default function MainTabsLayout() {
               icon="home"
               label="Dòng tin"
               focused={!!props.accessibilityState?.selected}
+              showLiveDot
               onPress={() => router.push('/(main)/feed')}
             />
           ),
@@ -77,17 +79,29 @@ export default function MainTabsLayout() {
                   width: 52,
                   height: 52,
                   borderRadius: 26,
-                  backgroundColor: colors.ink.DEFAULT,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  shadowColor: '#000',
-                  shadowOpacity: 0.25,
-                  shadowRadius: 8,
+                  // backgroundColor bắt buộc phải có (dù bị LinearGradient con phủ kín) — shadow
+                  // không render trên iOS nếu View mang shadow là trong suốt (đã gặp ở OtpDigitBox).
+                  backgroundColor: colors.cream.DEFAULT,
+                  shadowColor: colors.primary.DEFAULT,
+                  shadowOpacity: 0.4,
+                  shadowRadius: 10,
                   shadowOffset: { width: 0, height: 4 },
                   elevation: 6,
                 }}
               >
-                <Ionicons name="add" size={26} color="#fff" />
+                <LinearGradient
+                  colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
+                  style={{
+                    flex: 1,
+                    borderRadius: 26,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 3,
+                    borderColor: colors.cream.DEFAULT,
+                  }}
+                >
+                  <Ionicons name="add" size={26} color="#fff" />
+                </LinearGradient>
               </View>
             </Pressable>
           ),
@@ -134,15 +148,26 @@ interface TabButtonProps {
   label: string;
   focused: boolean;
   onPress: () => void;
+  // Chấm nhỏ báo "đang xem live" — chỉ trang trí, không gắn số liệu chưa đọc thật nào (không có API
+  // đếm tin mới), chỉ hiện khi tab đang active.
+  showLiveDot?: boolean;
 }
 
-function TabButton({ icon, label, focused, onPress }: TabButtonProps) {
+function TabButton({ icon, label, focused, onPress, showLiveDot }: TabButtonProps) {
   return (
     <Pressable
       onPress={onPress}
       style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 5, paddingTop: 8 }}
     >
-      <TabIcon name={icon} focused={focused} />
+      <View>
+        <TabIcon name={icon} focused={focused} />
+        {showLiveDot && focused ? (
+          <View
+            style={{ backgroundColor: colors.primary.DEFAULT }}
+            className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full"
+          />
+        ) : null}
+      </View>
       <Text
         numberOfLines={1}
         style={{
