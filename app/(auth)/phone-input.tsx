@@ -3,25 +3,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, Pressable, Text, View } from 'react-native';
+import { Animated, Easing, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { extractErrorMessage, sendOtp } from '../../src/api/client';
 import { colors } from '../../src/constants/design-tokens';
 import { AuthDecorativeBlobs } from '../../src/components/ui/AuthDecorativeBlobs';
 import { GlowInputCard } from '../../src/components/ui/GlowInputCard';
 import { GradientText } from '../../src/components/ui/GradientText';
 import { Keypad } from '../../src/components/ui/Keypad';
 
-// on.phone — xác thực bằng số điện thoại, không cần email/tên thật (mục 2 tài liệu FE). Ô "+84"
-// tách riêng nên digits ở đây LUÔN là 9 số sau mã quốc gia (không có số 0 đầu) — khớp đúng cách
-// libphonenumber-js chuẩn hoá lại 1 lần nữa ở backend (send-otp DTO).
-// Giao diện làm lại theo mockup 2026-08-24 (tông hồng-cam, khớp rebrand design-tokens.ts) — riêng
-// nhãn "Mã hoá đầu cuối eKYC" trong mockup gốc SAI với thực tế app (eKYC chỉ áp dụng cho liên kết
-// ngân hàng — mục 53, không liên quan luồng OTP này) nên đổi sang mô tả đúng hành vi thật.
 export default function PhoneInputScreen() {
   const [digits, setDigits] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dotPulse = useRef(new Animated.Value(0)).current;
 
@@ -50,25 +42,15 @@ export default function PhoneInputScreen() {
   if (displayError) cardState = 'error';
   else if (isValid) cardState = 'success';
 
-  const onSubmit = async () => {
-    if (loading) return;
+  // Gửi OTP thật (sendOtp) sẽ nối lại khi làm tiếp luồng đăng ký — hiện chỉ validate định dạng rồi
+  // điều hướng, route đích /(auth)/otp-verify chưa tồn tại (xem README).
+  const onSubmit = () => {
     if (!isValid) {
       setError('Số điện thoại không hợp lệ, kiểm tra lại');
       return;
     }
     setError(null);
-    setLoading(true);
-    try {
-      const { retryAfter } = await sendOtp(`+84${digits}`);
-      router.push({
-        pathname: '/(auth)/otp-verify',
-        params: { phone: `+84${digits}`, retryAfter: String(retryAfter) },
-      });
-    } catch (err) {
-      setError(await extractErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
+    router.push({ pathname: '/(auth)/otp-verify', params: { phone: `+84${digits}` } });
   };
 
   const formattedDigits = digits.replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, a, b, c) => [a, b, c].filter(Boolean).join(' '));
@@ -103,9 +85,6 @@ export default function PhoneInputScreen() {
           <Text className="text-xs font-sans-bold text-primary">Bảo mật & Riêng tư</Text>
         </View>
 
-        {/* MaskedView (gradient text thật) là View, không lồng được vào trong <Text> như chữ
-            thường — tách "Nhập số " (Text đặc) và "điện thoại" (GradientText) thành 2 phần đặt
-            cạnh nhau trên 1 hàng flex-row, thay vì 1 khối Text duy nhất như bản màu đặc cũ. */}
         <View className="mt-3 flex-row flex-wrap items-baseline">
           <Text className="text-[28px] leading-[32px] font-sans-black tracking-tight text-ink">Nhập số </Text>
           <GradientText
@@ -130,7 +109,7 @@ export default function PhoneInputScreen() {
               <Text className="font-sans-black text-[20px] tracking-widest text-ink" numberOfLines={1}>
                 {formattedDigits}
               </Text>
-              {!loading && digits.length < 9 ? (
+              {digits.length < 9 ? (
                 <Animated.View style={{ opacity: dotPulse.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }}>
                   <LinearGradient
                     colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
@@ -163,9 +142,6 @@ export default function PhoneInputScreen() {
           <Text className="text-xs font-sans-semibold text-primary">Đã nhập {digits.length}/9 số</Text>
         </View>
 
-        {/* mockup: khoảng trống co giãn nằm TRƯỚC nhóm "bàn phím + nút gửi" (đẩy cả nhóm xuống
-            đáy), không phải nằm GIỮA 2 thứ đó — bản trước đặt sai chỗ, tạo khoảng trắng lớn giữa
-            bàn phím và nút gửi thay vì 2 thứ nằm sát nhau như mockup. */}
         <View className="flex-1" />
 
         <View className="mt-7">
@@ -173,11 +149,7 @@ export default function PhoneInputScreen() {
         </View>
 
         <View className="pt-6 pb-6">
-          {/* Giữ nguyên khung nút (gradient/bo góc/shadow) khi loading — trước đó thay hẳn bằng
-              1 spinner trần không nền, nhìn giật cục vì cả nút biến mất. Chỉ đổi NỘI DUNG bên
-              trong (chữ+icon → spinner trắng), disable onPress qua chính onSubmit (đã có sẵn
-              guard `if (loading) return`). */}
-          <Pressable onPress={onSubmit} disabled={loading} className="active:scale-[0.98]">
+          <Pressable onPress={onSubmit} className="active:scale-[0.98]">
             <LinearGradient
               colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
               start={{ x: 0, y: 0 }}
@@ -196,17 +168,10 @@ export default function PhoneInputScreen() {
                 shadowRadius: 16,
                 shadowOffset: { width: 0, height: 8 },
                 elevation: 6,
-                opacity: loading ? 0.85 : 1,
               }}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <>
-                  <Text className="font-sans-bold text-base text-white tracking-wide">Gửi mã xác thực</Text>
-                  <Ionicons name="paper-plane" size={16} color="#fff" />
-                </>
-              )}
+              <Text className="font-sans-bold text-base text-white tracking-wide">Gửi mã xác thực</Text>
+              <Ionicons name="paper-plane" size={16} color="#fff" />
             </LinearGradient>
           </Pressable>
         </View>

@@ -7,9 +7,6 @@ interface SplashDecorativeBlobsProps {
   orange: string;
 }
 
-// 3 khối gradient hồng-cam trang trí nền Splash — blur THẬT (BlurView phủ rộng hơn khối màu 40px
-// mỗi phía), cùng kỹ thuật đã dùng ở AuthDecorativeBlobs (màn Nhập SĐT) và Welcome, thay cho viền
-// cứng không blur trước đó. Tách riêng file vì Splash.tsx đã vượt 250 dòng quy định của dự án.
 export function SplashDecorativeBlobs({ pink, orange }: SplashDecorativeBlobsProps) {
   return (
     <>

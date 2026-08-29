@@ -11,10 +11,6 @@ interface WelcomeHeroProps {
   ink: string;
 }
 
-// Hai thẻ tin nổi quanh chấm định vị giữa — hero minh hoạ "mở app là thấy ngay". Kích thước/shadow
-// khớp đúng mockup HTML gốc (h-[260px], card 180/170px, shadow-xl, rotate -1/+1deg — bản trước dùng
-// số áng chừng 158px/158/150px, shadow-sm, rotate -3/+3deg). "Hiệu ứng toả" quanh chấm định vị dùng
-// 2 vòng lệch pha (Animated.delay), cùng kỹ thuật đã dùng ở Splash.tsx.
 export function WelcomeHero({ pink, orange, muted, ink }: WelcomeHeroProps) {
   const ring1 = useRef(new Animated.Value(0)).current;
   const ring2 = useRef(new Animated.Value(0)).current;

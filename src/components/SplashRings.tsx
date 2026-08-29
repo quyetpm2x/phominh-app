@@ -7,9 +7,6 @@ export interface RingSpec {
   durationMs: number;
 }
 
-// 8 vòng tròn đồng tâm quanh badge — kích thước đã thu nhỏ theo tỉ lệ so với mockup gốc (thiết kế
-// cho viewport desktop) để phù hợp màn hình di động, vòng ngoài cùng vẫn tràn ra ngoài viền màn
-// hình có chủ ý (root View overflow:hidden tự cắt, giống hiệu ứng "bleed" trong mockup gốc).
 export const RINGS: RingSpec[] = [
   { size: 360, kind: 'pulse', peakOpacity: 0.05, durationMs: 7000 },
   { size: 320, kind: 'ping', peakOpacity: 0.2, durationMs: 6000 },
@@ -27,8 +24,6 @@ interface SplashRingsProps {
   orange: string;
 }
 
-// Tách khỏi Splash.tsx (đã vượt 250 dòng) — chỉ phần render, animation setup vẫn ở Splash.tsx vì
-// cần chạy trong cùng useEffect với các animation khác (badge/title/tagline/pill).
 export function SplashRings({ ringValues, pink, orange }: SplashRingsProps) {
   return (
     <>

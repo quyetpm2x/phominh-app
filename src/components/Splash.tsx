@@ -9,8 +9,6 @@ import { colors } from '../constants/design-tokens';
 import { SplashDecorativeBlobs } from './SplashDecorativeBlobs';
 import { RINGS, SplashRings } from './SplashRings';
 
-// Đọc thẳng từ design-tokens.ts (rebrand 2026-08-24 áp dụng TOÀN APP, không riêng gì Splash —
-// đã xác nhận lại, xoá bỏ file onboardingAccent.ts tách riêng gây hiểu lầm trước đó).
 const SPLASH_BG = colors.cream.DEFAULT;
 const SPLASH_PINK = colors.primary.DEFAULT;
 const SPLASH_ORANGE = colors.accent.DEFAULT;
@@ -25,12 +23,6 @@ interface SplashProps {
   onDone: () => void;
 }
 
-// sp.core — làm lại theo mockup 2026-08-24 (tông hồng-cam, badge building-icon, vòng tròn đồng tâm
-// nhiều lớp). Không có thư viện gradient-text (@react-native-masked-view chưa cài, không thêm
-// dependency native mới giữa phiên vì cần rebuild dev client) nên tiêu đề dùng màu đặc SPLASH_PINK
-// thay vì gradient chữ như bản HTML gốc. Trình tự: badge phóng to (0s) → tên/tagline trồi lên
-// (0.5s/0.62s) → pill loading (0.74s) → gọi onDone khi xong (~2.9s), các vòng tròn/glow chạy loop
-// độc lập suốt thời gian hiện màn hình.
 export function Splash({ onDone }: SplashProps) {
   const ringValues = useRef(RINGS.map(() => new Animated.Value(0))).current;
   const glowPulse = useRef(new Animated.Value(0)).current;
@@ -63,8 +55,6 @@ export function Splash({ onDone }: SplashProps) {
           ]),
         ).start();
       } else {
-        // 'ping' và 'spin' đều là 1 vòng lặp tăng dần 0→1 liên tục — với spin, 360deg trùng 0deg
-        // nên điểm "reset" giữa 2 vòng lặp không lộ ra, tạo cảm giác quay đều.
         Animated.loop(
           Animated.timing(value, {
             toValue: 1,

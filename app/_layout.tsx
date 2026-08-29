@@ -30,10 +30,6 @@ export default function RootLayout() {
     JetBrainsMono_700Bold,
   });
 
-  // useFonts đôi khi không bao giờ resolve thành true LẪN không báo lỗi trên 1 số máy thật (gặp
-  // trên thiết bị thật nhiều hơn simulator) — nếu chỉ chờ fontsLoaded/fontError, màn hình có thể
-  // kẹt trắng vô hạn. Đặt trần thời gian chờ cứng: hết giờ vẫn render app, chữ chỉ tạm dùng font hệ
-  // thống thay vì Be Vietnam Pro/JetBrains Mono.
   const [timedOut, setTimedOut] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setTimedOut(true), FONT_LOAD_TIMEOUT_MS);

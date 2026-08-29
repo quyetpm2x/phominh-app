@@ -10,8 +10,6 @@ import { brand } from '../../src/constants/brand';
 import { colors } from '../../src/constants/design-tokens';
 import { WelcomeHero } from '../../src/components/WelcomeHero';
 
-// Đọc thẳng từ design-tokens.ts (rebrand 2026-08-24 áp dụng TOÀN APP — đã xác nhận lại, xoá bỏ
-// file onboardingAccent.ts tách riêng gây hiểu lầm là chỉ Splash/Welcome mới hồng-cam).
 const OA = {
   pink: colors.primary.DEFAULT,
   orange: colors.accent.DEFAULT,
@@ -46,9 +44,6 @@ const VALUE_PROPS = [
   },
 ];
 
-// isWelcome — làm lại theo mockup HTML gốc (2026-08-24). Ảnh nền bản đồ mờ trong mockup trỏ tới
-// Supabase Storage của chính công cụ Sleek (không phải backend Phố Mình) — CỐ TÌNH bỏ qua, không
-// hotlink hạ tầng bên thứ ba (đã xác nhận với người dùng), giữ nền trơn/gradient blob như trước.
 export default function WelcomeScreen() {
   const dotPulse = useRef(new Animated.Value(0)).current;
 
@@ -63,8 +58,6 @@ export default function WelcomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: OA.background }}>
-      {/* Blob trang trí — blur THẬT (BlurView phủ rộng hơn khối màu 40px mỗi phía), cùng kỹ thuật
-          AuthDecorativeBlobs bên màn Nhập SĐT / SplashDecorativeBlobs bên Splash. */}
       <View style={{ position: 'absolute', top: -96, right: -96, width: 256, height: 256, borderRadius: 128, overflow: 'hidden' }}>
         <LinearGradient colors={[`${OA.pink}26`, `${OA.orange}1a`]} style={{ flex: 1 }} />
       </View>
@@ -103,10 +96,6 @@ export default function WelcomeScreen() {
                 </LinearGradient>
               </View>
 
-              {/* Pill "41 tin mới" — mockup dùng backdrop-blur-md (kính mờ thật). BlurView không
-                  chắc hỗ trợ className cho layout (component native đặc biệt) — bọc ngoài bằng
-                  View lo hình dáng (bo tròn/viền/overflow), BlurView chỉ phủ tuyệt đối bên trong
-                  để làm mờ, giống đúng cách đã dùng ổn định ở card Nhập SĐT. */}
               <View
                 className="self-start rounded-full border border-border/70 overflow-hidden"
                 style={{

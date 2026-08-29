@@ -1,17 +1,4 @@
-// Bảng màu ĐÃ REBRAND (2026-08-24, xác nhận với người dùng) — chuyển từ tông xanh lá + kem ấm
-// ("Phố Mình mobile app" option 1a) sang tông hồng-cam + trắng-xám lạnh, dùng đúng mã màu người
-// dùng chọn qua công cụ theme editor (khớp bảng SPLASH_* trước đó CHỈ dùng riêng ở Splash.tsx —
-// nay áp dụng cho TOÀN APP, không còn lệch tone giữa Splash và phần còn lại nữa). Các sắc độ phụ
-// (50/100/300/dark/soft/light/faint...) không có mã màu gốc — tự tính bằng cách pha với trắng/đen
-// theo đúng tỉ lệ tương đối của scale cũ, không phải giá trị người dùng tự chọn từng ô.
-// Web (`web-app/web/packages/design-tokens/`) KHÔNG đổi theo, vẫn tách biệt hoàn toàn (mục 1 tài liệu FE).
-// `danger.DEFAULT`/`cream.surface` cập nhật thêm khi có file HTML gốc của công cụ theme editor —
-// lộ ra đúng mã `--destructive` (#E63946) và `--muted` (#F1F3F5) chính thức, thay cho giá trị đoán
-// trước đó (giữ nguyên phần "tự tính" cho các sắc độ phụ không có trong file gốc).
-// ĐÍNH CHÍNH (cùng ngày): có lúc xuất hiện file `src/constants/onboardingAccent.ts` tách riêng,
-// tưởng lầm hồng-cam CHỈ dành cho Splash/Welcome — SAI, đã xác nhận lại: hồng-cam áp dụng TOÀN
-// APP đúng như file này. `onboardingAccent.ts` đã xoá, Splash.tsx/welcome.tsx chuyển dùng thẳng
-// `colors` ở đây (thêm `primary.peach` cho đúng 1 giá trị riêng Splash từng có mà ở đây chưa có).
+
 export const colors = {
   primary: {
     50: '#ffecf0',
@@ -37,9 +24,6 @@ export const colors = {
     DEFAULT: '#E63946',
     text: '#ac2b34',
   },
-  // Xanh lá "thành công" — mới thêm (2026-08-25), KHÔNG phải xanh lá thương hiệu cũ đã bỏ hẳn khi
-  // rebrand. Chỉ dùng làm tín hiệu trạng thái hợp lệ (vd viền/glow ô nhập SĐT khi số đã đúng định
-  // dạng), không dùng làm màu chủ đạo ở bất kỳ đâu khác.
   success: {
     50: '#e7f9ee',
     100: '#c3f0d6',
