@@ -1,6 +1,6 @@
 import { BlurView } from 'expo-blur';
-import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 
 import { colors } from '../../constants/design-tokens';
@@ -77,7 +77,7 @@ export function GlowInputCard({ state = 'default', children }: GlowInputCardProp
             `elevation`, className shadow-sm không tự sinh ra thuộc tính này. */}
         <Animated.View
           style={{
-            height: 56,
+            height: 73,
             borderRadius: 20,
             backgroundColor: '#fff',
             shadowColor: '#000',
@@ -94,9 +94,26 @@ export function GlowInputCard({ state = 'default', children }: GlowInputCardProp
                 5% mờ còn lại, KHÔNG phải hiệu ứng chính. Từng để BlurView tự lo cả nền lẫn blur nên
                 bị ám hồng quá đậm — tách: BlurView chỉ làm mờ, lớp trắng 95% phủ riêng để giữ card
                 gần như trắng thật. */}
-            <BlurView intensity={40} tint="light" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
-            <Animated.View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.95)' }} />
-            <Animated.View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14 }}>{children}</Animated.View>
+            <BlurView
+              intensity={40}
+              tint="light"
+              style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+            />
+            <Animated.View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(255,255,255,0.95)',
+              }}
+            />
+            <Animated.View
+              style={{ flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14 }}
+            >
+              {children}
+            </Animated.View>
           </Animated.View>
         </Animated.View>
       </Animated.View>

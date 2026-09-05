@@ -3,9 +3,8 @@ import { useState } from 'react';
 
 import { Splash } from '../src/components/Splash';
 
-// Đơn giản hoá 2026-08-29 — dọn sạch chỉ còn 3 màn (Splash/Welcome/Phone-input, xem
-// tai-lieu-chuc-nang.md), bỏ nhánh kiểm tra phiên đăng nhập/hồ sơ cá nhân vì đích đến của các
-// nhánh đó (feed, personal-info) đã bị xoá cùng đợt — luôn về thẳng welcome sau khi Splash xong.
+// Luồng mở app hiện luôn đi Splash -> Welcome. Các nhánh phiên đăng nhập/hồ sơ cũ đã được dọn bỏ,
+// còn bước OTP sẽ nối tiếp sau màn nhập số điện thoại.
 export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
 

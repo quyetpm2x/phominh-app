@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import InsetShadow from '@wave909/react-native-inset-shadow';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Text, View } from 'react-native';
@@ -8,16 +9,18 @@ import { brand } from '../constants/brand';
 import { colors } from '../constants/design-tokens';
 import { SplashDecorativeBlobs } from './SplashDecorativeBlobs';
 import { RINGS, SplashRings } from './SplashRings';
+import { GradientPrimaryView } from './ui/GradientPrimaryView';
+import { PhoMinhBuildingIcon } from './ui/icon';
 
-const SPLASH_BG = colors.cream.DEFAULT;
-const SPLASH_PINK = colors.primary.DEFAULT;
-const SPLASH_ORANGE = colors.accent.DEFAULT;
-const SPLASH_PEACH = colors.primary.peach;
-const SPLASH_INK = colors.ink.DEFAULT;
-const SPLASH_MUTED = colors.muted.DEFAULT;
-const SPLASH_BORDER = colors.border.DEFAULT;
+export const SPLASH_BG = colors.cream.DEFAULT;
+export const SPLASH_PINK = colors.primary.DEFAULT;
+export const SPLASH_ORANGE = colors.accent.DEFAULT;
+export const SPLASH_PEACH = colors.primary.peach;
+export const SPLASH_INK = colors.ink.DEFAULT;
+export const SPLASH_MUTED = colors.muted.DEFAULT;
+export const SPLASH_BORDER = colors.border.DEFAULT;
 
-const BADGE_SIZE = 112;
+export const BADGE_SIZE = 112;
 
 interface SplashProps {
   onDone: () => void;
@@ -102,10 +105,10 @@ export function Splash({ onDone }: SplashProps) {
           <View />
 
           <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-            <View style={{ width: 360, height: 360, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 260, height: 260, alignItems: 'center', justifyContent: 'center' }}>
               <SplashRings ringValues={ringValues} pink={SPLASH_PINK} orange={SPLASH_ORANGE} />
 
-              <Animated.View
+              {/* <Animated.View
                 pointerEvents="none"
                 style={{
                   position: 'absolute',
@@ -115,42 +118,17 @@ export function Splash({ onDone }: SplashProps) {
                   backgroundColor: SPLASH_PEACH,
                   opacity: glowPulse.interpolate({ inputRange: [0, 1], outputRange: [0.25, 0.4] }),
                 }}
-              />
+              /> */}
 
-              <Animated.View
-                style={{
-                  width: BADGE_SIZE,
-                  height: BADGE_SIZE,
-                  opacity: badgeOpacity,
-                  transform: [{ scale: badgeScale }],
-                  shadowColor: SPLASH_PINK,
-                  shadowOpacity: 0.4,
-                  shadowRadius: 24,
-                  shadowOffset: { width: 0, height: 16 },
-                  elevation: 12,
-                }}
-              >
-                <LinearGradient
-                  colors={[SPLASH_ORANGE, SPLASH_PINK, SPLASH_ORANGE]}
-                  start={{ x: 0, y: 1 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{
-                    width: BADGE_SIZE,
-                    height: BADGE_SIZE,
-                    borderRadius: 30,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Ionicons name="business" size={50} color="#fff" />
-                </LinearGradient>
-              </Animated.View>
+              <GradientPrimaryView badgeOpacity={badgeOpacity} badgeScale={badgeScale} hasShadow={true}>
+                <PhoMinhBuildingIcon />
+              </GradientPrimaryView>
             </View>
 
-            <View style={{ alignItems: 'center', paddingHorizontal: 34, marginTop: -20 }}>
+            <View style={{ alignItems: 'center', paddingHorizontal: 34, marginTop: -40 }}>
               <Animated.Text
                 style={[
-                  { fontFamily: 'BeVietnamPro_700Bold', fontSize: 34, letterSpacing: -0.8, color: SPLASH_PINK },
+                  { fontFamily: 'BeVietnamPro_900Black',fontWeight:'900', fontSize: 34, letterSpacing: -0.8, color: SPLASH_PINK },
                   riseStyle(title),
                 ]}
               >
@@ -169,7 +147,7 @@ export function Splash({ onDone }: SplashProps) {
                   riseStyle(tagline),
                 ]}
               >
-                {brand.tagline}
+                {brand.description}
               </Animated.Text>
             </View>
           </View>

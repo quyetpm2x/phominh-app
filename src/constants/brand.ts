@@ -1,6 +1,7 @@
 
 export const brand = {
   appName: 'Phố Mình',
+  description: 'TIN TỨC & ĐỜI SỐNG KHU PHỐ',
   tagline: 'Chuyện quanh mình, ngay lúc này',
   taglineLong: 'Mở app là thấy. Không cần tìm, không cần xin vào group nào cả.',
   version: '0.9.2',

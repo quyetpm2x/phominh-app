@@ -32,11 +32,11 @@ export const colors = {
     text: '#15803d',
   },
   ink: {
-    DEFAULT: '#1A1A1A',
+    DEFAULT: '#292524',
     soft: '#6a6a6a',
   },
   muted: {
-    DEFAULT: '#4A4A4A',
+    DEFAULT: '#A6A09B',
     light: '#aeaeae',
     faint: '#808080',
   },
