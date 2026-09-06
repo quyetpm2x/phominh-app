@@ -11,6 +11,7 @@ interface GradientSubmitButtonProps {
   loading: boolean;
   onPress: () => void;
   icon?: ComponentProps<typeof Ionicons>['name'];
+  compact?: boolean;
 }
 
 // Animate mượt opacity lúc enable/disable đổi (thay vì nhảy tức thời) — cùng kỹ thuật
@@ -21,6 +22,7 @@ export function GradientSubmitButton({
   loading,
   onPress,
   icon = 'arrow-forward',
+  compact = false,
 }: GradientSubmitButtonProps) {
   const opacity = useRef(new Animated.Value(disabled ? 0.5 : 1)).current;
 
@@ -33,15 +35,21 @@ export function GradientSubmitButton({
   }, [disabled, opacity]);
 
   return (
-    <Pressable onPress={onPress} disabled={disabled || loading} className="active:scale-[0.98]">
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
+      onPress={onPress}
+      disabled={disabled || loading}
+      className="active:scale-[0.98]"
+    >
       <Animated.View style={{ opacity }}>
         <LinearGradient
           colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
           start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          end={compact ? { x: 0, y: 1 } : { x: 1, y: 0 }}
           style={{
-            height: 54,
-            borderRadius: 16,
+            height: compact ? 48 : 54,
+            borderRadius: compact ? 14 : 16,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',

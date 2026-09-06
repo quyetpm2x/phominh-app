@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { useState } from 'react';
 import { TextInput as RNTextInput, View } from 'react-native';
 
@@ -7,6 +7,7 @@ import { colors } from '../../constants/design-tokens';
 
 interface IconTextInputProps extends ComponentProps<typeof RNTextInput> {
   icon: ComponentProps<typeof Ionicons>['name'];
+  iconNode?: ReactNode;
   // Báo field đang sai validate (vd rỗng sau khi trim) — đổi viền sang đỏ, không tự tính bên trong
   // component này vì rule validate khác nhau tuỳ field (bắt buộc hay không).
   invalid?: boolean;
@@ -16,7 +17,15 @@ interface IconTextInputProps extends ComponentProps<typeof RNTextInput> {
 // (icon Solar, RN không có sẵn nên dùng Ionicons tương đương). Tách riêng khỏi TextInput dùng
 // chung (src/components/ui/TextInput.tsx) thay vì sửa thẳng component đó — TextInput đang dùng ở
 // rất nhiều màn khác không cần icon, tránh ảnh hưởng ngoài ý muốn.
-export function IconTextInput({ icon, invalid, style, onFocus, onBlur, ...props }: IconTextInputProps) {
+export function IconTextInput({
+  icon,
+  iconNode,
+  invalid,
+  style,
+  onFocus,
+  onBlur,
+  ...props
+}: IconTextInputProps) {
   const [focused, setFocused] = useState(false);
 
   let borderClass = 'border-border';
@@ -25,12 +34,18 @@ export function IconTextInput({ icon, invalid, style, onFocus, onBlur, ...props 
 
   return (
     <View className="relative justify-center">
-      <Ionicons
-        name={icon}
-        size={16}
-        color={colors.muted.DEFAULT}
-        style={{ position: 'absolute', left: 14, zIndex: 1 }}
-      />
+      {iconNode ? (
+        <View pointerEvents="none" style={{ position: 'absolute', left: 14, zIndex: 1 }}>
+          {iconNode}
+        </View>
+      ) : (
+        <Ionicons
+          name={icon}
+          size={16}
+          color={colors.muted.DEFAULT}
+          style={{ position: 'absolute', left: 14, zIndex: 1 }}
+        />
+      )}
       <RNTextInput
         className={`h-12 rounded-xl border bg-cream-surface/40 pl-10 pr-4 text-sm font-sans-semibold text-ink ${borderClass}`}
         placeholderTextColor={colors.muted.light}

@@ -1,7 +1,6 @@
 import { Stack } from 'expo-router';
 
-// Luồng auth hiện giữ các màn nền tảng để đi tiếp onboarding: Welcome, nhập số điện thoại và bước
-// OTP placeholder để route tiếp theo luôn tồn tại trong lúc hoàn thiện xác thực thật.
+// Luồng onboarding: Welcome → số điện thoại → OTP → cấp quyền thiết bị.
 export default function AuthLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -9,6 +8,10 @@ export default function AuthLayout() {
       <Stack.Screen name="terms-of-use" />
       <Stack.Screen name="phone-input" />
       <Stack.Screen name="otp-verify" />
+      <Stack.Screen name="permissions" />
+      <Stack.Screen name="home-area" />
+      <Stack.Screen name="work-info" />
+      <Stack.Screen name="onboarding-complete" />
     </Stack>
   );
 }

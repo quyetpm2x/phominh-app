@@ -1,4 +1,5 @@
 import { Pressable, Text, View, type PressableProps } from 'react-native';
+import type { ReactNode } from 'react';
 
 type ChipColor = 'green' | 'gold' | 'red' | 'gray' | 'dark';
 
@@ -38,17 +39,19 @@ export function Chip({ label, color = 'gray', size = 'sm' }: ChipProps) {
 interface FilterChipProps extends PressableProps {
   label: string;
   selected?: boolean;
+  icon?: ReactNode;
 }
 
 // Chip bấm được (loại bài trong bộ lọc, chip trạng thái nhanh...).
-export function FilterChip({ label, selected, ...props }: FilterChipProps) {
+export function FilterChip({ label, selected, icon, ...props }: FilterChipProps) {
   return (
     <Pressable
-      className={`rounded-full border px-3.5 py-2 ${
+      className={`flex-row items-center justify-center gap-1.5 rounded-full border px-3.5 py-2 ${
         selected ? 'border-primary bg-primary-50' : 'border-border bg-white'
       }`}
       {...props}
     >
+      {icon}
       <Text className={`font-sans-semibold text-xs ${selected ? 'text-primary' : 'text-ink'}`}>{label}</Text>
     </Pressable>
   );

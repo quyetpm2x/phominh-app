@@ -56,7 +56,8 @@ export default function OtpVerifyScreen() {
       setError('Vui lòng nhập đủ 6 số trong mã OTP.');
       return;
     }
-    Alert.alert('Xác thực chưa khả dụng', 'Tính năng xác thực SMS sẽ sớm được hỗ trợ. Vui lòng thử lại sau.');
+    // Luồng UI tạm: chấp nhận đủ 6 số. Thay bằng xác thực OTP qua API khi tích hợp backend.
+    router.push('/(auth)/permissions');
   };
   return (
     <SafeAreaView className="flex-1 bg-cream">
