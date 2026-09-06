@@ -6,7 +6,11 @@ import {
   BeVietnamPro_700Bold,
   BeVietnamPro_900Black,
 } from '@expo-google-fonts/be-vietnam-pro';
-import { JetBrainsMono_400Regular, JetBrainsMono_500Medium, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono';
+import {
+  JetBrainsMono_400Regular,
+  JetBrainsMono_500Medium,
+  JetBrainsMono_700Bold,
+} from '@expo-google-fonts/jetbrains-mono';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -54,8 +58,8 @@ export default function RootLayout() {
         <StatusBar style="dark" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(main)" />
-          <Stack.Screen name="post" />
+          <Stack.Screen name="home" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="post/[id]" />
           <Stack.Screen name="profile" />
           <Stack.Screen name="messages" />
           <Stack.Screen name="report" />

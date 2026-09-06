@@ -3,7 +3,9 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { router } from 'expo-router';
+import { LOCAL_SIGN_IN_KEY } from '../../src/lib/personalProfile';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -74,6 +76,23 @@ function AreaRow({
 }
 
 export default function OnboardingCompleteScreen() {
+  const [entering, setEntering] = useState(false);
+  const enteringRef = useRef(false);
+  const enterHome = async () => {
+    if (enteringRef.current) return;
+    enteringRef.current = true;
+    setEntering(true);
+    try {
+      await SecureStore.setItemAsync(LOCAL_SIGN_IN_KEY, 'true');
+      router.dismissAll();
+      router.replace('/home');
+    } catch {
+      Alert.alert('Chưa thể vào trang chủ', 'Vui lòng thử lại.');
+    } finally {
+      enteringRef.current = false;
+      setEntering(false);
+    }
+  };
   const [home, setHome] = useState<SelectedArea | null>(null);
   const [work, setWork] = useState<SelectedArea | null>(null);
   const [loading, setLoading] = useState(true);
@@ -199,7 +218,9 @@ export default function OnboardingCompleteScreen() {
         </View>
         <Pressable
           accessibilityRole="button"
-          onPress={() => Alert.alert('Khám phá xóm mình', 'Tính năng khám phá sẽ sớm sẵn sàng.')}
+          onPress={enterHome}
+          disabled={entering}
+          accessibilityState={{ disabled: entering, busy: entering }}
           className="mt-6 active:scale-[0.98]"
         >
           <GradientPrimaryButton>

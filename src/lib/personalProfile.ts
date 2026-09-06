@@ -1,4 +1,6 @@
 export const PROFILE_STORAGE_KEY = 'pho_minh_personal_profile';
+// Local onboarding session for the agreed OTP demo. This is not an API access token.
+export const LOCAL_SIGN_IN_KEY = 'pho_minh_local_signed_in';
 export type Gender = 'male' | 'female' | 'other';
 export interface PersonalProfile {
   fullName: string;

@@ -1,23 +1,26 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
-
+import { Redirect } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { useCallback, useEffect, useState } from 'react';
 import { Splash } from '../src/components/Splash';
+import { LOCAL_SIGN_IN_KEY } from '../src/lib/personalProfile';
 
-// Luồng mở app hiện luôn đi Splash -> Welcome. Các nhánh phiên đăng nhập/hồ sơ cũ đã được dọn bỏ,
-// còn bước OTP sẽ nối tiếp sau màn nhập số điện thoại.
 export default function Index() {
-  const [showSplash, setShowSplash] = useState(true);
-
-  if (showSplash) {
-    return (
-      <Splash
-        onDone={() => {
-          setShowSplash(false);
-          router.replace('/(auth)/welcome');
-        }}
-      />
-    );
-  }
-
-  return null;
+  const [splashDone, setSplashDone] = useState(false);
+  const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const onSplashDone = useCallback(() => setSplashDone(true), []);
+  useEffect(() => {
+    let active = true;
+    SecureStore.getItemAsync(LOCAL_SIGN_IN_KEY)
+      .then((value) => {
+        if (active) setSignedIn(value === 'true');
+      })
+      .catch(() => {
+        if (active) setSignedIn(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+  if (!splashDone || signedIn === null) return <Splash onDone={onSplashDone} />;
+  return <Redirect href={signedIn ? '/home' : '/(auth)/welcome'} />;
 }

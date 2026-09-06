@@ -1,0 +1,62 @@
+import { colors } from '../../constants/design-tokens';
+import type { FeedPost } from './types';
+
+export const PHOTOS = {
+  me: require('../../../assets/images/feed/imgImage.png'),
+  hoa: require('../../../assets/images/feed/imgImage1.png'),
+  grill: require('../../../assets/images/feed/imgImage2.png'),
+  restaurant: require('../../../assets/images/feed/imgImage3.png'),
+  food: require('../../../assets/images/feed/imgImage4.png'),
+  tuan: require('../../../assets/images/feed/imgImage5.png'),
+  street: require('../../../assets/images/feed/imgImage6.png'),
+};
+// Local Figma fixtures. No feed, counters or actions below are sent to a server yet.
+export const POSTS: readonly FeedPost[] = [
+  {
+    id: 'hoa',
+    name: 'Cô Hoa Bún Chả',
+    badge: 'QUÁN QUEN',
+    color: colors.primary.DEFAULT,
+    avatar: PHOTOS.hoa,
+    rank: 'Bậc 4',
+    time: 'Còn 4h',
+    distance: '150m',
+    likes: 24,
+    comments: 8,
+    merchant: true,
+    text: 'Trưa nay cô lên thêm mẻ ==nem cua bể tươi giòn & chả nướng than hoa== nóng hổi vừa ra lò. Có ảnh chụp tại sạp cho bà con thẩm nha!',
+    photos: [PHOTOS.food, PHOTOS.grill, PHOTOS.restaurant],
+  },
+  {
+    id: 'tuan',
+    name: 'Bác Tuấn T4',
+    badge: 'HÀNG XÓM 3 NĂM',
+    color: colors.accent.DEFAULT,
+    avatar: PHOTOS.tuan,
+    rank: '12 xác nhận',
+    time: '35 phút trước',
+    distance: '400m',
+    likes: 18,
+    comments: 5,
+    merchant: false,
+    text: 'Đầu ngõ 72 đang ==sửa đường ống nước==, mình gửi ảnh 2 góc đầu ngõ và lối tránh ngách 68 cho bà con tiện quan sát nhé!',
+    photos: [PHOTOS.street, PHOTOS.food],
+  },
+  {
+    id: 'ha',
+    name: 'Bác Hà T4',
+    badge: 'HÀNG XÓM 3 NĂM',
+    color: colors.accent.DEFAULT,
+    avatar: PHOTOS.tuan,
+    rank: '12 xác nhận',
+    time: '35 phút trước',
+    distance: '400m',
+    likes: 18,
+    comments: 5,
+    merchant: true,
+    text: 'Đầu ngõ 72 đang ==sửa đường ống nước==, mình gửi ảnh 2 góc đầu ngõ và lối tránh ngách 68 cho bà con tiện quan sát nhé!',
+    photos: [PHOTOS.street, PHOTOS.food],
+  },
+] as const;
+
+export const POST_DRAFT_STORAGE_KEY = 'pho_minh_post_draft';
