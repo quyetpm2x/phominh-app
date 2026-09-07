@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { type ComponentProps, useEffect, useRef } from 'react';
+import { type ComponentProps, type ReactNode, useEffect, useRef } from 'react';
 import { ActivityIndicator, Animated, Pressable, Text } from 'react-native';
 
 import { colors } from '../../constants/design-tokens';
@@ -12,6 +12,9 @@ interface GradientSubmitButtonProps {
   onPress: () => void;
   icon?: ComponentProps<typeof Ionicons>['name'];
   compact?: boolean;
+  leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
+  vertical?: boolean;
 }
 
 // Animate mượt opacity lúc enable/disable đổi (thay vì nhảy tức thời) — cùng kỹ thuật
@@ -23,6 +26,9 @@ export function GradientSubmitButton({
   onPress,
   icon = 'arrow-forward',
   compact = false,
+  leadingIcon,
+  trailingIcon,
+  vertical = compact,
 }: GradientSubmitButtonProps) {
   const opacity = useRef(new Animated.Value(disabled ? 0.5 : 1)).current;
 
@@ -46,7 +52,7 @@ export function GradientSubmitButton({
         <LinearGradient
           colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
           start={{ x: 0, y: 0 }}
-          end={compact ? { x: 0, y: 1 } : { x: 1, y: 0 }}
+          end={vertical ? { x: 0, y: 1 } : { x: 1, y: 0 }}
           style={{
             height: compact ? 48 : 54,
             borderRadius: compact ? 14 : 16,
@@ -65,8 +71,9 @@ export function GradientSubmitButton({
             <ActivityIndicator color="#fff" />
           ) : (
             <>
+              {leadingIcon}
               <Text className="font-sans-black text-sm tracking-wide text-white">{label}</Text>
-              <Ionicons name={icon} size={16} color="#fff" />
+              {!leadingIcon ? (trailingIcon ?? <Ionicons name={icon} size={16} color="#fff" />) : null}
             </>
           )}
         </LinearGradient>

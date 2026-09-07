@@ -1,3 +1,4 @@
+import { selectFeedPosts } from './selectFeedPosts';
 import { usePostInteractions } from './postInteractions';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
@@ -22,7 +23,23 @@ import { POSTS, POST_DRAFT_STORAGE_KEY } from './data';
 import type { AreaTab, Filter, Sheet } from './types';
 
 export function useHomeFeed() {
-  const { liked, saved, comments, setLiked, setSaved, setComments } = usePostInteractions();
+  const {
+    liked,
+    saved,
+    comments,
+    hidden,
+    reports,
+    reducedTopics,
+    reduceTopic,
+    blockedAuthors,
+    blockAuthor,
+    unblockAuthor,
+    restoreTopic,
+    setHidden,
+    setLiked,
+    setSaved,
+    setComments,
+  } = usePostInteractions();
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [profile, setProfile] = useState(EMPTY_PROFILE);
   const [home, setHome] = useState<HomeArea>(DEFAULT_HOME_AREA);
@@ -34,7 +51,6 @@ export function useHomeFeed() {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [selected, setSelected] = useState(0);
   const [menu, setMenu] = useState<number | null>(null);
-  const [hidden, setHidden] = useState<string[]>([]);
   const [comment, setComment] = useState('');
   const [draft, setDraft] = useState('');
   const [unread, setUnread] = useState(3);
@@ -43,11 +59,7 @@ export function useHomeFeed() {
   const scroll = useRef<ScrollView>(null);
   const selectedArea = tab === 'work' && work ? work : tab === 'nearby' && nearby ? nearby : home;
   const selectedPost = POSTS[selected];
-  const visiblePosts = POSTS.filter(
-    (post) =>
-      !hidden.includes(post.id) &&
-      (filter === 'all' || (filter === 'shops' ? post.merchant : !post.merchant)),
-  );
+  const visiblePosts = selectFeedPosts(POSTS, filter, { hidden, reports, blockedAuthors, reducedTopics });
 
   useEffect(() => {
     let active = true;
@@ -159,6 +171,13 @@ export function useHomeFeed() {
 
   return {
     signedIn,
+    reports,
+    blockedAuthors,
+    blockAuthor,
+    unblockAuthor,
+    restoreTopic,
+    reducedTopics,
+    reduceTopic,
     profile,
     home,
     nearby,

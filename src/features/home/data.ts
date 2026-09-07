@@ -14,6 +14,7 @@ export const PHOTOS = {
 export const POSTS: readonly FeedPost[] = [
   {
     id: 'hoa',
+    authorId: 'hoa',
     name: 'Cô Hoa Bún Chả',
     badge: 'QUÁN QUEN',
     color: colors.primary.DEFAULT,
@@ -29,6 +30,7 @@ export const POSTS: readonly FeedPost[] = [
   },
   {
     id: 'tuan',
+    authorId: 'tuan',
     name: 'Bác Tuấn T4',
     badge: 'HÀNG XÓM 3 NĂM',
     color: colors.accent.DEFAULT,
@@ -44,6 +46,7 @@ export const POSTS: readonly FeedPost[] = [
   },
   {
     id: 'ha',
+    authorId: 'ha',
     name: 'Bác Hà T4',
     badge: 'HÀNG XÓM 3 NĂM',
     color: colors.accent.DEFAULT,

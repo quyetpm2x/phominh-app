@@ -1,3 +1,4 @@
+import { ReportedPostCard } from '../src/features/home/ReportedPostCard';
 import { Redirect, router } from 'expo-router';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -45,6 +46,22 @@ export default function HomeScreen() {
       <ScrollView ref={scroll} contentContainerStyle={styles.feed} showsVerticalScrollIndicator={false}>
         <FeedComposer profile={profile} onCompose={() => setSheet('compose')} />
         {visiblePosts.map((post) => {
+          if (controller.reports[post.id]) {
+            const topic = post.merchant ? 'shops' : 'neighbors';
+            return (
+              <ReportedPostCard
+                key={post.id}
+                post={post}
+                blocked={controller.blockedAuthors.includes(post.authorId)}
+                reduced={controller.reducedTopics.includes(topic)}
+                onBlock={() => controller.blockAuthor(post.authorId)}
+                onReduce={() => controller.reduceTopic(topic)}
+                onUndoBlock={() => controller.unblockAuthor(post.authorId)}
+                onUndoReduce={() => controller.restoreTopic(topic)}
+                onManage={() => setSheet('preferences')}
+              />
+            );
+          }
           const index = POSTS.findIndex((item) => item.id === post.id);
           return (
             <FeedPostCard

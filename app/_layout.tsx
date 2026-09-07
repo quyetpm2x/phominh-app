@@ -63,6 +63,7 @@ export default function RootLayout() {
           <Stack.Screen name="profile" />
           <Stack.Screen name="messages" />
           <Stack.Screen name="report" />
+          <Stack.Screen name="report-success" options={{ gestureEnabled: false }} />
           <Stack.Screen name="merchant" />
           <Stack.Screen name="settings" />
         </Stack>

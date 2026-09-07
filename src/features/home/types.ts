@@ -2,6 +2,7 @@ import type { ImageSourcePropType } from 'react-native';
 export type AreaTab = 'nearby' | 'home' | 'work';
 export type Filter = 'all' | 'shops' | 'neighbors';
 export type Sheet =
+  | 'preferences'
   | 'filter'
   | 'map'
   | 'gallery'
@@ -15,6 +16,7 @@ export type Sheet =
 
 export interface FeedPost {
   id: string;
+  authorId: string;
   name: string;
   badge: string;
   color: string;

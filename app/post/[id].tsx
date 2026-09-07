@@ -1,3 +1,5 @@
+import { getPostMenuItems } from '../../src/features/post/postMenu';
+import { usePostInteractions } from '../../src/features/home/postInteractions';
 import { BlurView } from 'expo-blur';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -172,13 +174,18 @@ export default function PostDetailScreen() {
       <ActionSheetMenu
         visible={detail.menuOpen}
         onClose={() => detail.setMenuOpen(false)}
-        items={[
-          {
-            label: detail.saved[post.id] ? 'Bỏ lưu bài viết' : 'Lưu bài viết',
-            onPress: () => detail.setSaved((previous) => ({ ...previous, [post.id]: !previous[post.id] })),
+        title="Tuỳ chọn bài viết"
+        subtitle={`Bài đăng của ${post.name}`}
+        items={getPostMenuItems({
+          saved: Boolean(detail.saved[post.id]),
+          onSave: () => detail.setSaved((previous) => ({ ...previous, [post.id]: !previous[post.id] })),
+          onShare: () => void detail.share(),
+          onReport: () => router.push({ pathname: '/report', params: { postId: post.id } }),
+          onHide: () => {
+            usePostInteractions.getState().setHidden((previous) => [...previous, post.id]);
+            back();
           },
-          { label: 'Chia sẻ bài viết', onPress: () => void detail.share() },
-        ]}
+        })}
       />
       <BottomSheet visible={detail.galleryOpen} onClose={() => detail.setGalleryOpen(false)}>
         <ScrollView horizontal pagingEnabled contentContainerStyle={styles.gallery}>

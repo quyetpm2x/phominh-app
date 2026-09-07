@@ -41,3 +41,10 @@ test('ending a session clears shared local activity', () => {
   state.reset();
   expect(usePostInteractions.getState()).toMatchObject({ comments: {}, saved: {}, liked: {}, useful: {} });
 });
+
+test('hiding from detail updates the feed without changing unrelated posts', () => {
+  usePostInteractions.getState().setHidden((previous) => [...previous, 'hoa']);
+  expect(usePostInteractions.getState().hidden).toEqual(['hoa']);
+  usePostInteractions.getState().reset();
+  expect(usePostInteractions.getState().hidden).toEqual([]);
+});
