@@ -1,4 +1,5 @@
 import { Button } from '../../components/ui/Button';
+import { PostShareSheet } from '../share/PostShareSheet';
 import { router } from 'expo-router';
 import { getPostMenuItems } from '../post/postMenu';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +33,11 @@ export function HomeSheets({ controller }: { controller: HomeFeedController }) {
   } = controller;
   return (
     <>
+      <PostShareSheet
+        post={controller.sharingPost}
+        onClose={() => controller.setSharingPost(null)}
+        areaLabel={areaLabel}
+      />
       <BottomSheet visible={sheet !== null} onClose={() => setSheet(null)}>
         <View className="mb-4 flex-row items-center justify-between">
           <Text className="font-sans-bold text-lg text-ink">

@@ -44,7 +44,7 @@ export function BottomSheet({
             intensity={4}
             tint="dark"
             experimentalBlurMethod="dimezisBlurView"
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
           />
         ) : null}
         <Pressable

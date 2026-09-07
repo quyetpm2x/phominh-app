@@ -1,4 +1,5 @@
 import { getPostMenuItems } from '../../src/features/post/postMenu';
+import { PostShareSheet } from '../../src/features/share/PostShareSheet';
 import { usePostInteractions } from '../../src/features/home/postInteractions';
 import { BlurView } from 'expo-blur';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
@@ -66,7 +67,7 @@ export default function PostDetailScreen() {
     <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-white">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex}>
         <View className="h-14 flex-row items-center justify-between border-b border-[#F5F5F4] bg-white/90 px-3">
-          <BlurView intensity={12} tint="light" style={StyleSheet.absoluteFillObject} />
+          <BlurView intensity={12} tint="light" style={StyleSheet.absoluteFill} />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Quay lại"
@@ -200,6 +201,7 @@ export default function PostDetailScreen() {
         </ScrollView>
         <Button label="Đóng" variant="outline" onPress={() => detail.setGalleryOpen(false)} />
       </BottomSheet>
+      <PostShareSheet post={detail.shareOpen ? post : null} onClose={() => detail.setShareOpen(false)} />
     </SafeAreaView>
   );
 }

@@ -115,7 +115,7 @@ export function MapAreaPicker({
               intensity={30}
               tint="dark"
               experimentalBlurMethod="dimezisBlurView"
-              style={StyleSheet.absoluteFillObject}
+              style={StyleSheet.absoluteFill}
             />
             <View className="bg-[#1C1917]/80 rounded-full px-5 py-3">
               <Text className="font-sans-bold text-[11px] leading-[16.5px] text-white">

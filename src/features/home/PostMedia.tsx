@@ -25,7 +25,7 @@ export function PostMedia({ post, onOpenGallery }: Props) {
               <Image source={PHOTOS.food} style={styles.fill} resizeMode="cover" />
               <LinearGradient
                 colors={['#00000033', '#00000000', '#00000099']}
-                style={StyleSheet.absoluteFillObject}
+                style={StyleSheet.absoluteFill}
               />
               <View className="absolute left-2.5 top-2.5 flex-row items-center gap-1 rounded-lg border border-white/10 bg-black/60 px-2 py-1">
                 <CustomIcon name="feedPhotoCamera" size={12} />
@@ -98,7 +98,7 @@ export function PostMedia({ post, onOpenGallery }: Props) {
 }
 
 const styles = StyleSheet.create({
-  fill: StyleSheet.absoluteFillObject,
+  fill: StyleSheet.absoluteFill,
 
   mainPhoto: { flex: 2, overflow: 'hidden' },
 

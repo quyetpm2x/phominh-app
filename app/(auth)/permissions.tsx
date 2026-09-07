@@ -211,7 +211,14 @@ export default function PermissionsScreen() {
 }
 const styles = StyleSheet.create({
   content: { flexGrow: 1, paddingHorizontal: 24, paddingTop: 8, paddingBottom: 24 },
-  mirroredBackground: { ...StyleSheet.absoluteFillObject, transform: [{ scaleX: -1 }] },
+  mirroredBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    transform: [{ scaleX: -1 }],
+  },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6 },
   card: {
     shadowColor: '#000',

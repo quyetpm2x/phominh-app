@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { BlurView } from 'expo-blur';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { useRef } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
@@ -40,7 +40,7 @@ export default function ReportScreen() {
     <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-white">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex}>
         <View className="min-h-[57px] flex-row items-center justify-between border-b border-[#E9ECEF]/80 px-5 pb-4 pt-1">
-          <BlurView pointerEvents="none" intensity={12} tint="light" style={StyleSheet.absoluteFillObject} />
+          <BlurView pointerEvents="none" intensity={12} tint="light" style={StyleSheet.absoluteFill} />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Quay lại"
@@ -103,12 +103,7 @@ export default function ReportScreen() {
               />
             </ScrollView>
             <View className="gap-2 border-t border-[#E9ECEF]/80 bg-white/90 px-5 py-5">
-              <BlurView
-                pointerEvents="none"
-                intensity={12}
-                tint="light"
-                style={StyleSheet.absoluteFillObject}
-              />
+              <BlurView pointerEvents="none" intensity={12} tint="light" style={StyleSheet.absoluteFill} />
               <GradientSubmitButton
                 label="Gửi báo cáo"
                 compact

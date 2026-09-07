@@ -4,7 +4,7 @@ import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Share, type ScrollView } from 'react-native';
+import { Alert, type ScrollView } from 'react-native';
 import {
   DEFAULT_HOME_AREA,
   HOME_AREA_STORAGE_KEY,
@@ -20,7 +20,7 @@ import {
 } from '../../lib/personalProfile';
 
 import { POSTS, POST_DRAFT_STORAGE_KEY } from './data';
-import type { AreaTab, Filter, Sheet } from './types';
+import type { AreaTab, FeedPost, Filter, Sheet } from './types';
 
 export function useHomeFeed() {
   const {
@@ -51,6 +51,7 @@ export function useHomeFeed() {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [selected, setSelected] = useState(0);
   const [menu, setMenu] = useState<number | null>(null);
+  const [sharingPost, setSharingPost] = useState<FeedPost | null>(null);
   const [comment, setComment] = useState('');
   const [draft, setDraft] = useState('');
   const [unread, setUnread] = useState(3);
@@ -134,13 +135,7 @@ export function useHomeFeed() {
     setComment('');
     setSheet(next);
   };
-  const sharePost = async (index: number) => {
-    try {
-      await Share.share({ message: `${POSTS[index].name}\n${POSTS[index].text.replace(/==/g, '')}` });
-    } catch {
-      Alert.alert('Chưa chia sẻ được', 'Vui lòng thử lại.');
-    }
-  };
+  const sharePost = (index: number) => setSharingPost(POSTS[index] ?? null);
   const logout = async () => {
     if (loggingOut) return;
     setLoggingOut(true);
@@ -201,6 +196,8 @@ export function useHomeFeed() {
     changeTab,
     openPost,
     sharePost,
+    sharingPost,
+    setSharingPost,
     logout,
     saveDraft,
     setSheet,

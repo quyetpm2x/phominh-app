@@ -88,5 +88,14 @@ const styles = StyleSheet.create({
   },
   active: { padding: 2, shadowOpacity: 0.35, shadowRadius: 8 },
   cursor: { width: 2, height: 24, borderRadius: 1 },
-  input: { ...StyleSheet.absoluteFillObject, opacity: 0.02, color: 'transparent', fontSize: 1 },
+  input: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.02,
+    color: 'transparent',
+    fontSize: 1,
+  },
 });

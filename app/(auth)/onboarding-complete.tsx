@@ -145,7 +145,7 @@ export default function OnboardingCompleteScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-cream">
-      <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+      <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <AuthDecorativeBlobs />
       </View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -206,7 +206,7 @@ export default function OnboardingCompleteScreen() {
         <View style={styles.spacer} />
         <View style={styles.areaCardShadow}>
           <View className="overflow-hidden rounded-[31px] border border-white">
-            <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFillObject} />
+            <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
             <View className="gap-5 bg-white/80 p-6">
               <Text className="font-sans-bold text-[10px] tracking-[2px] text-muted">KHU VỰC HOẠT ĐỘNG</Text>
               <View className="gap-4">

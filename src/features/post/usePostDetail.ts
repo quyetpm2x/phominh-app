@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Share } from 'react-native';
+import { Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import {
   EMPTY_PROFILE,
@@ -19,6 +19,7 @@ export function usePostDetail(id: string | undefined) {
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [likedComments, setLikedComments] = useState<Record<string, boolean>>({});
   const [menuOpen, setMenuOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const { comments, saved, setSaved, setComments, useful, toggleUseful } = usePostInteractions();
   useEffect(() => {
@@ -58,14 +59,7 @@ export function usePostDetail(id: string | undefined) {
     setDraft('');
     setReplyTo(null);
   };
-  const share = async () => {
-    if (!post) return;
-    try {
-      await Share.share({ message: `${post.name}\n${post.text.replace(/==/g, '')}` });
-    } catch {
-      Alert.alert('Chưa chia sẻ được', 'Vui lòng thử lại.');
-    }
-  };
+  const share = () => setShareOpen(true);
   const contact = () =>
     Alert.alert(
       'Chưa có thông tin liên hệ',
@@ -93,6 +87,8 @@ export function usePostDetail(id: string | undefined) {
     commentCount: (id === 'hoa' ? 3 : 0) + localComments.length,
     sendComment,
     share,
+    shareOpen,
+    setShareOpen,
     contact,
   };
 }
