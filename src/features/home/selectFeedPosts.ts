@@ -5,6 +5,7 @@ interface FeedPreferences {
   reports: Record<string, unknown>;
   blockedAuthors: readonly string[];
   reducedTopics: readonly ('shops' | 'neighbors')[];
+  extensions?: Record<string, { boost: boolean; expiresAt: number }>;
 }
 export function selectFeedPosts(posts: readonly FeedPost[], filter: Filter, preferences: FeedPreferences) {
   const { hidden, reports, blockedAuthors, reducedTopics } = preferences;
@@ -17,5 +18,9 @@ export function selectFeedPosts(posts: readonly FeedPost[], filter: Filter, pref
   });
   const priority = (post: FeedPost) =>
     reports[post.id] ? 0 : Number(reducedTopics.includes(post.merchant ? 'shops' : 'neighbors'));
-  return visible.sort((a, b) => priority(a) - priority(b));
+  const boosted = (post: FeedPost) =>
+    Boolean(
+      preferences.extensions?.[post.id]?.boost && preferences.extensions[post.id].expiresAt > Date.now(),
+    );
+  return visible.sort((a, b) => Number(boosted(b)) - Number(boosted(a)) || priority(a) - priority(b));
 }

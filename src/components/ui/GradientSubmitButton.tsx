@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { type ComponentProps, type ReactNode, useEffect, useRef } from 'react';
+import { type ComponentProps, type ReactNode, useEffect, useState } from 'react';
 import { ActivityIndicator, Animated, Pressable, Text } from 'react-native';
 
 import { colors } from '../../constants/design-tokens';
@@ -15,6 +15,7 @@ interface GradientSubmitButtonProps {
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
   vertical?: boolean;
+  rounded?: boolean;
 }
 
 // Animate mượt opacity lúc enable/disable đổi (thay vì nhảy tức thời) — cùng kỹ thuật
@@ -29,8 +30,9 @@ export function GradientSubmitButton({
   leadingIcon,
   trailingIcon,
   vertical = compact,
+  rounded = false,
 }: GradientSubmitButtonProps) {
-  const opacity = useRef(new Animated.Value(disabled ? 0.5 : 1)).current;
+  const [opacity] = useState(() => new Animated.Value(disabled ? 0.5 : 1));
 
   useEffect(() => {
     Animated.timing(opacity, {
@@ -55,13 +57,13 @@ export function GradientSubmitButton({
           end={vertical ? { x: 0, y: 1 } : { x: 1, y: 0 }}
           style={{
             height: compact ? 48 : 54,
-            borderRadius: compact ? 14 : 16,
+            borderRadius: rounded ? 28 : compact ? 14 : 16,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 8,
             shadowColor: colors.primary.DEFAULT,
-            shadowOpacity: 0.3,
+            shadowOpacity: 1,
             shadowRadius: 14,
             shadowOffset: { width: 0, height: 8 },
             elevation: 6,

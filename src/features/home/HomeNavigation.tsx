@@ -1,6 +1,6 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CustomIcon } from '../../components/ui/CustomIcon';
-import { GradientPrimaryView } from '../../components/ui/GradientPrimaryView';
 import { colors } from '../../constants/design-tokens';
 import type { Filter } from './types';
 interface Props {
@@ -61,9 +61,53 @@ export function HomeNavigation({
         onPress={onCompose}
         style={styles.addButton}
       >
-        <GradientPrimaryView size={52} borderRadius={16} borderWidth={2}>
-          <CustomIcon name="feedPlus" size={26} color="white" />
-        </GradientPrimaryView>
+        <View
+          style={{
+            width: 52,
+            height: 52,
+            borderRadius: 16,
+            boxShadow: [
+              {
+                offsetX: 0,
+                offsetY: 4,
+                blurRadius: 10,
+                spreadDistance: -2,
+                color: 'rgba(255, 75, 43, 0.4)',
+              },
+              {
+                offsetX: 0,
+                offsetY: 10,
+                blurRadius: 25,
+                spreadDistance: -4,
+                color: 'rgba(255, 65, 108, 0.5)',
+              },
+              {
+                offsetX: 0,
+                offsetY: 0,
+                blurRadius: 0,
+                spreadDistance: 4,
+                color: '#FFFFFF',
+              },
+            ],
+          }}
+        >
+          <LinearGradient
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: 16,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderWidth: 2,
+              borderColor: 'rgba(255,255,255,0.3)',
+            }}
+            colors={['#FF416C', '#FF4B2B']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+          >
+            <CustomIcon name="feedPlus" size={26} color="white" />
+          </LinearGradient>
+        </View>
       </Pressable>
       <Pressable
         accessibilityRole="tab"

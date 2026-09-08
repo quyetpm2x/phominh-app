@@ -18,7 +18,7 @@ import {
   type TextInput as NativeTextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ActionSheetMenu } from '../../src/components/ui/ActionSheetMenu';
+import { PostActionSheet } from '../../src/features/post/PostActionSheet';
 import { Avatar } from '../../src/components/ui/Avatar';
 import { BottomSheet } from '../../src/components/ui/BottomSheet';
 import { Button } from '../../src/components/ui/Button';
@@ -123,6 +123,7 @@ export default function PostDetailScreen() {
                 detail.setLikedComments((previous) => ({ ...previous, [commentId]: !previous[commentId] }))
               }
               onReply={(name) => {
+                if (post.commentsEnabled === false) return;
                 detail.setReplyTo(name);
                 input.current?.focus();
               }}
@@ -149,7 +150,10 @@ export default function PostDetailScreen() {
               <TextInput
                 ref={input}
                 accessibilityLabel="Viết bình luận"
-                placeholder="Viết bình luận..."
+                placeholder={
+                  post.commentsEnabled === false ? 'Bài viết đã tắt bình luận' : 'Viết bình luận...'
+                }
+                editable={post.commentsEnabled !== false}
                 placeholderTextColor="#292524"
                 value={detail.draft}
                 onChangeText={detail.setDraft}
@@ -161,8 +165,8 @@ export default function PostDetailScreen() {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Gửi bình luận"
-                accessibilityState={{ disabled: !detail.draft.trim() }}
-                disabled={!detail.draft.trim()}
+                accessibilityState={{ disabled: post.commentsEnabled === false || !detail.draft.trim() }}
+                disabled={post.commentsEnabled === false || !detail.draft.trim()}
                 onPress={sendComment}
                 hitSlop={10}
               >
@@ -172,11 +176,10 @@ export default function PostDetailScreen() {
           </View>
         </View>
       </KeyboardAvoidingView>
-      <ActionSheetMenu
+      <PostActionSheet
         visible={detail.menuOpen}
         onClose={() => detail.setMenuOpen(false)}
-        title="Tuỳ chọn bài viết"
-        subtitle={`Bài đăng của ${post.name}`}
+        post={post}
         items={getPostMenuItems({
           saved: Boolean(detail.saved[post.id]),
           onSave: () => detail.setSaved((previous) => ({ ...previous, [post.id]: !previous[post.id] })),

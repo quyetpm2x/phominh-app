@@ -17,6 +17,11 @@ export type Sheet =
 export interface FeedPost {
   id: string;
   authorId: string;
+  commentsEnabled?: boolean;
+  notifyReplies?: boolean;
+  location?: { title: string; address: string };
+  views?: number;
+  remainingHours?: number;
   name: string;
   badge: string;
   color: string;

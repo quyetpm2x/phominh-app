@@ -60,6 +60,8 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="home" options={{ gestureEnabled: false }} />
           <Stack.Screen name="post/[id]" />
+          <Stack.Screen name="post/statistics/[id]" />
+          <Stack.Screen name="post/edit/[id]" options={{ gestureEnabled: false }} />
           <Stack.Screen name="profile" />
           <Stack.Screen name="messages" />
           <Stack.Screen name="report" />

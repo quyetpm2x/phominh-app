@@ -1,4 +1,5 @@
 import { colors } from '../../constants/design-tokens';
+import { LOCAL_USER_ID } from '../../lib/personalProfile';
 import type { FeedPost } from './types';
 
 export const PHOTOS = {
@@ -59,6 +60,25 @@ export const POSTS: readonly FeedPost[] = [
     merchant: true,
     text: 'Đầu ngõ 72 đang ==sửa đường ống nước==, mình gửi ảnh 2 góc đầu ngõ và lối tránh ngách 68 cho bà con tiện quan sát nhé!',
     photos: [PHOTOS.street, PHOTOS.food],
+  },
+  {
+    id: 'my-demo-post',
+    location: { title: 'Ngõ 19 Phố Duy Tân', address: 'Phường Dịch Vọng Hậu, Quận Cầu Giấy, Hà Nội' },
+    authorId: LOCAL_USER_ID,
+    name: 'Bạn',
+    badge: 'ĐỜI SỐNG',
+    color: colors.primary.DEFAULT,
+    avatar: PHOTOS.me,
+    rank: 'Bậc 2',
+    time: '35 phút trước',
+    remainingHours: 47,
+    views: 148,
+    distance: '32m',
+    likes: 24,
+    comments: 8,
+    merchant: false,
+    text: 'Xe bánh mì đầu ngõ hôm nay nghỉ bán nha cả nhà ơi...',
+    photos: [],
   },
 ] as const;
 

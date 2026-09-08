@@ -46,15 +46,19 @@ export function PostSheetContent({
           ))}
           <TextInput
             accessibilityLabel="Nội dung bình luận"
-            placeholder="Viết bình luận…"
+            placeholder={
+              selectedPost.commentsEnabled === false ? 'Bài viết đã tắt bình luận' : 'Viết bình luận…'
+            }
+            editable={selectedPost.commentsEnabled !== false}
             value={comment}
             onChangeText={setComment}
             maxLength={300}
           />
           <Button
             label="Thêm bình luận"
-            disabled={!comment.trim()}
+            disabled={selectedPost.commentsEnabled === false || !comment.trim()}
             onPress={() => {
+              if (selectedPost.commentsEnabled === false || !comment.trim()) return;
               setComments((previous) => ({
                 ...previous,
                 [selectedPost.id]: [...(previous[selectedPost.id] ?? []), comment.trim()],

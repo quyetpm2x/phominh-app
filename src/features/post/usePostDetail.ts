@@ -8,11 +8,14 @@ import {
   restoreProfile,
 } from '../../lib/personalProfile';
 import { POSTS } from '../home/data';
+import { applyPostEdit } from '../post-edit/postEdit';
 import { usePostInteractions } from '../home/postInteractions';
 import { SAMPLE_COMMENTS, type PostComment } from './data';
 
 export function usePostDetail(id: string | undefined) {
-  const post = POSTS.find((item) => item.id === id);
+  const originalPost = POSTS.find((item) => item.id === id);
+  const edit = usePostInteractions((state) => (id ? state.edits[id] : undefined));
+  const post = originalPost ? applyPostEdit(originalPost, edit) : undefined;
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [profile, setProfile] = useState(EMPTY_PROFILE);
   const [draft, setDraft] = useState('');
@@ -53,7 +56,7 @@ export function usePostDetail(id: string | undefined) {
     })),
   ];
   const sendComment = () => {
-    if (!post || !draft.trim()) return;
+    if (!post || post.commentsEnabled === false || !draft.trim()) return;
     const text = replyTo ? `@${replyTo}: ${draft.trim()}` : draft.trim();
     setComments((previous) => ({ ...previous, [post.id]: [...(previous[post.id] ?? []), text] }));
     setDraft('');

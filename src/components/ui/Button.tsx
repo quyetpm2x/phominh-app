@@ -37,28 +37,42 @@ export function Button({ label, variant = 'primary', className, ...props }: Butt
 interface GradientButtonProps extends PressableProps {
   label: string;
   className?: string;
+  compact?: boolean;
 }
 
 // CTA chính trong onboarding/đăng bài — linear-gradient(primary → accent), khớp rebrand 2026-08-24
 // (trước đó primary → ink, đã đổi hướng gradient theo đúng mockup mới: đổi tông màu chứ không tối
 // dần). Đọc màu từ design-tokens.ts thay vì hardcode hex — sửa 1 chỗ áp dụng cho toàn bộ 13 màn
 // đang dùng component này.
-export function GradientButton({ label, className, disabled, ...props }: GradientButtonProps) {
+export function GradientButton({
+  label,
+  className,
+  disabled,
+  compact = false,
+  ...props
+}: GradientButtonProps) {
   return (
-    <Pressable className={className} disabled={disabled} {...props}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: Boolean(disabled) }}
+      className={className}
+      disabled={disabled}
+      {...props}
+    >
       <LinearGradient
         colors={[colors.primary.DEFAULT, colors.accent.DEFAULT]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        end={compact ? { x: 0, y: 1 } : { x: 1, y: 0 }}
         style={{
-          height: 54,
-          borderRadius: 15,
+          height: compact ? 32 : 54,
+          borderRadius: compact ? 20 : 15,
+          paddingHorizontal: compact ? 16 : 0,
           alignItems: 'center',
           justifyContent: 'center',
           opacity: disabled ? 0.5 : 1,
         }}
       >
-        <Text className="font-sans-bold text-base text-white">{label}</Text>
+        <Text className={`font-sans-bold text-white ${compact ? 'text-[13px]' : 'text-base'}`}>{label}</Text>
       </LinearGradient>
     </Pressable>
   );

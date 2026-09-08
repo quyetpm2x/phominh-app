@@ -1,5 +1,9 @@
 import type { SetStateAction } from 'react';
 import { create } from 'zustand';
+import type { ExtensionResult } from '../post-extension/extensionResult';
+import { isValidPostEdit, type PostEdit } from '../post-edit/postEdit';
+import { POSTS } from './data';
+import { LOCAL_USER_ID } from '../../lib/personalProfile';
 
 type Flags = Record<string, boolean>;
 type Comments = Record<string, string[]>;
@@ -9,6 +13,10 @@ interface LocalReport {
   details: string;
 }
 interface PostInteractions {
+  edits: Record<string, PostEdit>;
+  savePostEdit: (postId: string, edit: PostEdit) => boolean;
+  extensions: Record<string, ExtensionResult>;
+  completeExtension: (result: ExtensionResult) => void;
   reports: Record<string, LocalReport>;
   reducedTopics: ('shops' | 'neighbors')[];
   reduceTopic: (topic: 'shops' | 'neighbors') => void;
@@ -32,8 +40,25 @@ interface PostInteractions {
 }
 // Shared local demo interactions so navigating back to the feed retains changes.
 export const usePostInteractions = create<PostInteractions>((set) => ({
+  edits: {},
+  savePostEdit: (postId, edit) => {
+    if (POSTS.find((post) => post.id === postId)?.authorId !== LOCAL_USER_ID || !isValidPostEdit(edit))
+      return false;
+    const clean = {
+      text: edit.text.trim(),
+      commentsEnabled: edit.commentsEnabled,
+      notifyReplies: edit.notifyReplies,
+    };
+    set((state) => ({ edits: { ...state.edits, [postId]: clean } }));
+    return true;
+  },
+  extensions: {},
+  completeExtension: (result) =>
+    set((state) => ({ extensions: { ...state.extensions, [result.postId]: result } })),
   reset: () =>
     set({
+      edits: {},
+      extensions: {},
       liked: {},
       saved: {},
       useful: {},

@@ -36,7 +36,7 @@ export const GradientPrimaryButton = ({ children }: { children: React.ReactNode 
       >
         <InsetShadow
           shadowColor="rgba(0,0,0,1)"
-          shadowOpacity={0.1}
+          shadowOpacity={0.08}
           shadowRadius={5}
           shadowOffset={2}
           backgroundColor="#ffffff"

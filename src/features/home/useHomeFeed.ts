@@ -1,4 +1,5 @@
 import { selectFeedPosts } from './selectFeedPosts';
+import { applyPostEdit } from '../post-edit/postEdit';
 import { usePostInteractions } from './postInteractions';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
@@ -25,6 +26,8 @@ import type { AreaTab, FeedPost, Filter, Sheet } from './types';
 export function useHomeFeed() {
   const {
     liked,
+    edits,
+    extensions,
     saved,
     comments,
     hidden,
@@ -59,8 +62,15 @@ export function useHomeFeed() {
   const [savingDraft, setSavingDraft] = useState(false);
   const scroll = useRef<ScrollView>(null);
   const selectedArea = tab === 'work' && work ? work : tab === 'nearby' && nearby ? nearby : home;
-  const selectedPost = POSTS[selected];
-  const visiblePosts = selectFeedPosts(POSTS, filter, { hidden, reports, blockedAuthors, reducedTopics });
+  const currentPosts = POSTS.map((post) => applyPostEdit(post, edits[post.id]));
+  const selectedPost = currentPosts[selected];
+  const visiblePosts = selectFeedPosts(currentPosts, filter, {
+    hidden,
+    reports,
+    blockedAuthors,
+    reducedTopics,
+    extensions,
+  });
 
   useEffect(() => {
     let active = true;
@@ -135,7 +145,7 @@ export function useHomeFeed() {
     setComment('');
     setSheet(next);
   };
-  const sharePost = (index: number) => setSharingPost(POSTS[index] ?? null);
+  const sharePost = (index: number) => setSharingPost(currentPosts[index] ?? null);
   const logout = async () => {
     if (loggingOut) return;
     setLoggingOut(true);

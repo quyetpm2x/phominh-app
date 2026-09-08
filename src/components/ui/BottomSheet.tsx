@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -8,7 +8,7 @@ interface BottomSheetProps {
   onClose: () => void;
   onDismiss?: () => void;
   children: ReactNode;
-  variant?: 'default' | 'actions';
+  variant?: 'default' | 'actions' | 'dialog';
 }
 export function BottomSheet({
   visible,
@@ -19,8 +19,9 @@ export function BottomSheet({
 }: BottomSheetProps) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const translateY = useRef(new Animated.Value(height)).current;
+  const [translateY] = useState(() => new Animated.Value(height));
   const actions = variant === 'actions';
+  const dialog = variant === 'dialog';
   useEffect(() => {
     if (!visible || !actions) return;
     translateY.setValue(height);
@@ -37,8 +38,8 @@ export function BottomSheet({
       onRequestClose={onClose}
       onDismiss={onDismiss}
     >
-      <View className="flex-1 justify-end">
-        {actions ? (
+      <View className={dialog ? 'flex-1 justify-center px-4' : 'flex-1 justify-end'}>
+        {actions || dialog ? (
           <BlurView
             pointerEvents="none"
             intensity={4}
@@ -50,32 +51,44 @@ export function BottomSheet({
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Đóng bảng tuỳ chọn"
-          className={actions ? 'absolute inset-0 bg-black/60' : 'absolute inset-0 bg-ink/40'}
+          className={
+            dialog
+              ? 'absolute inset-0 bg-black/65'
+              : actions
+                ? 'absolute inset-0 bg-black/60'
+                : 'absolute inset-0 bg-ink/40'
+          }
           onPress={onClose}
         />
         <Animated.View
           className={
-            actions
-              ? 'rounded-t-[40px] border-t border-[#E9ECEF] bg-white px-5 pt-5'
-              : 'rounded-t-3xl bg-cream px-5 pb-8 pt-4'
+            dialog
+              ? 'rounded-[44px] border border-[#E9ECEF]/80 bg-white p-6'
+              : actions
+                ? 'rounded-t-[40px] border-t border-[#E9ECEF] bg-white px-5 pt-5'
+                : 'rounded-t-3xl bg-cream px-5 pb-8 pt-4'
           }
           style={
-            actions
-              ? {
-                  paddingBottom: Math.max(32, insets.bottom),
-                  maxHeight: height - insets.top,
-                  transform: [{ translateY }],
-                }
-              : undefined
+            dialog
+              ? { maxHeight: height - insets.top - insets.bottom - 32 }
+              : actions
+                ? {
+                    paddingBottom: Math.max(32, insets.bottom),
+                    maxHeight: height - insets.top,
+                    transform: [{ translateY }],
+                  }
+                : undefined
           }
         >
-          <View
-            className={
-              actions
-                ? 'mx-auto mb-1 h-1.5 w-12 rounded-full bg-[#4A4A4A]/30'
-                : 'mx-auto mb-4 h-1 w-9 rounded-full bg-border'
-            }
-          />
+          {!dialog ? (
+            <View
+              className={
+                actions
+                  ? 'mx-auto mb-1 h-1.5 w-12 rounded-full bg-[#4A4A4A]/30'
+                  : 'mx-auto mb-4 h-1 w-9 rounded-full bg-border'
+              }
+            />
+          ) : null}
           {children}
         </Animated.View>
       </View>

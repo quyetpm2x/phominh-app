@@ -31,7 +31,7 @@ test('manual hiding removes content, topic reduction reorders without changing s
   const state = usePostInteractions.getState();
   state.setHidden(['hoa']);
   state.reduceTopic('shops');
-  expect(ids()).toEqual(['tuan', 'ha']);
+  expect(ids()).toEqual(['tuan', 'my-demo-post', 'ha']);
   expect(POSTS.map((post) => post.id)).toEqual(originalOrder);
   expect(selectFeedPosts(POSTS, 'shops', usePostInteractions.getState()).map((post) => post.id)).toEqual([
     'ha',

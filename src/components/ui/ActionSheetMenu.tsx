@@ -18,8 +18,16 @@ interface ActionSheetMenuProps {
   items: ActionSheetItem[];
   title?: string;
   subtitle?: string;
+  headerIcon?: ReactNode;
 }
-export function ActionSheetMenu({ visible, onClose, items, title, subtitle }: ActionSheetMenuProps) {
+export function ActionSheetMenu({
+  visible,
+  onClose,
+  items,
+  title,
+  subtitle,
+  headerIcon,
+}: ActionSheetMenuProps) {
   const pending = useRef<(() => void) | null>(null);
   const flush = () => {
     const action = pending.current;
@@ -46,7 +54,7 @@ export function ActionSheetMenu({ visible, onClose, items, title, subtitle }: Ac
       {title ? (
         <View className="mb-[15px] flex-row items-center gap-2.5 border-b border-[#E9ECEF]/60 pb-[9px]">
           <View className="h-9 w-9 items-center justify-center rounded-[10px] bg-primary/10">
-            <CustomIcon name="menuOptions" size={18} />
+            {headerIcon ?? <CustomIcon name="menuOptions" size={18} />}
           </View>
           <View className="flex-1">
             <Text

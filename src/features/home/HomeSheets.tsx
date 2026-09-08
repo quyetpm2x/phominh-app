@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { getPostMenuItems } from '../post/postMenu';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { ActionSheetMenu } from '../../components/ui/ActionSheetMenu';
+import { PostActionSheet } from '../post/PostActionSheet';
 import { BottomSheet } from '../../components/ui/BottomSheet';
 import { FilterChip } from '../../components/ui/Chip';
 import { MapAreaPicker } from '../../components/ui/MapAreaPicker';
@@ -151,11 +151,10 @@ export function HomeSheets({ controller }: { controller: HomeFeedController }) {
           <AccountSheetContent {...controller} />
         </ScrollView>
       </BottomSheet>
-      <ActionSheetMenu
+      <PostActionSheet
         visible={menu !== null}
         onClose={() => setMenu(null)}
-        title="Tuỳ chọn bài viết"
-        subtitle={`Bài đăng của ${POSTS[menu ?? 0].name}`}
+        post={POSTS[menu ?? 0]}
         items={getPostMenuItems({
           saved: Boolean(saved[POSTS[menu ?? 0].id]),
           onSave: () => {
