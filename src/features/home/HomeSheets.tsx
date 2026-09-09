@@ -55,11 +55,9 @@ export function HomeSheets({ controller }: { controller: HomeFeedController }) {
                         ? 'Liên hệ quán'
                         : sheet === 'details'
                           ? 'Thông tin khu phố'
-                          : sheet === 'notifications'
-                            ? 'Thông báo'
-                            : sheet === 'profile'
-                              ? 'Trang cá nhân'
-                              : 'Đăng tin'}
+                          : sheet === 'profile'
+                            ? 'Trang cá nhân'
+                            : 'Đăng tin'}
           </Text>
           <Pressable
             accessibilityRole="button"

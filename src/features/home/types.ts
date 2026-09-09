@@ -9,7 +9,6 @@ export type Sheet =
   | 'comments'
   | 'contact'
   | 'details'
-  | 'notifications'
   | 'profile'
   | 'compose'
   | null;

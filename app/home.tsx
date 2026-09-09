@@ -1,39 +1,37 @@
-import { Redirect, router } from 'expo-router';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Redirect, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button } from '../src/components/ui/Button';
 import { colors } from '../src/constants/design-tokens';
-import { POSTS } from '../src/features/home/data';
-import { FeedComposer } from '../src/features/home/FeedComposer';
-import { FeedPostCard } from '../src/features/home/FeedPostCard';
-import { HomeHeader } from '../src/features/home/HomeHeader';
+import { HomeFeedTab } from '../src/features/home/HomeFeedTab';
 import { HomeNavigation } from '../src/features/home/HomeNavigation';
 import { HomeSheets } from '../src/features/home/HomeSheets';
-import { ReportedPostCard } from '../src/features/home/ReportedPostCard';
-import { useHomeFeed } from '../src/features/home/useHomeFeed';
 import { useHomeDestination } from '../src/features/home/useHomeDestination';
+import { useHomeFeed } from '../src/features/home/useHomeFeed';
+import { NotificationsTab } from '../src/features/notifications/NotificationsTab';
+import { useNotifications } from '../src/features/notifications/useNotifications';
 
 export default function HomeScreen() {
   const controller = useHomeFeed();
+  const notifications = useNotifications();
+  const params = useLocalSearchParams<{
+    tab?: string;
+    request?: string;
+    focusPost?: string;
+    feedFilter?: string;
+  }>();
+  const routeKey = JSON.stringify([params.tab, params.request, params.focusPost, params.feedFilter]);
+  const routeTab =
+    !params.focusPost && !params.feedFilter && params.tab === 'notifications' ? 'notifications' : 'feed';
+  const [selection, setSelection] = useState<{ routeKey: string; tab: 'feed' | 'notifications' }>({
+    routeKey,
+    tab: routeTab,
+  });
+  const activeTab = selection.routeKey === routeKey ? selection.tab : routeTab;
+  const setActiveTab = (tab: 'feed' | 'notifications') => setSelection({ routeKey, tab });
   const destination = useHomeDestination(controller);
-  const {
-    signedIn,
-    profile,
-    scroll,
-    visiblePosts,
-    liked,
-    comments,
-    filter,
-    unread,
-    setFilter,
-    setHidden,
-    setSheet,
-    setUnread,
-    setMenu,
-    setLiked,
-    openPost,
-    sharePost,
-  } = controller;
+  const { signedIn, scroll, filter, setFilter, setSheet } = controller;
+
   if (signedIn === null)
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-cream">
@@ -44,81 +42,22 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-white">
-      <HomeHeader {...controller} />
-      <ScrollView
-        ref={scroll}
-        contentContainerStyle={styles.feed}
-        showsVerticalScrollIndicator={false}
-        onContentSizeChange={destination.onContentSizeChange}
-        onScrollBeginDrag={destination.onScrollBeginDrag}
-      >
-        <FeedComposer profile={profile} onCompose={() => setSheet('compose')} />
-        {visiblePosts.map((post) => {
-          if (controller.reports[post.id]) {
-            const topic = post.merchant ? 'shops' : 'neighbors';
-            return (
-              <ReportedPostCard
-                key={post.id}
-                post={post}
-                blocked={controller.blockedAuthors.includes(post.authorId)}
-                reduced={controller.reducedTopics.includes(topic)}
-                onBlock={() => controller.blockAuthor(post.authorId)}
-                onReduce={() => controller.reduceTopic(topic)}
-                onUndoBlock={() => controller.unblockAuthor(post.authorId)}
-                onUndoReduce={() => controller.restoreTopic(topic)}
-                onManage={() => setSheet('preferences')}
-              />
-            );
-          }
-          const index = POSTS.findIndex((item) => item.id === post.id);
-          return (
-            <View key={post.id} onLayout={(event) => destination.onPostLayout(post.id, event)}>
-              <FeedPostCard
-                post={post}
-                liked={Boolean(liked[post.id])}
-                commentCount={comments[post.id]?.length ?? 0}
-                onOpenPost={() => router.push({ pathname: '/post/[id]', params: { id: post.id } })}
-                onLike={() => setLiked((previous) => ({ ...previous, [post.id]: !previous[post.id] }))}
-                onMenu={() => setMenu(index)}
-                onComments={() =>
-                  router.push({ pathname: '/post/[id]', params: { id: post.id, comments: 'true' } })
-                }
-                onShare={() => void sharePost(index)}
-                onDetails={() =>
-                  post.merchant
-                    ? openPost(index, 'contact')
-                    : router.push({ pathname: '/post/[id]', params: { id: post.id } })
-                }
-                onOpenGallery={() => router.push({ pathname: '/post/[id]', params: { id: post.id } })}
-              />
-            </View>
-          );
-        })}
-        {visiblePosts.length === 0 ? (
-          <View className="gap-3 rounded-2xl bg-white p-6">
-            <Text className="text-center font-sans text-muted">Không có bài viết phù hợp.</Text>
-            <Button
-              label="Hiện tất cả"
-              variant="outline"
-              onPress={() => {
-                setFilter('all');
-                setHidden([]);
-              }}
-            />
-          </View>
-        ) : null}
-      </ScrollView>
+      <View className="flex-1" style={activeTab === 'feed' ? styles.visible : styles.hidden}>
+        <HomeFeedTab controller={controller} destination={destination} />
+      </View>
+      <View className="flex-1" style={activeTab === 'notifications' ? styles.visible : styles.hidden}>
+        <NotificationsTab controller={notifications} />
+      </View>
       <HomeNavigation
+        activeTab={activeTab}
         filter={filter}
-        unread={unread}
+        unread={notifications.unread}
         onFilterChange={(next) => {
+          setActiveTab('feed');
           setFilter(next);
           scroll.current?.scrollTo({ y: 0, animated: true });
         }}
-        onNotifications={() => {
-          setSheet('notifications');
-          setUnread(0);
-        }}
+        onNotifications={() => setActiveTab('notifications')}
         onCompose={() => setSheet('compose')}
         onProfile={() => setSheet('profile')}
       />
@@ -127,6 +66,4 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  feed: { padding: 16, gap: 16, backgroundColor: '#FFFBF7', flexGrow: 1, paddingBottom: 24 },
-});
+const styles = StyleSheet.create({ visible: { display: 'flex' }, hidden: { display: 'none' } });

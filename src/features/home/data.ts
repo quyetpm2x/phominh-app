@@ -80,6 +80,22 @@ export const POSTS: readonly FeedPost[] = [
     text: 'Xe bánh mì đầu ngõ hôm nay nghỉ bán nha cả nhà ơi...',
     photos: [],
   },
+  {
+    id: 'quyet',
+    authorId: 'ha',
+    name: 'Bác Hà T4',
+    badge: 'HÀNG XÓM 3 NĂM',
+    color: colors.accent.DEFAULT,
+    avatar: PHOTOS.tuan,
+    rank: '12 xác nhận',
+    time: '35 phút trước',
+    distance: '400m',
+    likes: 18,
+    comments: 5,
+    merchant: true,
+    text: 'Đầu ngõ 72 đang ==sửa đường ống nước==, mình gửi ảnh 2 góc đầu ngõ và lối tránh ngách 68 cho bà con tiện quan sát nhé!',
+    photos: [PHOTOS.street],
+  },
 ] as const;
 
 export const POST_DRAFT_STORAGE_KEY = 'pho_minh_post_draft';

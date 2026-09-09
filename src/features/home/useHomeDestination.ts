@@ -5,7 +5,12 @@ import type { HomeFeedController } from './useHomeFeed';
 
 // Return from post actions to the requested feed card or the existing profile panel.
 export function useHomeDestination({ scroll, setFilter, setSheet, signedIn }: HomeFeedController) {
-  const params = useLocalSearchParams<{ focusPost?: string; panel?: string; request?: string }>();
+  const params = useLocalSearchParams<{
+    focusPost?: string;
+    panel?: string;
+    feedFilter?: string;
+    request?: string;
+  }>();
   const target = useRef<string | null>(null);
   const positions = useRef<Record<string, number>>({});
   const handled = useRef<string | undefined>(undefined);
@@ -17,10 +22,11 @@ export function useHomeDestination({ scroll, setFilter, setSheet, signedIn }: Ho
     useCallback(() => {
       if (!signedIn || !params.request || handled.current === params.request) return;
       handled.current = params.request;
-      if (params.panel === 'profile') {
-        setSheet('profile');
+      if (params.panel === 'profile' || params.panel === 'compose') {
+        setSheet(params.panel);
         return;
       }
+      if (params.feedFilter === 'all' || params.feedFilter === 'shops') setFilter(params.feedFilter);
       if (!params.focusPost) return;
       target.current = params.focusPost;
       setFilter('all');
@@ -28,7 +34,16 @@ export function useHomeDestination({ scroll, setFilter, setSheet, signedIn }: Ho
         frame = requestAnimationFrame(scrollToTarget);
       });
       return () => cancelAnimationFrame(frame);
-    }, [signedIn, params.request, params.panel, params.focusPost, setSheet, setFilter, scrollToTarget]),
+    }, [
+      signedIn,
+      params.request,
+      params.panel,
+      params.feedFilter,
+      params.focusPost,
+      setSheet,
+      setFilter,
+      scrollToTarget,
+    ]),
   );
   const onPostLayout = (id: string, event: LayoutChangeEvent) => {
     positions.current[id] = event.nativeEvent.layout.y;

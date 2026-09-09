@@ -39,20 +39,29 @@ export function Chip({ label, color = 'gray', size = 'sm' }: ChipProps) {
 interface FilterChipProps extends PressableProps {
   label: string;
   selected?: boolean;
+  filled?: boolean;
   icon?: ReactNode;
 }
 
 // Chip bấm được (loại bài trong bộ lọc, chip trạng thái nhanh...).
-export function FilterChip({ label, selected, icon, ...props }: FilterChipProps) {
+export function FilterChip({ label, selected, filled = false, icon, ...props }: FilterChipProps) {
   return (
     <Pressable
       className={`flex-row items-center justify-center gap-1.5 rounded-full border px-3.5 py-2 ${
-        selected ? 'border-primary bg-primary-50' : 'border-border bg-white'
+        selected
+          ? filled
+            ? 'border-primary bg-primary'
+            : 'border-primary bg-primary-50'
+          : 'border-border bg-white'
       }`}
       {...props}
     >
       {icon}
-      <Text className={`font-sans-semibold text-xs ${selected ? 'text-primary' : 'text-ink'}`}>{label}</Text>
+      <Text
+        className={`font-sans-semibold text-xs ${selected ? (filled ? 'text-white' : 'text-primary') : 'text-ink'}`}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }

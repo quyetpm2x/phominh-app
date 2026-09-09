@@ -19,11 +19,6 @@ export function AccountSheetContent({
 }: Props) {
   return (
     <>
-      {sheet === 'notifications' ? (
-        <Text className="font-sans text-muted">
-          Thông báo đang dùng dữ liệu minh hoạ. Chưa có thông báo mới từ hệ thống.
-        </Text>
-      ) : null}
       {sheet === 'profile' ? (
         <View className="gap-4">
           <View className="flex-row items-center gap-3">
