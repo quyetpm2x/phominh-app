@@ -12,10 +12,11 @@ import { usePostExtension } from './usePostExtension';
 interface Props {
   post: FeedPost | null;
   onClose: () => void;
+  onViewPost?: (id: string) => void;
 }
-export function PostExtensionSheet({ post, onClose }: Props) {
+export function PostExtensionSheet({ post, onClose, onViewPost }: Props) {
   const { hours, setHours, boost, setBoost, result, remaining, close, confirm, navigate, flush } =
-    usePostExtension(post, onClose);
+    usePostExtension(post, onClose, onViewPost);
   const remainingLabel =
     remaining === undefined
       ? 'Chưa có thông tin'
@@ -36,6 +37,7 @@ export function PostExtensionSheet({ post, onClose }: Props) {
           result={result}
           onViewPost={() => navigate('feed')}
           onProfile={() => navigate('profile')}
+          localPost={Boolean(onViewPost)}
         />
       ) : (
         <ScrollView

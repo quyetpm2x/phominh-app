@@ -2,7 +2,7 @@ import type { SetStateAction } from 'react';
 import { create } from 'zustand';
 import type { ExtensionResult } from '../post-extension/extensionResult';
 import { isValidPostEdit, type PostEdit } from '../post-edit/postEdit';
-import { POSTS } from './data';
+import { findPost } from '../post/findPost';
 import { LOCAL_USER_ID } from '../../lib/personalProfile';
 
 type Flags = Record<string, boolean>;
@@ -42,8 +42,7 @@ interface PostInteractions {
 export const usePostInteractions = create<PostInteractions>((set) => ({
   edits: {},
   savePostEdit: (postId, edit) => {
-    if (POSTS.find((post) => post.id === postId)?.authorId !== LOCAL_USER_ID || !isValidPostEdit(edit))
-      return false;
+    if (findPost(postId)?.authorId !== LOCAL_USER_ID || !isValidPostEdit(edit)) return false;
     const clean = {
       text: edit.text.trim(),
       commentsEnabled: edit.commentsEnabled,

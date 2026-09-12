@@ -9,8 +9,9 @@ interface Props {
   result: ExtensionResult;
   onViewPost: () => void;
   onProfile: () => void;
+  localPost?: boolean;
 }
-export function ExtensionSuccessContent({ result, onViewPost, onProfile }: Props) {
+export function ExtensionSuccessContent({ result, onViewPost, onProfile, localPost = false }: Props) {
   const analytics = DEMO_ANALYTICS[result.postId];
   const area = analytics
     ? `${analytics.area.replace('Khu vực ', '').split(',')[0]} (${analytics.radius})`
@@ -57,7 +58,7 @@ export function ExtensionSuccessContent({ result, onViewPost, onProfile }: Props
       </View>
       <View className="gap-2">
         <GradientSubmitButton
-          label="Xem bài viết trên dòng tin"
+          label={localPost ? 'Xem bài viết' : 'Xem bài viết trên dòng tin'}
           disabled={false}
           loading={false}
           compact
@@ -66,13 +67,15 @@ export function ExtensionSuccessContent({ result, onViewPost, onProfile }: Props
           leadingIcon={<CustomIcon name="extensionFeed" size={16} />}
           onPress={onViewPost}
         />
-        <Pressable
-          accessibilityRole="button"
-          onPress={onProfile}
-          className="h-11 items-center justify-center rounded-full bg-[#F1F3F5]"
-        >
-          <Text className="font-sans-bold text-[13px] text-[#1A1A1A]">Về trang cá nhân</Text>
-        </Pressable>
+        {!localPost ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={onProfile}
+            className="h-11 items-center justify-center rounded-full bg-[#F1F3F5]"
+          >
+            <Text className="font-sans-bold text-[13px] text-[#1A1A1A]">Về trang cá nhân</Text>
+          </Pressable>
+        ) : null}
       </View>
     </ScrollView>
   );

@@ -7,13 +7,13 @@ import {
   PROFILE_STORAGE_KEY,
   restoreProfile,
 } from '../../lib/personalProfile';
-import { POSTS } from '../home/data';
+import { findPost } from './findPost';
 import { applyPostEdit } from '../post-edit/postEdit';
 import { usePostInteractions } from '../home/postInteractions';
 import { SAMPLE_COMMENTS, type PostComment } from './data';
 
 export function usePostDetail(id: string | undefined) {
-  const originalPost = POSTS.find((item) => item.id === id);
+  const originalPost = findPost(id);
   const edit = usePostInteractions((state) => (id ? state.edits[id] : undefined));
   const post = originalPost ? applyPostEdit(originalPost, edit) : undefined;
   const [signedIn, setSignedIn] = useState<boolean | null>(null);

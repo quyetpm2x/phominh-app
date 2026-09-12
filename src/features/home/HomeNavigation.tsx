@@ -2,22 +2,22 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { colors } from '../../constants/design-tokens';
-import type { Filter } from './types';
+import type { Filter, HomeTab } from './types';
 interface Props {
-  activeTab?: 'feed' | 'notifications';
-  filter: Filter;
+  activeTab?: HomeTab;
   unread: number;
   onFilterChange: (filter: Filter) => void;
   onNotifications: () => void;
+  onShop: () => void;
   onCompose: () => void;
   onProfile: () => void;
 }
 export function HomeNavigation({
   activeTab = 'feed',
-  filter,
   unread,
   onFilterChange,
   onNotifications,
+  onShop,
   onCompose,
   onProfile,
 }: Props) {
@@ -26,35 +26,33 @@ export function HomeNavigation({
     <View style={styles.navigation}>
       <Pressable
         accessibilityRole="tab"
-        accessibilityState={{ selected: feedActive && filter !== 'shops' }}
+        accessibilityState={{ selected: feedActive }}
         onPress={() => onFilterChange('all')}
         style={styles.navItem}
       >
         <View>
-          <CustomIcon
-            name="feedNews"
-            size={24}
-            color={feedActive && filter !== 'shops' ? colors.primary.DEFAULT : '#A0A0A0'}
-          />
-          {feedActive && filter !== 'shops' ? (
-            <View className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary" />
-          ) : null}
+          <CustomIcon name="feedNews" size={24} color={feedActive ? colors.primary.DEFAULT : '#A0A0A0'} />
+          {feedActive ? <View className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary" /> : null}
         </View>
         <Text
           className="font-sans-black text-[10px]"
-          style={feedActive && filter !== 'shops' ? styles.activeNav : styles.inactiveNav}
+          style={feedActive ? styles.activeNav : styles.inactiveNav}
         >
           Dòng tin
         </Text>
       </Pressable>
       <Pressable
         accessibilityRole="tab"
-        accessibilityState={{ selected: !feedActive }}
+        accessibilityState={{ selected: activeTab === 'notifications' }}
         onPress={onNotifications}
         style={styles.navItem}
       >
         <View>
-          <CustomIcon name="feedBell" size={24} color={feedActive ? '#A0A0A0' : colors.primary.DEFAULT} />
+          <CustomIcon
+            name="feedBell"
+            size={24}
+            color={activeTab === 'notifications' ? colors.primary.DEFAULT : '#A0A0A0'}
+          />
           {unread > 0 ? (
             <View className="absolute -right-1 -top-1 min-w-3.5 items-center rounded-full bg-accent px-1">
               <Text className="font-sans-black text-[8px] text-white">{unread}</Text>
@@ -63,7 +61,7 @@ export function HomeNavigation({
         </View>
         <Text
           className="font-sans-medium text-[10px]"
-          style={feedActive ? styles.inactiveNav : styles.activeNav}
+          style={activeTab === 'notifications' ? styles.activeNav : styles.inactiveNav}
         >
           Thông báo
         </Text>
@@ -124,18 +122,18 @@ export function HomeNavigation({
       </Pressable>
       <Pressable
         accessibilityRole="tab"
-        accessibilityState={{ selected: feedActive && filter === 'shops' }}
-        onPress={() => onFilterChange('shops')}
+        accessibilityState={{ selected: activeTab === 'shop' }}
+        onPress={onShop}
         style={styles.navItem}
       >
         <CustomIcon
           name="feedShop"
           size={24}
-          color={feedActive && filter === 'shops' ? colors.primary.DEFAULT : '#A0A0A0'}
+          color={activeTab === 'shop' ? colors.primary.DEFAULT : '#A0A0A0'}
         />
         <Text
           className="font-sans-medium text-[10px]"
-          style={feedActive && filter === 'shops' ? styles.activeNav : styles.inactiveNav}
+          style={activeTab === 'shop' ? styles.activeNav : styles.inactiveNav}
         >
           Quán
         </Text>

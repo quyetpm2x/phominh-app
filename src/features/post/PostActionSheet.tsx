@@ -90,7 +90,11 @@ export function PostActionSheet({
         headerIcon={ownPost ? <CustomIcon name="menuOwner" size={18} /> : undefined}
         items={ownPost ? ownerItems : items}
       />
-      <PostExtensionSheet post={extendingPost} onClose={() => setExtendingPost(null)} />
+      <PostExtensionSheet
+        post={extendingPost}
+        onClose={() => setExtendingPost(null)}
+        onViewPost={(id) => router.push({ pathname: '/post/[id]', params: { id } })}
+      />
     </>
   );
 }

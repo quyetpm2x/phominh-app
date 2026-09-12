@@ -54,6 +54,7 @@ export function useHomeFeed() {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [selected, setSelected] = useState(0);
   const [menu, setMenu] = useState<number | null>(null);
+  const [ownedMenuPost, setOwnedMenuPost] = useState<FeedPost | null>(null);
   const [sharingPost, setSharingPost] = useState<FeedPost | null>(null);
   const [comment, setComment] = useState('');
   const [draft, setDraft] = useState('');
@@ -85,7 +86,8 @@ export function useHomeFeed() {
       if (!active) return;
       const value = (index: number) => (values[index].status === 'fulfilled' ? values[index].value : null);
       setSignedIn(value(0) === 'true');
-      setProfile(restoreProfile(value(1)));
+      // Demo account is configured as an activated shop so the registered-shop tab is visible.
+      setProfile({ ...restoreProfile(value(1)), isShopRegistered: true });
       setHome(parseHomeArea(value(2)) ?? DEFAULT_HOME_AREA);
       setWork(parseHomeArea(value(3)));
       setDraft(value(4) ?? '');
@@ -193,6 +195,8 @@ export function useHomeFeed() {
     selectedPost,
     selectedArea,
     menu,
+    ownedMenuPost,
+    setOwnedMenuPost,
     liked,
     saved,
     comment,

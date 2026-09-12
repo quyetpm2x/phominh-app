@@ -1,6 +1,23 @@
 import { usePostInteractions } from './postInteractions';
+import { findPost } from '../post/findPost';
 
 beforeEach(() => usePostInteractions.getState().reset());
+
+test('owner menu destinations resolve string IDs from My Posts and retain edits', () => {
+  const post = findPost('my-review');
+  expect(post?.id).toBe('my-review');
+  const edit = { text: 'Nội dung đã cập nhật', commentsEnabled: true, notifyReplies: false };
+  expect(usePostInteractions.getState().savePostEdit('my-review', edit)).toBe(true);
+  expect(usePostInteractions.getState().edits['my-review']).toEqual(edit);
+});
+
+test('shared post lookup does not allow editing another author or an unknown post', () => {
+  const edit = { text: 'Nội dung cập nhật', commentsEnabled: true, notifyReplies: false };
+  expect(usePostInteractions.getState().savePostEdit('hoa', edit)).toBe(false);
+  expect(usePostInteractions.getState().savePostEdit('missing-post', edit)).toBe(false);
+  expect(findPost('missing-post')).toBeUndefined();
+  expect(usePostInteractions.getState().edits).toEqual({});
+});
 
 test('comments added from both screens retain previous comments and stay scoped to their post', () => {
   const fromFeed = usePostInteractions.getState().setComments;

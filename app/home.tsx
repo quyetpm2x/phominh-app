@@ -6,10 +6,12 @@ import { colors } from '../src/constants/design-tokens';
 import { HomeFeedTab } from '../src/features/home/HomeFeedTab';
 import { HomeNavigation } from '../src/features/home/HomeNavigation';
 import { HomeSheets } from '../src/features/home/HomeSheets';
+import type { HomeTab } from '../src/features/home/types';
 import { useHomeDestination } from '../src/features/home/useHomeDestination';
 import { useHomeFeed } from '../src/features/home/useHomeFeed';
 import { NotificationsTab } from '../src/features/notifications/NotificationsTab';
 import { useNotifications } from '../src/features/notifications/useNotifications';
+import { ShopTab } from '../src/features/shop/ShopTab';
 
 export default function HomeScreen() {
   const controller = useHomeFeed();
@@ -21,16 +23,18 @@ export default function HomeScreen() {
     feedFilter?: string;
   }>();
   const routeKey = JSON.stringify([params.tab, params.request, params.focusPost, params.feedFilter]);
-  const routeTab =
-    !params.focusPost && !params.feedFilter && params.tab === 'notifications' ? 'notifications' : 'feed';
-  const [selection, setSelection] = useState<{ routeKey: string; tab: 'feed' | 'notifications' }>({
+  const routeTab: HomeTab =
+    !params.focusPost && !params.feedFilter && (params.tab === 'notifications' || params.tab === 'shop')
+      ? params.tab
+      : 'feed';
+  const [selection, setSelection] = useState<{ routeKey: string; tab: HomeTab }>({
     routeKey,
     tab: routeTab,
   });
   const activeTab = selection.routeKey === routeKey ? selection.tab : routeTab;
-  const setActiveTab = (tab: 'feed' | 'notifications') => setSelection({ routeKey, tab });
+  const setActiveTab = (tab: HomeTab) => setSelection({ routeKey, tab });
   const destination = useHomeDestination(controller);
-  const { signedIn, scroll, filter, setFilter, setSheet } = controller;
+  const { signedIn, scroll, setFilter, setSheet } = controller;
 
   if (signedIn === null)
     return (
@@ -48,9 +52,11 @@ export default function HomeScreen() {
       <View className="flex-1" style={activeTab === 'notifications' ? styles.visible : styles.hidden}>
         <NotificationsTab controller={notifications} />
       </View>
+      <View className="flex-1" style={activeTab === 'shop' ? styles.visible : styles.hidden}>
+        <ShopTab controller={controller} onCompose={() => setSheet('compose')} />
+      </View>
       <HomeNavigation
         activeTab={activeTab}
-        filter={filter}
         unread={notifications.unread}
         onFilterChange={(next) => {
           setActiveTab('feed');
@@ -58,6 +64,7 @@ export default function HomeScreen() {
           scroll.current?.scrollTo({ y: 0, animated: true });
         }}
         onNotifications={() => setActiveTab('notifications')}
+        onShop={() => setActiveTab('shop')}
         onCompose={() => setSheet('compose')}
         onProfile={() => setSheet('profile')}
       />

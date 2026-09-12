@@ -30,6 +30,11 @@ describe('birth date validation', () => {
 });
 
 describe('restoreProfile', () => {
+  it('only restores registered shop access from an explicit boolean', () => {
+    expect(restoreProfile('{}').isShopRegistered).toBe(false);
+    expect(restoreProfile('{"isShopRegistered":"true"}').isShopRegistered).toBe(false);
+    expect(restoreProfile('{"isShopRegistered":true}').isShopRegistered).toBe(true);
+  });
   it.each([null, 'invalid', 'null', '2'])('falls back safely for %s', (raw) =>
     expect(restoreProfile(raw)).toEqual(EMPTY_PROFILE),
   );

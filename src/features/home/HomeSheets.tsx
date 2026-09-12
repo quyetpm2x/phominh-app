@@ -26,11 +26,15 @@ export function HomeSheets({ controller }: { controller: HomeFeedController }) {
     setTab,
     menu,
     setMenu,
+    ownedMenuPost,
+    setOwnedMenuPost,
     saved,
     setSaved,
     setHidden,
     sharePost,
   } = controller;
+  const menuPost = ownedMenuPost ?? (menu !== null ? POSTS[menu] : undefined);
+  const actionPost = menuPost ?? POSTS[0];
   return (
     <>
       <PostShareSheet
@@ -150,18 +154,21 @@ export function HomeSheets({ controller }: { controller: HomeFeedController }) {
         </ScrollView>
       </BottomSheet>
       <PostActionSheet
-        visible={menu !== null}
-        onClose={() => setMenu(null)}
-        post={POSTS[menu ?? 0]}
+        visible={Boolean(menuPost)}
+        onClose={() => {
+          setMenu(null);
+          setOwnedMenuPost(null);
+        }}
+        post={actionPost}
         items={getPostMenuItems({
-          saved: Boolean(saved[POSTS[menu ?? 0].id]),
+          saved: Boolean(saved[actionPost.id]),
           onSave: () => {
-            const id = POSTS[menu ?? 0].id;
+            const id = actionPost.id;
             setSaved((previous) => ({ ...previous, [id]: !previous[id] }));
           },
           onShare: () => void sharePost(menu ?? 0),
-          onReport: () => router.push({ pathname: '/report', params: { postId: POSTS[menu ?? 0].id } }),
-          onHide: () => setHidden((previous) => [...previous, POSTS[menu ?? 0].id]),
+          onReport: () => router.push({ pathname: '/report', params: { postId: actionPost.id } }),
+          onHide: () => setHidden((previous) => [...previous, actionPost.id]),
         })}
       />
     </>

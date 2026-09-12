@@ -6,8 +6,8 @@ import { FeedComposer } from './FeedComposer';
 import { FeedPostCard } from './FeedPostCard';
 import { HomeHeader } from './HomeHeader';
 import { ReportedPostCard } from './ReportedPostCard';
-import type { HomeFeedController } from './useHomeFeed';
 import type { useHomeDestination } from './useHomeDestination';
+import type { HomeFeedController } from './useHomeFeed';
 
 export function HomeFeedTab({
   controller,

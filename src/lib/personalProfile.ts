@@ -11,6 +11,7 @@ export interface PersonalProfile {
   gender: Gender;
   bio: string;
   avatarUri: string | null;
+  isShopRegistered?: boolean;
 }
 export const EMPTY_PROFILE: PersonalProfile = {
   fullName: '',
@@ -19,6 +20,7 @@ export const EMPTY_PROFILE: PersonalProfile = {
   gender: 'male',
   bio: '',
   avatarUri: null,
+  isShopRegistered: false,
 };
 
 export function parseBirthDate(value: string): Date | null {
@@ -52,6 +54,7 @@ export function restoreProfile(raw: string | null): PersonalProfile {
       gender: ['male', 'female', 'other'].includes(p.gender) ? p.gender : 'male',
       bio: typeof p.bio === 'string' ? p.bio.slice(0, 80) : '',
       avatarUri: typeof p.avatarUri === 'string' ? p.avatarUri : null,
+      isShopRegistered: p.isShopRegistered === true,
     };
   } catch {
     return { ...EMPTY_PROFILE };

@@ -6,7 +6,11 @@ import type { FeedPost } from '../home/types';
 import { createExtensionResult, type ExtensionResult } from './extensionResult';
 import { useRemainingPostHours } from './useRemainingPostHours';
 
-export function usePostExtension(post: FeedPost | null, dismiss: () => void) {
+export function usePostExtension(
+  post: FeedPost | null,
+  dismiss: () => void,
+  onViewPost?: (id: string) => void,
+) {
   const [hours, setHours] = useState<ExtensionResult['hours']>(24);
   const [boost, setBoost] = useState(true);
   const [result, setResult] = useState<ExtensionResult | null>(null);
@@ -47,6 +51,11 @@ export function usePostExtension(post: FeedPost | null, dismiss: () => void) {
   const navigate = (destination: 'feed' | 'profile') => {
     if (!result) return;
     const postId = result.postId;
+    if (onViewPost) {
+      pending.current = () => onViewPost(postId);
+      close();
+      return;
+    }
     pending.current = () =>
       router.dismissTo({
         pathname: '/home',

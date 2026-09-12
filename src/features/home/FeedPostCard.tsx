@@ -95,7 +95,9 @@ export function FeedPostCard({
           hitSlop={10}
           onPress={onMenu}
         >
-          <CustomIcon name="feedMore" size={16} />
+          <View className="rotate-90 p-1 bg-[#f1f3f5a0] rounded-full">
+            <CustomIcon name="feedMore" size={16} />
+          </View>
         </Pressable>
       </View>
       <HighlightedText
