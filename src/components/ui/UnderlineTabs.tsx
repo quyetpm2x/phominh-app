@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ReactNode } from 'react';
 
 export interface UnderlineTabOption<T extends string> {
@@ -12,6 +12,7 @@ interface UnderlineTabsProps<T extends string> {
   value: T;
   onChange: (key: T) => void;
   compact?: boolean;
+  variant?: 'underline' | 'segmented';
 }
 
 // Tab gạch chân (Nhà / Chỗ làm / Quanh đây trong Feed) — đúng {{ tabButtons }} của thiết kế: chữ,
@@ -21,7 +22,29 @@ export function UnderlineTabs<T extends string>({
   value,
   onChange,
   compact = false,
+  variant = 'underline',
 }: UnderlineTabsProps<T>) {
+  if (variant === 'segmented')
+    return (
+      <View style={styles.segmented}>
+        {options.map((option) => (
+          <Pressable
+            key={option.key}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: value === option.key }}
+            style={[styles.segment, value === option.key && styles.active]}
+            onPress={() => onChange(option.key)}
+          >
+            <Text
+              className="font-sans-bold"
+              style={[styles.label, value === option.key && styles.activeLabel]}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    );
   return (
     <View className={compact ? 'flex-row justify-between gap-3' : 'flex-row gap-5'}>
       {options.map((opt) => {
@@ -58,3 +81,25 @@ export function UnderlineTabs<T extends string>({
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  segmented: {
+    height: 40,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    backgroundColor: '#FFFFFF80',
+    borderRadius: 11.1,
+    flexDirection: 'row',
+  },
+  segment: { flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 8.3 },
+  active: {
+    backgroundColor: '#FFF',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 1,
+    shadowOffset: { width: 0, height: 1 },
+  },
+  label: { fontSize: 12, lineHeight: 18, color: '#4A4A4A' },
+  activeLabel: { color: '#1A1A1A' },
+});

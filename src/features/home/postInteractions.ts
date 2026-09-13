@@ -13,6 +13,9 @@ interface LocalReport {
   details: string;
 }
 interface PostInteractions {
+  dismissedHiddenPreviews: string[];
+  dismissHiddenPreview: (id: string) => void;
+  clearHiddenItems: (previewIds: string[]) => void;
   edits: Record<string, PostEdit>;
   savePostEdit: (postId: string, edit: PostEdit) => boolean;
   extensions: Record<string, ExtensionResult>;
@@ -40,7 +43,12 @@ interface PostInteractions {
 }
 // Shared local demo interactions so navigating back to the feed retains changes.
 export const usePostInteractions = create<PostInteractions>((set) => ({
+  dismissedHiddenPreviews: [],
   edits: {},
+  dismissHiddenPreview: (id) =>
+    set((state) => ({ dismissedHiddenPreviews: [...new Set([...state.dismissedHiddenPreviews, id])] })),
+  clearHiddenItems: (previewIds) =>
+    set({ hidden: [], blockedAuthors: [], reducedTopics: [], dismissedHiddenPreviews: previewIds }),
   savePostEdit: (postId, edit) => {
     if (findPost(postId)?.authorId !== LOCAL_USER_ID || !isValidPostEdit(edit)) return false;
     const clean = {
@@ -56,6 +64,7 @@ export const usePostInteractions = create<PostInteractions>((set) => ({
     set((state) => ({ extensions: { ...state.extensions, [result.postId]: result } })),
   reset: () =>
     set({
+      dismissedHiddenPreviews: [],
       edits: {},
       extensions: {},
       liked: {},

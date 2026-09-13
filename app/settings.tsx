@@ -36,15 +36,19 @@ export default function SettingsScreen() {
             tone="pink"
             badge="manage"
             last
-            onPress={() => setSheet('permissions')}
+            onPress={() => router.push('/app-permissions')}
           />
         </SettingsSection>
         <SettingsSection title="QUYỀN RIÊNG TƯ">
-          <SettingsRow icon="settingsStar" title="Người quen ưu tiên" onPress={() => setSheet('favorites')} />
+          <SettingsRow
+            icon="settingsStar"
+            title="Người quen ưu tiên"
+            onPress={() => router.push('/priority-neighbors')}
+          />
           <SettingsRow
             icon="settingsHidden"
             title="Danh sách không quan tâm"
-            onPress={() => setSheet('hidden')}
+            onPress={() => router.push('/hidden-items')}
           />
           <SettingsRow
             icon="settingsPrivacy"

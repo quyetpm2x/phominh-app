@@ -13,7 +13,8 @@
       "bundleIdentifier": "vn.phominh.app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Phố Mình cần vị trí để hiện tin quanh bạn khi mở app.",
-        "NSCameraUsageDescription": "Phố Mình cần camera để chụp ảnh đăng bài trực tiếp."
+        "NSCameraUsageDescription": "Phố Mình cần camera để chụp ảnh đăng bài trực tiếp.",
+        "NSMicrophoneUsageDescription": "Phố Mình cần microphone để đăng bài và tìm kiếm bằng giọng nói."
       }
     },
     "android": {
@@ -22,10 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FAFBFC"
       },
-      "permissions": [
-        "CAMERA",
-        "ACCESS_FINE_LOCATION"
-      ]
+      "permissions": ["CAMERA", "ACCESS_FINE_LOCATION"]
     },
     "plugins": [
       "expo-router",
@@ -33,7 +31,9 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Phố Mình cần camera để chụp ảnh đăng bài trực tiếp."
+          "cameraPermission": "Phố Mình cần camera để chụp ảnh đăng bài trực tiếp.",
+          "microphonePermission": "Phố Mình cần microphone để đăng bài và tìm kiếm bằng giọng nói.",
+          "recordAudioAndroid": true
         }
       ],
       [

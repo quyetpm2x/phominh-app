@@ -1,25 +1,31 @@
+import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, AppState, Linking, Platform } from 'react-native';
 
-export type DevicePermission = 'location' | 'notifications' | 'camera';
-type PermissionState = { granted: boolean; canAskAgain: boolean };
+export type DevicePermission = 'location' | 'notifications' | 'camera' | 'photos' | 'microphone';
+export type PermissionState = { granted: boolean; canAskAgain: boolean; limited?: boolean };
 type PermissionMap = Record<DevicePermission, PermissionState | null>;
 
 const readers = {
   location: Location.getForegroundPermissionsAsync,
   notifications: Notifications.getPermissionsAsync,
   camera: Camera.getCameraPermissionsAsync,
+  photos: ImagePicker.getMediaLibraryPermissionsAsync,
+  microphone: Camera.getMicrophonePermissionsAsync,
 };
 
-function normalize(permission: PermissionState & { ios?: { status: number } }): PermissionState {
+function normalize(
+  permission: PermissionState & { ios?: { status: number }; accessPrivileges?: string },
+): PermissionState {
   return {
     granted:
       permission.granted ||
       permission.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL ||
       permission.ios?.status === Notifications.IosAuthorizationStatus.EPHEMERAL,
+    limited: permission.accessPrivileges === 'limited',
     canAskAgain: permission.canAskAgain,
   };
 }
@@ -29,6 +35,8 @@ export function useDevicePermissions() {
     location: null,
     notifications: null,
     camera: null,
+    photos: null,
+    microphone: null,
   });
   const [pending, setPending] = useState<DevicePermission | null>(null);
   const requesting = useRef(false);
@@ -92,6 +100,8 @@ export function useDevicePermissions() {
       let result;
       if (key === 'location') result = await Location.requestForegroundPermissionsAsync();
       else if (key === 'camera') result = await Camera.requestCameraPermissionsAsync();
+      else if (key === 'photos') result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      else if (key === 'microphone') result = await Camera.requestMicrophonePermissionsAsync();
       else {
         if (Platform.OS === 'android') {
           await Notifications.setNotificationChannelAsync('neighborhood', {

@@ -2,20 +2,13 @@ import { useState } from 'react';
 import { router } from 'expo-router';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
-import { Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BottomSheet } from '../../components/ui/BottomSheet';
 import { Button } from '../../components/ui/Button';
 import { LOCAL_SIGN_IN_KEY } from '../../lib/personalProfile';
-import { FeedPreferencesContent } from '../home/FeedPreferencesContent';
 import { usePostInteractions } from '../home/postInteractions';
 
 const details = {
-  permissions: [
-    'Quyền ứng dụng & Vị trí',
-    'Quản lý quyền truy cập vị trí, thông báo, camera và microphone trong cài đặt của thiết bị.',
-  ],
-  favorites: ['Người quen ưu tiên', 'Danh sách người quen ưu tiên chưa được kết nối.'],
-  hidden: ['Danh sách không quan tâm', ''],
   privacy: ['Chính sách quyền riêng tư', 'Chính sách quyền riêng tư chưa được cung cấp trong phiên bản này.'],
   help: [
     'Trung tâm trợ giúp',
@@ -53,21 +46,7 @@ export function SettingsSheets({ sheet, onClose }: { sheet: SettingsSheet | null
         <Text accessibilityRole="header" className="font-sans-bold text-lg text-ink">
           {sheet ? details[sheet][0] : ''}
         </Text>
-        {sheet === 'hidden' ? (
-          <FeedPreferencesContent />
-        ) : (
-          <Text className="font-sans text-sm text-muted">{sheet ? details[sheet][1] : ''}</Text>
-        )}
-        {sheet === 'permissions' ? (
-          <Button
-            label="Mở cài đặt thiết bị"
-            onPress={() =>
-              void Linking.openSettings().catch(() =>
-                Alert.alert('Không mở được cài đặt', 'Vui lòng mở Cài đặt trên thiết bị.'),
-              )
-            }
-          />
-        ) : null}
+        <Text className="font-sans text-sm text-muted">{sheet ? details[sheet][1] : ''}</Text>
         {sheet === 'account' ? (
           <Button
             label="Đăng xuất"

@@ -5,7 +5,13 @@ import { profileEditIcons } from './profile-edit-icons';
 import { inviteIcons } from './invite-icons';
 import { settingsIcons } from './settings-icons';
 import { notificationSettingsIcons } from './notification-settings-icons';
+import { appPermissionIcons } from './app-permission-icons';
+import { priorityIcons } from './priority-icons';
+import { hiddenIcons } from './hidden-icons';
 export const icons = {
+  ...hiddenIcons,
+  ...priorityIcons,
+  ...appPermissionIcons,
   ...notificationSettingsIcons,
   ...settingsIcons,
   ...profileIcons,
