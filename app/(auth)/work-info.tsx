@@ -33,6 +33,7 @@ import { colors, fontFamily } from '../../src/constants/design-tokens';
 import {
   EMPTY_PROFILE,
   PROFILE_STORAGE_KEY,
+  PROFILE_BIO_MAX_LENGTH,
   formatBirthDate,
   parseBirthDate,
   restoreProfile,
@@ -377,11 +378,11 @@ export default function WorkInfoScreen() {
               </View>
             </View>
             <View className="gap-1.5">
-              <FieldLabel label="Giới thiệu bản thân" hint="Tối đa 80 ký tự" />
+              <FieldLabel label="Giới thiệu bản thân" hint={`Tối đa ${PROFILE_BIO_MAX_LENGTH} ký tự`} />
               <TextInput
-                accessibilityLabel="Giới thiệu bản thân, tối đa 80 ký tự"
+                accessibilityLabel={`Giới thiệu bản thân, tối đa ${PROFILE_BIO_MAX_LENGTH} ký tự`}
                 multiline
-                maxLength={80}
+                maxLength={PROFILE_BIO_MAX_LENGTH}
                 value={profile.bio}
                 onChangeText={(text) => update('bio', text)}
                 placeholder="Thích tìm quán ăn ngon trưa & cafe thư giãn quanh tòa nhà..."

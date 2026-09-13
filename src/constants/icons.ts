@@ -1,6 +1,16 @@
 // SVG geometry migrated from the original welcome icon components.
 // Keep the existing default sizes and height ratios to preserve the layout.
+import { profileIcons } from './profile-icons';
+import { profileEditIcons } from './profile-edit-icons';
+import { inviteIcons } from './invite-icons';
+import { settingsIcons } from './settings-icons';
+import { notificationSettingsIcons } from './notification-settings-icons';
 export const icons = {
+  ...notificationSettingsIcons,
+  ...settingsIcons,
+  ...profileIcons,
+  ...profileEditIcons,
+  ...inviteIcons,
   editLocation: {
     size: 16,
     heightRatio: 1,

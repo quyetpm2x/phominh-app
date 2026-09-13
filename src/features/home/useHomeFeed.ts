@@ -2,9 +2,9 @@ import { selectFeedPosts } from './selectFeedPosts';
 import { applyPostEdit } from '../post-edit/postEdit';
 import { usePostInteractions } from './postInteractions';
 import * as Location from 'expo-location';
-import { router } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, type ScrollView } from 'react-native';
 import {
   DEFAULT_HOME_AREA,
@@ -59,7 +59,6 @@ export function useHomeFeed() {
   const [comment, setComment] = useState('');
   const [draft, setDraft] = useState('');
   const [unread, setUnread] = useState(3);
-  const [loggingOut, setLoggingOut] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const scroll = useRef<ScrollView>(null);
   const selectedArea = tab === 'work' && work ? work : tab === 'nearby' && nearby ? nearby : home;
@@ -73,44 +72,46 @@ export function useHomeFeed() {
     extensions,
   });
 
-  useEffect(() => {
-    let active = true;
-    const load = async () => {
-      const values = await Promise.allSettled([
-        SecureStore.getItemAsync(LOCAL_SIGN_IN_KEY),
-        SecureStore.getItemAsync(PROFILE_STORAGE_KEY),
-        SecureStore.getItemAsync(HOME_AREA_STORAGE_KEY),
-        SecureStore.getItemAsync(WORK_AREA_STORAGE_KEY),
-        SecureStore.getItemAsync(POST_DRAFT_STORAGE_KEY),
-      ]);
-      if (!active) return;
-      const value = (index: number) => (values[index].status === 'fulfilled' ? values[index].value : null);
-      setSignedIn(value(0) === 'true');
-      // Demo account is configured as an activated shop so the registered-shop tab is visible.
-      setProfile({ ...restoreProfile(value(1)), isShopRegistered: true });
-      setHome(parseHomeArea(value(2)) ?? DEFAULT_HOME_AREA);
-      setWork(parseHomeArea(value(3)));
-      setDraft(value(4) ?? '');
-      try {
-        if (value(0) !== 'true') return;
-        const permission = await Location.getForegroundPermissionsAsync();
-        if (!permission.granted) return;
-        const position = await Location.getLastKnownPositionAsync();
-        if (active && position)
-          setNearby({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            radiusKm: 1.5,
-          });
-      } catch {
-        /* Saved home remains available without GPS. */
-      }
-    };
-    void load();
-    return () => {
-      active = false;
-    };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      const load = async () => {
+        const values = await Promise.allSettled([
+          SecureStore.getItemAsync(LOCAL_SIGN_IN_KEY),
+          SecureStore.getItemAsync(PROFILE_STORAGE_KEY),
+          SecureStore.getItemAsync(HOME_AREA_STORAGE_KEY),
+          SecureStore.getItemAsync(WORK_AREA_STORAGE_KEY),
+          SecureStore.getItemAsync(POST_DRAFT_STORAGE_KEY),
+        ]);
+        if (!active) return;
+        const value = (index: number) => (values[index].status === 'fulfilled' ? values[index].value : null);
+        setSignedIn(value(0) === 'true');
+        // Demo account is configured as an activated shop so the registered-shop tab is visible.
+        setProfile({ ...restoreProfile(value(1)), isShopRegistered: true });
+        setHome(parseHomeArea(value(2)) ?? DEFAULT_HOME_AREA);
+        setWork(parseHomeArea(value(3)));
+        setDraft(value(4) ?? '');
+        try {
+          if (value(0) !== 'true') return;
+          const permission = await Location.getForegroundPermissionsAsync();
+          if (!permission.granted) return;
+          const position = await Location.getLastKnownPositionAsync();
+          if (active && position)
+            setNearby({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              radiusKm: 1.5,
+            });
+        } catch {
+          /* Saved home remains available without GPS. */
+        }
+      };
+      void load();
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
   useEffect(() => {
     let active = true;
     setAreaLabel(tab === 'work' ? 'Chỗ làm của bạn' : 'Khu vực của bạn');
@@ -148,20 +149,6 @@ export function useHomeFeed() {
     setSheet(next);
   };
   const sharePost = (index: number) => setSharingPost(currentPosts[index] ?? null);
-  const logout = async () => {
-    if (loggingOut) return;
-    setLoggingOut(true);
-    try {
-      await SecureStore.deleteItemAsync(LOCAL_SIGN_IN_KEY);
-      usePostInteractions.getState().reset();
-      setSheet(null);
-      router.replace('/(auth)/welcome');
-    } catch {
-      Alert.alert('Chưa đăng xuất được', 'Vui lòng thử lại.');
-    } finally {
-      setLoggingOut(false);
-    }
-  };
   const saveDraft = async () => {
     if (savingDraft || !draft.trim()) return;
     setSavingDraft(true);
@@ -186,6 +173,7 @@ export function useHomeFeed() {
     reducedTopics,
     reduceTopic,
     profile,
+    work,
     home,
     nearby,
     tab,
@@ -203,7 +191,6 @@ export function useHomeFeed() {
     comments,
     draft,
     unread,
-    loggingOut,
     savingDraft,
     scroll,
     visiblePosts,
@@ -212,7 +199,6 @@ export function useHomeFeed() {
     sharePost,
     sharingPost,
     setSharingPost,
-    logout,
     saveDraft,
     setSheet,
     setFilter,

@@ -8,6 +8,7 @@ import { colors } from '../../constants/design-tokens';
 interface IconTextInputProps extends ComponentProps<typeof RNTextInput> {
   icon: ComponentProps<typeof Ionicons>['name'];
   iconNode?: ReactNode;
+  iconPosition?: 'left' | 'right';
   // Báo field đang sai validate (vd rỗng sau khi trim) — đổi viền sang đỏ, không tự tính bên trong
   // component này vì rule validate khác nhau tuỳ field (bắt buộc hay không).
   invalid?: boolean;
@@ -20,6 +21,7 @@ interface IconTextInputProps extends ComponentProps<typeof RNTextInput> {
 export function IconTextInput({
   icon,
   iconNode,
+  iconPosition = 'left',
   invalid,
   style,
   onFocus,
@@ -35,7 +37,7 @@ export function IconTextInput({
   return (
     <View className="relative justify-center">
       {iconNode ? (
-        <View pointerEvents="none" style={{ position: 'absolute', left: 14, zIndex: 1 }}>
+        <View pointerEvents="none" style={{ position: 'absolute', [iconPosition]: 14, zIndex: 1 }}>
           {iconNode}
         </View>
       ) : (
@@ -43,11 +45,11 @@ export function IconTextInput({
           name={icon}
           size={16}
           color={colors.muted.DEFAULT}
-          style={{ position: 'absolute', left: 14, zIndex: 1 }}
+          style={{ position: 'absolute', [iconPosition]: 14, zIndex: 1 }}
         />
       )}
       <RNTextInput
-        className={`h-12 rounded-xl border bg-cream-surface/40 pl-10 pr-4 text-sm font-sans-semibold text-ink ${borderClass}`}
+        className={`h-12 rounded-xl border bg-cream-surface/40 ${iconPosition === 'right' ? 'pl-4 pr-12' : 'pl-10 pr-4'} text-sm font-sans-semibold text-ink ${borderClass}`}
         placeholderTextColor={colors.muted.light}
         style={[
           style,

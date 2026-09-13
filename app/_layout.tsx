@@ -63,12 +63,14 @@ export default function RootLayout() {
           <Stack.Screen name="post/[id]" />
           <Stack.Screen name="post/statistics/[id]" />
           <Stack.Screen name="post/edit/[id]" options={{ gestureEnabled: false }} />
-          <Stack.Screen name="profile" />
+          <Stack.Screen name="profile" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="invite" />
           <Stack.Screen name="messages" />
           <Stack.Screen name="report" />
           <Stack.Screen name="report-success" options={{ gestureEnabled: false }} />
           <Stack.Screen name="merchant" />
           <Stack.Screen name="settings" />
+          <Stack.Screen name="notification-settings" />
         </Stack>
       </QueryClientProvider>
     </SafeAreaProvider>

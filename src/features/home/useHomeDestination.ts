@@ -22,7 +22,7 @@ export function useHomeDestination({ scroll, setFilter, setSheet, signedIn }: Ho
     useCallback(() => {
       if (!signedIn || !params.request || handled.current === params.request) return;
       handled.current = params.request;
-      if (params.panel === 'profile' || params.panel === 'compose') {
+      if (params.panel === 'compose') {
         setSheet(params.panel);
         return;
       }

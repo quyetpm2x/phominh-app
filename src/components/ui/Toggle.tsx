@@ -1,24 +1,38 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 export function Toggle({
   value,
   onValueChange,
   label,
+  variant = 'default',
+  disabled = false,
 }: {
   value: boolean;
   onValueChange: (value: boolean) => void;
   label: string;
+  variant?: 'default' | 'settings';
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       accessibilityRole="switch"
       accessibilityLabel={label}
-      accessibilityState={{ checked: value }}
+      accessibilityState={{ checked: value, disabled }}
       hitSlop={10}
+      disabled={disabled}
       onPress={() => onValueChange(!value)}
+      style={variant === 'settings' ? styles.track : undefined}
       className={`h-6 w-10 justify-center rounded-full px-0.5 ${value ? 'bg-primary' : 'bg-[#D1D5DB]'}`}
     >
-      <View className={`h-5 w-5 rounded-full bg-white ${value ? 'self-end' : 'self-start'}`} />
+      <View
+        style={variant === 'settings' ? styles.thumb : undefined}
+        className={`h-5 w-5 rounded-full bg-white ${value ? 'self-end' : 'self-start'}`}
+      />
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  track: { width: 48, height: 24, paddingHorizontal: 4, flexShrink: 0 },
+  thumb: { width: 16, height: 16 },
+});

@@ -74,8 +74,8 @@ export function HomeNavigation({
       >
         <View
           style={{
-            width: 52,
-            height: 52,
+            width: 56,
+            height: 56,
             borderRadius: 16,
             boxShadow: [
               {
@@ -138,9 +138,28 @@ export function HomeNavigation({
           Quán
         </Text>
       </Pressable>
-      <Pressable accessibilityRole="tab" onPress={onProfile} style={styles.navItem}>
-        <CustomIcon name="feedProfile" size={24} />
-        <Text className="font-sans-medium text-[10px] text-[#A0A0A0]">Tôi</Text>
+      <Pressable
+        accessibilityRole="tab"
+        accessibilityState={{ selected: activeTab === 'profile' }}
+        onPress={onProfile}
+        style={styles.navItem}
+      >
+        <View>
+          <CustomIcon
+            name="meNavigation"
+            size={24}
+            color={activeTab === 'profile' ? colors.primary.DEFAULT : '#A0A0A0'}
+          />
+          {activeTab === 'profile' ? (
+            <View className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary" />
+          ) : null}
+        </View>
+        <Text
+          className={activeTab === 'profile' ? 'font-sans-black text-[10px]' : 'font-sans-medium text-[10px]'}
+          style={activeTab === 'profile' ? styles.activeNav : styles.inactiveNav}
+        >
+          Tôi
+        </Text>
       </Pressable>
     </View>
   );

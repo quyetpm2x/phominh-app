@@ -45,10 +45,14 @@ describe('restoreProfile', () => {
         nickname: 'An',
         birthDate: '31/02/2000',
         gender: 'unknown',
-        bio: 'a'.repeat(100),
+        bio: 'a'.repeat(120),
         avatarUri: false,
       }),
     );
-    expect(result).toEqual({ ...EMPTY_PROFILE, nickname: 'An', bio: 'a'.repeat(80) });
+    expect(result).toEqual({ ...EMPTY_PROFILE, nickname: 'An', bio: 'a'.repeat(100) });
+  });
+  it('keeps the full biography accepted by the profile editor after reopening', () => {
+    const profile = { ...EMPTY_PROFILE, fullName: 'An', bio: 'a'.repeat(100) };
+    expect(restoreProfile(JSON.stringify(profile))).toEqual(profile);
   });
 });

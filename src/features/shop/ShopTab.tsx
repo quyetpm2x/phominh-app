@@ -19,20 +19,23 @@ export function ShopTab({
   onCompose,
   controller,
   posts = MY_POSTS,
+  showPosts,
+  onSelectPosts,
 }: {
   onCompose: () => void;
   controller: HomeFeedController;
   posts?: MyPost[];
+  showPosts: boolean;
+  onSelectPosts: (show: boolean) => void;
 }) {
   const { profile } = controller;
   const scroll = useRef<ScrollView>(null);
   const [dateRange, setDateRange] = useState<ShopDateRange>(7);
-  const [showPosts, setShowPosts] = useState(false);
   const [action, setAction] = useState<ShopAction | null>(null);
   const registered = profile.isShopRegistered === true;
   const myPosts = posts.filter((item) => registered || item.id !== 'my-clearance');
   const selectTab = (posts: boolean) => {
-    setShowPosts(posts);
+    onSelectPosts(posts);
     scroll.current?.scrollTo({ y: 0, animated: false });
   };
   return (

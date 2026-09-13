@@ -1,44 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Avatar } from '../../components/ui/Avatar';
+import { StyleSheet, Text } from 'react-native';
 import { Button } from '../../components/ui/Button';
 import { TextInput } from '../../components/ui/TextInput';
 import type { HomeFeedController } from './useHomeFeed';
-type Props = Pick<
-  HomeFeedController,
-  'sheet' | 'profile' | 'loggingOut' | 'logout' | 'draft' | 'setDraft' | 'savingDraft' | 'saveDraft'
->;
-export function AccountSheetContent({
-  sheet,
-  profile,
-  loggingOut,
-  logout,
-  draft,
-  setDraft,
-  savingDraft,
-  saveDraft,
-}: Props) {
+type Props = Pick<HomeFeedController, 'sheet' | 'draft' | 'setDraft' | 'savingDraft' | 'saveDraft'>;
+export function AccountSheetContent({ sheet, draft, setDraft, savingDraft, saveDraft }: Props) {
   return (
     <>
-      {sheet === 'profile' ? (
-        <View className="gap-4">
-          <View className="flex-row items-center gap-3">
-            <Avatar
-              size={56}
-              radius={28}
-              initial={profile.fullName.charAt(0) || 'P'}
-              imageUrl={profile.avatarUri ?? undefined}
-            />
-            <View className="flex-1">
-              <Text className="font-sans-bold text-lg text-ink">
-                {profile.fullName || 'Thành viên Phố Mình'}
-              </Text>
-              <Text className="font-sans text-muted">{profile.nickname}</Text>
-            </View>
-          </View>
-          {profile.bio ? <Text className="font-sans text-ink">{profile.bio}</Text> : null}
-          <Button label="Đăng xuất" variant="outline" disabled={loggingOut} onPress={() => void logout()} />
-        </View>
-      ) : null}
       {sheet === 'compose' ? (
         <>
           <TextInput

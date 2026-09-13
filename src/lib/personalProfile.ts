@@ -1,4 +1,5 @@
 export const PROFILE_STORAGE_KEY = 'pho_minh_personal_profile';
+export const PROFILE_BIO_MAX_LENGTH = 100;
 // Local onboarding session for the agreed OTP demo. This is not an API access token.
 export const LOCAL_SIGN_IN_KEY = 'pho_minh_local_signed_in';
 // Identity for the local OTP demo; replace with the authenticated API user ID later.
@@ -52,7 +53,7 @@ export function restoreProfile(raw: string | null): PersonalProfile {
       nickname: typeof p.nickname === 'string' ? p.nickname.slice(0, 50) : '',
       birthDate: typeof p.birthDate === 'string' && parseBirthDate(p.birthDate) ? p.birthDate : '',
       gender: ['male', 'female', 'other'].includes(p.gender) ? p.gender : 'male',
-      bio: typeof p.bio === 'string' ? p.bio.slice(0, 80) : '',
+      bio: typeof p.bio === 'string' ? p.bio.slice(0, PROFILE_BIO_MAX_LENGTH) : '',
       avatarUri: typeof p.avatarUri === 'string' ? p.avatarUri : null,
       isShopRegistered: p.isShopRegistered === true,
     };

@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { NotificationGroup } from './NotificationGroup';
@@ -6,20 +7,7 @@ import { NotificationSheets } from './NotificationSheets';
 import type { useNotifications } from './useNotifications';
 
 export function NotificationsTab({ controller }: { controller: ReturnType<typeof useNotifications> }) {
-  const {
-    unread,
-    visible,
-    filter,
-    setFilter,
-    settingsOpen,
-    setSettingsOpen,
-    selected,
-    setSelected,
-    preferences,
-    setPreferences,
-    open,
-    readAll,
-  } = controller;
+  const { unread, visible, filter, setFilter, selected, setSelected, open, readAll } = controller;
   return (
     <>
       <NotificationsHeader
@@ -27,7 +15,7 @@ export function NotificationsTab({ controller }: { controller: ReturnType<typeof
         filter={filter}
         onFilter={setFilter}
         onReadAll={readAll}
-        onSettings={() => setSettingsOpen(true)}
+        onSettings={() => router.push('/notification-settings')}
       />
       <ScrollView className="flex-1 bg-[#F8F9FA]" contentContainerStyle={styles.content}>
         <NotificationGroup items={visible.filter((item) => !item.read)} unread onOpen={open} />
@@ -45,12 +33,8 @@ export function NotificationsTab({ controller }: { controller: ReturnType<typeof
         </View>
       </ScrollView>
       <NotificationSheets
-        settingsOpen={settingsOpen}
         selected={selected}
-        preferences={preferences}
-        onPreference={(category, value) => setPreferences((previous) => ({ ...previous, [category]: value }))}
         onClose={() => {
-          setSettingsOpen(false);
           setSelected(null);
         }}
       />

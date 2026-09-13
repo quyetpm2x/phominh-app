@@ -12,26 +12,39 @@ import { useHomeFeed } from '../src/features/home/useHomeFeed';
 import { NotificationsTab } from '../src/features/notifications/NotificationsTab';
 import { useNotifications } from '../src/features/notifications/useNotifications';
 import { ShopTab } from '../src/features/shop/ShopTab';
+import { ProfileTab } from '../src/features/profile/ProfileTab';
 
 export default function HomeScreen() {
   const controller = useHomeFeed();
   const notifications = useNotifications();
   const params = useLocalSearchParams<{
     tab?: string;
+    panel?: string;
     request?: string;
     focusPost?: string;
     feedFilter?: string;
   }>();
-  const routeKey = JSON.stringify([params.tab, params.request, params.focusPost, params.feedFilter]);
+  const routeKey = JSON.stringify([
+    params.tab,
+    params.panel,
+    params.request,
+    params.focusPost,
+    params.feedFilter,
+  ]);
   const routeTab: HomeTab =
-    !params.focusPost && !params.feedFilter && (params.tab === 'notifications' || params.tab === 'shop')
-      ? params.tab
-      : 'feed';
+    params.panel === 'profile'
+      ? 'profile'
+      : !params.focusPost &&
+          !params.feedFilter &&
+          (params.tab === 'notifications' || params.tab === 'shop' || params.tab === 'profile')
+        ? params.tab
+        : 'feed';
   const [selection, setSelection] = useState<{ routeKey: string; tab: HomeTab }>({
     routeKey,
     tab: routeTab,
   });
   const activeTab = selection.routeKey === routeKey ? selection.tab : routeTab;
+  const [showShopPosts, setShowShopPosts] = useState(false);
   const setActiveTab = (tab: HomeTab) => setSelection({ routeKey, tab });
   const destination = useHomeDestination(controller);
   const { signedIn, scroll, setFilter, setSheet } = controller;
@@ -53,7 +66,21 @@ export default function HomeScreen() {
         <NotificationsTab controller={notifications} />
       </View>
       <View className="flex-1" style={activeTab === 'shop' ? styles.visible : styles.hidden}>
-        <ShopTab controller={controller} onCompose={() => setSheet('compose')} />
+        <ShopTab
+          controller={controller}
+          onCompose={() => setSheet('compose')}
+          showPosts={showShopPosts}
+          onSelectPosts={setShowShopPosts}
+        />
+      </View>
+      <View className="flex-1" style={activeTab === 'profile' ? styles.visible : styles.hidden}>
+        <ProfileTab
+          controller={controller}
+          onMyPosts={() => {
+            setShowShopPosts(true);
+            setActiveTab('shop');
+          }}
+        />
       </View>
       <HomeNavigation
         activeTab={activeTab}
@@ -66,7 +93,7 @@ export default function HomeScreen() {
         onNotifications={() => setActiveTab('notifications')}
         onShop={() => setActiveTab('shop')}
         onCompose={() => setSheet('compose')}
-        onProfile={() => setSheet('profile')}
+        onProfile={() => setActiveTab('profile')}
       />
       <HomeSheets controller={controller} />
     </SafeAreaView>
