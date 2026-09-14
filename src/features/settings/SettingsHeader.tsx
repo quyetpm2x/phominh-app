@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 export function SettingsHeader({
   title,
@@ -8,7 +8,11 @@ export function SettingsHeader({
   badge,
   action,
   whiteBack = false,
+  style,
+  subtitle,
 }: {
+  style?: StyleProp<ViewStyle>;
+  subtitle?: string;
   title: string;
   compact?: boolean;
   badge?: string;
@@ -16,25 +20,49 @@ export function SettingsHeader({
   whiteBack?: boolean;
 }) {
   return (
-    <View style={[styles.header, compact && styles.compactHeader]}>
+    <View style={[styles.header, compact && styles.compactHeader, style]}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Quay lại"
         onPress={() => (router.canGoBack() ? router.back() : router.replace('/home?tab=profile'))}
-        style={[styles.back, compact && styles.plainBack, whiteBack && styles.whiteBack]}
+        style={[
+          styles.back,
+          compact && styles.plainBack,
+          whiteBack && styles.whiteBack,
+          subtitle && styles.smallBack,
+        ]}
       >
         <CustomIcon
-          name={whiteBack ? 'hiddenBack' : compact ? 'appPermissionBack' : 'settingsBack'}
-          size={whiteBack ? 18 : 20}
+          name={
+            subtitle
+              ? 'communityBack'
+              : whiteBack
+                ? 'hiddenBack'
+                : compact
+                  ? 'appPermissionBack'
+                  : 'settingsBack'
+          }
+          size={subtitle ? 16 : whiteBack ? 18 : 20}
         />
       </Pressable>
-      <Text
-        accessibilityRole="header"
-        className="font-sans-black"
-        style={[styles.title, compact && styles.compactTitle]}
-      >
-        {title}
-      </Text>
+      {subtitle ? (
+        <View style={styles.copy}>
+          <Text accessibilityRole="header" className="font-sans-black" style={styles.smallTitle}>
+            {title}
+          </Text>
+          <Text className="font-sans-medium" style={styles.subtitle}>
+            {subtitle}
+          </Text>
+        </View>
+      ) : (
+        <Text
+          accessibilityRole="header"
+          className="font-sans-black"
+          style={[styles.title, compact && styles.compactTitle]}
+        >
+          {title}
+        </Text>
+      )}
       {action}
       {badge ? (
         <Text className="font-sans-bold" style={styles.badge}>
@@ -45,6 +73,17 @@ export function SettingsHeader({
   );
 }
 const styles = StyleSheet.create({
+  copy: { flex: 1 },
+  smallBack: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: '#F1F3F599',
+    borderWidth: 0,
+    shadowOpacity: 0,
+  },
+  smallTitle: { fontSize: 16, lineHeight: 20, letterSpacing: -0.4, color: '#1A1A1A' },
+  subtitle: { fontSize: 11, lineHeight: 16.5, color: '#4A4A4A' },
   whiteBack: { backgroundColor: '#FFF' },
   compactHeader: {
     paddingHorizontal: 16,

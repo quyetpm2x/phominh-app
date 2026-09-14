@@ -53,7 +53,7 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="settingsPrivacy"
             title="Chính sách quyền riêng tư"
-            onPress={() => setSheet('privacy')}
+            onPress={() => router.push('/privacy-settings')}
           />
           <SettingsRow
             icon="settingsTerms"
@@ -63,8 +63,12 @@ export default function SettingsScreen() {
           />
         </SettingsSection>
         <SettingsSection title="HỖ TRỢ">
-          <SettingsRow icon="settingsHelp" title="Trung tâm trợ giúp" onPress={() => setSheet('help')} />
-          <SettingsRow icon="settingsInfo" title="Về ứng dụng" last onPress={() => setSheet('about')} />
+          <SettingsRow
+            icon="settingsHelp"
+            title="Trung tâm trợ giúp"
+            onPress={() => router.push('/help-faq')}
+          />
+          <SettingsRow icon="settingsInfo" title="Về ứng dụng" last onPress={() => router.push('/about')} />
         </SettingsSection>
         <Pressable
           accessibilityRole="button"

@@ -1,3 +1,4 @@
+import { LegalSectionCard } from '../../src/features/legal/LegalSectionCard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Alert, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
@@ -127,24 +128,12 @@ export default function TermsOfUseScreen() {
 
         <View className="gap-3">
           {SECTIONS.map((section) => (
-            <View
+            <LegalSectionCard
               key={section.icon}
-              style={styles.card}
-              className="gap-2.5 rounded-[20px] border border-border bg-white p-4"
-            >
-              <View className="flex-row items-center gap-2.5">
-                <View className="h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
-                  <TermsIcon name={section.icon} />
-                </View>
-                <Text
-                  accessibilityRole="header"
-                  className="flex-1 font-sans-bold text-[13.5px] leading-[20.25px] text-primary-darker"
-                >
-                  {section.title}
-                </Text>
-              </View>
-              <Text className="font-sans text-xs leading-[19.5px] text-[#4a4a4a]">{section.body}</Text>
-            </View>
+              title={section.title}
+              body={section.body}
+              icon={<TermsIcon name={section.icon} />}
+            />
           ))}
         </View>
 

@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, ReactNode, Ref } from 'react';
 import { useState } from 'react';
 import { TextInput as RNTextInput, View } from 'react-native';
 
 import { colors } from '../../constants/design-tokens';
 
 interface IconTextInputProps extends ComponentProps<typeof RNTextInput> {
+  inputRef?: Ref<RNTextInput>;
   icon: ComponentProps<typeof Ionicons>['name'];
   iconNode?: ReactNode;
   iconPosition?: 'left' | 'right';
@@ -20,6 +21,7 @@ interface IconTextInputProps extends ComponentProps<typeof RNTextInput> {
 // rất nhiều màn khác không cần icon, tránh ảnh hưởng ngoài ý muốn.
 export function IconTextInput({
   icon,
+  inputRef,
   iconNode,
   iconPosition = 'left',
   invalid,
@@ -49,6 +51,7 @@ export function IconTextInput({
         />
       )}
       <RNTextInput
+        ref={inputRef}
         className={`h-12 rounded-xl border bg-cream-surface/40 ${iconPosition === 'right' ? 'pl-4 pr-12' : 'pl-10 pr-4'} text-sm font-sans-semibold text-ink ${borderClass}`}
         placeholderTextColor={colors.muted.light}
         style={[

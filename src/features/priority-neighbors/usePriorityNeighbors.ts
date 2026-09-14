@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { Alert } from 'react-native';
 import { restorePriorityIds, type NeighborFilter } from './data';
@@ -12,22 +13,27 @@ export function usePriorityNeighbors() {
   const [filter, setFilter] = useState<NeighborFilter>('all');
   const [saving, setSaving] = useState(false);
   const busy = useRef(false);
-  useEffect(() => {
-    let active = true;
-    SecureStore.getItemAsync(KEY)
-      .then((raw) => {
-        if (active) {
-          setIds(restorePriorityIds(raw));
-          setReady(true);
-        }
-      })
-      .catch(() => {
-        if (active) setError(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [attempt]);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      SecureStore.getItemAsync(KEY)
+        .then((raw) => {
+          if (active) {
+            setIds(restorePriorityIds(raw));
+            setReady(true);
+            setError(false);
+          }
+        })
+        .catch(() => {
+          if (active) setError(true);
+        });
+      return () => {
+        active = false;
+      };
+      // Retry must rerun the focus callback after a failed storage read.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [attempt]),
+  );
   const toggle = async (id: string) => {
     if (!ready || busy.current) return;
     busy.current = true;

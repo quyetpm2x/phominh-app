@@ -10,7 +10,7 @@ export function Toggle({
   value: boolean;
   onValueChange: (value: boolean) => void;
   label: string;
-  variant?: 'default' | 'settings';
+  variant?: 'default' | 'settings' | 'privacy';
   disabled?: boolean;
 }) {
   return (
@@ -21,7 +21,7 @@ export function Toggle({
       hitSlop={10}
       disabled={disabled}
       onPress={() => onValueChange(!value)}
-      style={variant === 'settings' ? styles.track : undefined}
+      style={variant === 'privacy' ? styles.privacyTrack : variant === 'settings' ? styles.track : undefined}
       className={`h-6 w-10 justify-center rounded-full px-0.5 ${value ? 'bg-primary' : 'bg-[#D1D5DB]'}`}
     >
       <View
@@ -33,6 +33,7 @@ export function Toggle({
 }
 
 const styles = StyleSheet.create({
+  privacyTrack: { width: 44, height: 24, flexShrink: 0 },
   track: { width: 48, height: 24, paddingHorizontal: 4, flexShrink: 0 },
   thumb: { width: 16, height: 16 },
 });

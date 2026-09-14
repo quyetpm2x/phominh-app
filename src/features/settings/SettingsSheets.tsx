@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
-import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BottomSheet } from '../../components/ui/BottomSheet';
@@ -9,15 +8,6 @@ import { LOCAL_SIGN_IN_KEY } from '../../lib/personalProfile';
 import { usePostInteractions } from '../home/postInteractions';
 
 const details = {
-  privacy: ['Chính sách quyền riêng tư', 'Chính sách quyền riêng tư chưa được cung cấp trong phiên bản này.'],
-  help: [
-    'Trung tâm trợ giúp',
-    'Bạn có thể chỉnh sửa hồ sơ và khu vực theo dõi ở tab Tôi. Để báo cáo bài viết, mở tuỳ chọn của bài viết rồi chọn Báo cáo.',
-  ],
-  about: [
-    'Về ứng dụng',
-    `Phố Mình · Phiên bản ${Constants.expoConfig?.version ?? '1.0.0'}\nKết nối cộng đồng quanh bạn.`,
-  ],
   account: [
     'Đăng xuất & Xoá tài khoản',
     'Đăng xuất khỏi thiết bị này. Chức năng xoá tài khoản chưa được kết nối với máy chủ.',

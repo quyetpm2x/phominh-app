@@ -1,22 +1,34 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type TextStyle } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 import { CustomIcon, type CustomIconProps } from '../../components/ui/CustomIcon';
 
 export function SettingsSection({
   title,
   children,
   titleStyle,
+  gap = 10,
+  cardStyle,
 }: {
+  cardStyle?: StyleProp<ViewStyle>;
+  gap?: number;
   title: string;
   children: ReactNode;
   titleStyle?: StyleProp<TextStyle>;
 }) {
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, { gap }]}>
       <Text accessibilityRole="header" className="font-sans-black" style={[styles.heading, titleStyle]}>
         {title}
       </Text>
-      <View style={styles.card}>{children}</View>
+      <View style={[styles.card, cardStyle]}>{children}</View>
     </View>
   );
 }
@@ -29,7 +41,13 @@ export function SettingsRow({
   badge,
   last,
   onPress,
+  variant = 'default',
+  trailing,
+  hideChevron = false,
 }: {
+  variant?: 'default' | 'about';
+  trailing?: ReactNode;
+  hideChevron?: boolean;
   icon: CustomIconProps['name'];
   title: string;
   subtitle?: string;
@@ -48,10 +66,10 @@ export function SettingsRow({
           badge === 'manage' && styles.permissionsIcon,
         ]}
       >
-        <CustomIcon name={icon} size={20} />
+        <CustomIcon name={icon} size={variant === 'about' ? 18 : 20} />
       </View>
       <View style={styles.copy}>
-        <Text className="font-sans-bold" style={styles.title}>
+        <Text className="font-sans-bold" style={[styles.title, variant === 'about' && styles.aboutTitle]}>
           {title}
         </Text>
         {subtitle ? (
@@ -70,10 +88,21 @@ export function SettingsRow({
           </Text>
         </View>
       ) : null}
-      {onPress ? <CustomIcon name="settingsChevron" size={badge === 'manage' ? 14 : 20} /> : null}
+      {trailing}
+      {onPress && !hideChevron ? (
+        <CustomIcon
+          name={variant === 'about' ? 'aboutChevron' : 'settingsChevron'}
+          size={variant === 'about' || badge === 'manage' ? 14 : 20}
+        />
+      ) : null}
     </>
   );
-  const rowStyle = [styles.row, tone && styles.generalRow, badge === 'manage' && styles.permissionsRow];
+  const rowStyle = [
+    styles.row,
+    tone && styles.generalRow,
+    badge === 'manage' && styles.permissionsRow,
+    variant === 'about' && styles.aboutRow,
+  ];
   return (
     <View>
       {onPress ? (
@@ -83,11 +112,14 @@ export function SettingsRow({
       ) : (
         <View style={rowStyle}>{content}</View>
       )}
-      {!last ? <View style={styles.divider} /> : null}
+      {!last ? <View style={[styles.divider, variant === 'about' && styles.aboutDivider]} /> : null}
     </View>
   );
 }
 const styles = StyleSheet.create({
+  aboutTitle: { fontSize: 13.5, lineHeight: 20.25 },
+  aboutRow: { minHeight: 48.25, padding: 14, gap: 12 },
+  aboutDivider: { marginHorizontal: 0, backgroundColor: '#E9ECEF' },
   pink: { backgroundColor: '#FF416C1A' },
   orange: { backgroundColor: '#FF8A001A' },
   permissionsIcon: { marginRight: 10 },

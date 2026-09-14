@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, Text, type PressableProps } from 'react-native';
+import { Pressable, Text, type PressableProps, type StyleProp, type TextStyle } from 'react-native';
 
 import { colors } from '../../constants/design-tokens';
 
@@ -7,12 +8,22 @@ import { colors } from '../../constants/design-tokens';
 // không áp đặt màu sắc, tự do style bằng NativeWind (mục 2 tài liệu FE).
 interface ButtonProps extends PressableProps {
   label: string;
-  variant?: 'primary' | 'secondary' | 'dark' | 'danger' | 'outline';
+  variant?: 'primary' | 'secondary' | 'dark' | 'danger' | 'outline' | 'soft';
+  leadingIcon?: ReactNode;
+  labelStyle?: StyleProp<TextStyle>;
 }
 
-export function Button({ label, variant = 'primary', className, ...props }: ButtonProps) {
+export function Button({
+  label,
+  variant = 'primary',
+  className,
+  leadingIcon,
+  labelStyle,
+  ...props
+}: ButtonProps) {
   const base = 'items-center justify-center rounded-2xl px-5 h-[52px]';
   const variants = {
+    soft: 'bg-primary/10',
     primary: 'bg-primary',
     secondary: 'bg-cream-surface border border-border',
     dark: 'bg-ink',
@@ -20,6 +31,7 @@ export function Button({ label, variant = 'primary', className, ...props }: Butt
     outline: 'bg-white border border-border',
   };
   const textVariants = {
+    soft: 'text-primary',
     primary: 'text-white',
     secondary: 'text-ink',
     dark: 'text-white',
@@ -29,7 +41,10 @@ export function Button({ label, variant = 'primary', className, ...props }: Butt
 
   return (
     <Pressable className={`${base} ${variants[variant]} ${className ?? ''}`} {...props}>
-      <Text className={`font-sans-semibold text-[15.5px] ${textVariants[variant]}`}>{label}</Text>
+      {leadingIcon}
+      <Text style={labelStyle} className={`font-sans-semibold text-[15.5px] ${textVariants[variant]}`}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

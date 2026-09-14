@@ -8,7 +8,17 @@ import { notificationSettingsIcons } from './notification-settings-icons';
 import { appPermissionIcons } from './app-permission-icons';
 import { priorityIcons } from './priority-icons';
 import { hiddenIcons } from './hidden-icons';
+import { privacyIcons } from './privacy-icons';
+import { aboutIcons } from './about-icons';
+import { policyIcons } from './policy-icons';
+import { communityIcons } from './community-icons';
+import { faqIcons } from './faq-icons';
 export const icons = {
+  ...faqIcons,
+  ...communityIcons,
+  ...policyIcons,
+  ...aboutIcons,
+  ...privacyIcons,
   ...hiddenIcons,
   ...priorityIcons,
   ...appPermissionIcons,

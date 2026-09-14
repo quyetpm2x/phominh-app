@@ -70,7 +70,12 @@ export default function RootLayout() {
           <Stack.Screen name="report-success" options={{ gestureEnabled: false }} />
           <Stack.Screen name="merchant" />
           <Stack.Screen name="settings" />
+          <Stack.Screen name="about" />
+          <Stack.Screen name="privacy-policy" />
+          <Stack.Screen name="community-policy" />
+          <Stack.Screen name="help-faq" />
           <Stack.Screen name="hidden-items" />
+          <Stack.Screen name="privacy-settings" />
           <Stack.Screen name="priority-neighbors" />
           <Stack.Screen name="app-permissions" />
           <Stack.Screen name="notification-settings" />
