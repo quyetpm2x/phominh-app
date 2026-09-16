@@ -12,7 +12,7 @@ interface RadiusSliderProps {
   onChange: (km: number) => void;
   minKm?: number;
   maxKm?: number;
-  variant?: 'default' | 'home';
+  variant?: 'default' | 'home' | 'settings';
   stepKm?: number;
   color?: string;
 }
@@ -74,17 +74,19 @@ export function RadiusSlider({
         <View
           pointerEvents="none"
           className={
-            variant === 'home'
-              ? 'h-2.5 rounded-full bg-stone-100 overflow-hidden'
-              : 'h-1.5 rounded-full bg-border overflow-hidden'
+            variant === 'settings'
+              ? 'h-2 rounded bg-[#F1F3F5] overflow-hidden'
+              : variant === 'home'
+                ? 'h-2.5 rounded-full bg-stone-100 overflow-hidden'
+                : 'h-1.5 rounded-full bg-border overflow-hidden'
           }
         >
           <LinearGradient
-            colors={[color, colors.accent.DEFAULT]}
+            colors={[color, variant === 'settings' ? color : colors.accent.DEFAULT]}
             style={{ width: `${ratio * 100}%`, height: '100%', borderRadius: 8 }}
           />
         </View>
-        {variant === 'default' ? (
+        {variant !== 'home' ? (
           <View
             pointerEvents="none"
             style={{ left: `${ratio * 100}%`, marginLeft: -9, borderColor: color }}
@@ -92,17 +94,19 @@ export function RadiusSlider({
           />
         ) : null}
       </View>
-      <View className="mt-1 flex-row justify-between">
-        <Text className="font-sans-black text-[9px] tracking-[0.9px] text-muted">
-          {variant === 'home' ? `GẦN (${minKm.toFixed(1)}KM)` : `${minKm} km`}
-        </Text>
-        {variant === 'default' ? (
-          <Text className="font-mono-medium text-[10px] text-muted-light">nội đô Hà Nội hợp 1–4 km</Text>
-        ) : null}
-        <Text className="font-sans-black text-[9px] tracking-[0.9px] text-muted">
-          {variant === 'home' ? `XA (${maxKm.toFixed(1)}KM)` : `${maxKm} km`}
-        </Text>
-      </View>
+      {variant !== 'settings' ? (
+        <View className="mt-1 flex-row justify-between">
+          <Text className="font-sans-black text-[9px] tracking-[0.9px] text-muted">
+            {variant === 'home' ? `GẦN (${minKm.toFixed(1)}KM)` : `${minKm} km`}
+          </Text>
+          {variant === 'default' ? (
+            <Text className="font-mono-medium text-[10px] text-muted-light">nội đô Hà Nội hợp 1–4 km</Text>
+          ) : null}
+          <Text className="font-sans-black text-[9px] tracking-[0.9px] text-muted">
+            {variant === 'home' ? `XA (${maxKm.toFixed(1)}KM)` : `${maxKm} km`}
+          </Text>
+        </View>
+      ) : null}
     </View>
   );
 }

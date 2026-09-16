@@ -1,7 +1,15 @@
 import type { ReactNode } from 'react';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import { CustomIcon } from '../../components/ui/CustomIcon';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+  type TextStyle,
+} from 'react-native';
+import { CustomIcon, type CustomIconProps } from '../../components/ui/CustomIcon';
 export function SettingsHeader({
   title,
   compact = false,
@@ -10,7 +18,15 @@ export function SettingsHeader({
   whiteBack = false,
   style,
   subtitle,
+  titleStyle,
+  subtitleStyle,
+  backStyle,
+  backIcon,
 }: {
+  titleStyle?: StyleProp<TextStyle>;
+  subtitleStyle?: StyleProp<TextStyle>;
+  backStyle?: StyleProp<ViewStyle>;
+  backIcon?: CustomIconProps['name'];
   style?: StyleProp<ViewStyle>;
   subtitle?: string;
   title: string;
@@ -30,27 +46,33 @@ export function SettingsHeader({
           compact && styles.plainBack,
           whiteBack && styles.whiteBack,
           subtitle && styles.smallBack,
+          backStyle,
         ]}
       >
         <CustomIcon
           name={
-            subtitle
+            backIcon ??
+            (subtitle
               ? 'communityBack'
               : whiteBack
                 ? 'hiddenBack'
                 : compact
                   ? 'appPermissionBack'
-                  : 'settingsBack'
+                  : 'settingsBack')
           }
-          size={subtitle ? 16 : whiteBack ? 18 : 20}
+          size={backIcon ? 18 : subtitle ? 16 : whiteBack ? 18 : 20}
         />
       </Pressable>
       {subtitle ? (
         <View style={styles.copy}>
-          <Text accessibilityRole="header" className="font-sans-black" style={styles.smallTitle}>
+          <Text
+            accessibilityRole="header"
+            className="font-sans-black"
+            style={[styles.smallTitle, titleStyle]}
+          >
             {title}
           </Text>
-          <Text className="font-sans-medium" style={styles.subtitle}>
+          <Text className="font-sans-medium" style={[styles.subtitle, subtitleStyle]}>
             {subtitle}
           </Text>
         </View>

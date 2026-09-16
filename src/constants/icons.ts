@@ -13,7 +13,17 @@ import { aboutIcons } from './about-icons';
 import { policyIcons } from './policy-icons';
 import { communityIcons } from './community-icons';
 import { faqIcons } from './faq-icons';
+import { accountIcons } from './account-icons';
+import { deleteAccountIcons } from './delete-account-icons';
+import { deletionSentIcons } from './deletion-sent-icons';
+import { editAreaIcons } from './edit-area-icons';
+import { shopFeatureIcons } from './shop-feature-icons';
 export const icons = {
+  ...shopFeatureIcons,
+  ...editAreaIcons,
+  ...deletionSentIcons,
+  ...deleteAccountIcons,
+  ...accountIcons,
   ...faqIcons,
   ...communityIcons,
   ...policyIcons,

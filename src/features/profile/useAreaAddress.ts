@@ -6,10 +6,11 @@ export function useAreaAddress(area: HomeArea | null) {
   const [resolved, setResolved] = useState<{ key: string; address: string } | null>(null);
   const latitude = area?.latitude;
   const longitude = area?.longitude;
+  const savedAddress = area?.address;
   const key = `${latitude},${longitude}`;
   useEffect(() => {
     let active = true;
-    if (latitude === undefined || longitude === undefined) return;
+    if (savedAddress || latitude === undefined || longitude === undefined) return;
     void (async () => {
       try {
         if (!(await Location.getForegroundPermissionsAsync()).granted) return;
@@ -26,7 +27,8 @@ export function useAreaAddress(area: HomeArea | null) {
     return () => {
       active = false;
     };
-  }, [key, latitude, longitude]);
+  }, [key, latitude, longitude, savedAddress]);
+  if (area?.address) return area.address;
   return resolved?.key === key && resolved.address
     ? resolved.address
     : area

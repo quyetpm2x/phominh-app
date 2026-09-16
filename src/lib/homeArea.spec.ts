@@ -20,6 +20,15 @@ describe('parseHomeArea', () => {
   ])('rejects invalid saved state %s', (value) => {
     expect(parseHomeArea(value)).toBeNull();
   });
+  it('restores a trimmed address and ignores invalid address metadata', () => {
+    const area = { latitude: 21.03, longitude: 105.78, radiusKm: 1.5 };
+    expect(parseHomeArea(JSON.stringify({ ...area, address: '  Duy Tân  ' }))).toEqual({
+      ...area,
+      address: 'Duy Tân',
+    });
+    expect(parseHomeArea(JSON.stringify({ ...area, address: 123 }))).toEqual(area);
+    expect(parseHomeArea(JSON.stringify({ ...area, address: '   ' }))).toEqual(area);
+  });
   it.each([0.5, 0.8, 5])('accepts the radius boundary %s', (radiusKm) => {
     expect(parseHomeArea(JSON.stringify({ latitude: 0, longitude: 0, radiusKm }))?.radiusKm).toBe(radiusKm);
   });

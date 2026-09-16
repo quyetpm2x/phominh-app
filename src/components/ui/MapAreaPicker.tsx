@@ -1,19 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Location from 'expo-location';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { Circle, type Region } from 'react-native-maps';
 
 import { colors } from '../../constants/design-tokens';
-import { CustomIcon } from './CustomIcon';
+import { CustomIcon, type CustomIconProps } from './CustomIcon';
 
 interface MapAreaPickerProps {
   place: string;
   initialRegion: Region;
   radiusKm: number;
   pinColor?: string;
-  variant?: 'default' | 'home';
+  variant?: 'default' | 'home' | 'settings';
+  pinIcon?: CustomIconProps['name'];
+  targetCenter?: { latitude: number; longitude: number };
+  onLocateStart?: () => void;
+  onLocateEnd?: () => void;
   pinLabel?: string;
   onCenterChange: (lat: number, lng: number) => void;
 }
@@ -27,6 +31,10 @@ export function MapAreaPicker({
   variant = 'default',
   pinLabel = 'NHÀ Ở ĐÂY?',
   onCenterChange,
+  pinIcon = 'editAreaHome',
+  targetCenter,
+  onLocateStart,
+  onLocateEnd,
 }: MapAreaPickerProps) {
   const [center, setCenter] = useState({
     latitude: initialRegion.latitude,
@@ -36,6 +44,13 @@ export function MapAreaPicker({
   const locatingRef = useRef(false);
   const mapRef = useRef<MapView>(null);
   const home = variant === 'home';
+  const settings = variant === 'settings';
+  useEffect(() => {
+    if (!targetCenter) return;
+    mapRef.current?.animateToRegion({ ...initialRegion, ...targetCenter }, 300);
+    // initialRegion only provides the initial zoom.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetCenter?.latitude, targetCenter?.longitude]);
 
   const handleRegionChangeComplete = (region: Region) => {
     setCenter({ latitude: region.latitude, longitude: region.longitude });
@@ -46,6 +61,7 @@ export function MapAreaPicker({
     if (locatingRef.current) return;
     locatingRef.current = true;
     setLocating(true);
+    onLocateStart?.();
     try {
       let permission = await Location.getForegroundPermissionsAsync();
       if (!permission.granted && permission.canAskAgain)
@@ -82,6 +98,7 @@ export function MapAreaPicker({
     } finally {
       locatingRef.current = false;
       setLocating(false);
+      onLocateEnd?.();
     }
   };
 
@@ -105,7 +122,21 @@ export function MapAreaPicker({
           strokeWidth={1.5}
         />
       </MapView>
-      {home ? (
+      {settings ? (
+        <>
+          <View pointerEvents="none" style={styles.radiusBadge}>
+            <View style={styles.greenDot} />
+            <Text className="font-sans-bold" style={styles.radiusText}>
+              Bán kính: {radiusKm.toFixed(1)} km
+            </Text>
+          </View>
+          <View pointerEvents="none" style={[styles.settingsHalo, { backgroundColor: `${pinColor}40` }]}>
+            <View style={[styles.settingsPin, { backgroundColor: pinColor }]}>
+              <CustomIcon name={pinIcon} size={16} color="#FFF" />
+            </View>
+          </View>
+        </>
+      ) : home ? (
         <>
           <View
             pointerEvents="none"
@@ -151,10 +182,17 @@ export function MapAreaPicker({
         accessibilityState={{ disabled: locating, busy: locating }}
         disabled={locating}
         onPress={recenterToMyLocation}
-        style={home ? styles.homeLocate : styles.locate}
+        style={settings ? styles.settingsLocate : home ? styles.homeLocate : styles.locate}
       >
         {locating ? (
           <ActivityIndicator color={pinColor} />
+        ) : settings ? (
+          <>
+            <CustomIcon name="editAreaLocate" size={14} color={pinColor} />
+            <Text className="font-sans-bold" style={styles.locateText}>
+              Vị trí hiện tại
+            </Text>
+          </>
         ) : (
           <Ionicons name="locate" size={home ? 24 : 20} color={home ? pinColor : colors.ink.DEFAULT} />
         )}
@@ -164,6 +202,50 @@ export function MapAreaPicker({
 }
 const styles = StyleSheet.create({
   map: { flex: 1 },
+  radiusBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E9ECEFB3',
+    backgroundColor: '#F8F9FAE6',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 7.5,
+  },
+  greenDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#00BC7D' },
+  radiusText: { fontSize: 11, lineHeight: 16.5, color: '#1A1A1A' },
+  settingsHalo: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -40,
+    marginLeft: -40,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsPin: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  settingsLocate: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#F8F9FAE6',
+    borderWidth: 1,
+    borderColor: '#E9ECEFB3',
+    borderRadius: 8.333,
+  },
+  locateText: { fontSize: 12, lineHeight: 16, color: '#1A1A1A' },
   // The SVG's pin tip is aligned with the actual selected map coordinate.
   homePin: {
     position: 'absolute',

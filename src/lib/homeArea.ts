@@ -2,6 +2,7 @@ export interface HomeArea {
   latitude: number;
   longitude: number;
   radiusKm: number;
+  address?: string;
 }
 
 export const HOME_AREA_STORAGE_KEY = 'pho_minh_home_area';
@@ -26,7 +27,14 @@ export function parseHomeArea(value: string | null): HomeArea | null {
       area.radiusKm > 5
     )
       return null;
-    return { latitude: area.latitude, longitude: area.longitude, radiusKm: area.radiusKm };
+    return {
+      latitude: area.latitude,
+      longitude: area.longitude,
+      radiusKm: area.radiusKm,
+      ...(typeof area.address === 'string' && area.address.trim()
+        ? { address: area.address.trim().slice(0, 300) }
+        : {}),
+    };
   } catch {
     return null;
   }

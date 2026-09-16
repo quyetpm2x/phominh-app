@@ -28,7 +28,7 @@ export function ProfileAreaEditor({
             initialRegion={{ ...area, latitudeDelta: 0.04, longitudeDelta: 0.04 }}
             radiusKm={draft.radiusKm}
             onCenterChange={(latitude, longitude) =>
-              setDraft((current) => ({ ...current, latitude, longitude }))
+              setDraft((current) => ({ latitude, longitude, radiusKm: current.radiusKm }))
             }
           />
         </View>

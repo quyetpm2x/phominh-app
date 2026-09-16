@@ -10,6 +10,7 @@ interface ButtonProps extends PressableProps {
   label: string;
   variant?: 'primary' | 'secondary' | 'dark' | 'danger' | 'outline' | 'soft';
   leadingIcon?: ReactNode;
+  trailingIcon?: ReactNode;
   labelStyle?: StyleProp<TextStyle>;
 }
 
@@ -18,6 +19,7 @@ export function Button({
   variant = 'primary',
   className,
   leadingIcon,
+  trailingIcon,
   labelStyle,
   ...props
 }: ButtonProps) {
@@ -45,6 +47,7 @@ export function Button({
       <Text style={labelStyle} className={`font-sans-semibold text-[15.5px] ${textVariants[variant]}`}>
         {label}
       </Text>
+      {trailingIcon}
     </Pressable>
   );
 }

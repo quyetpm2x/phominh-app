@@ -1,15 +1,12 @@
 import { SettingsHeader } from '../src/features/settings/SettingsHeader';
-import { useState } from 'react';
 import { router } from 'expo-router';
 import Constants from 'expo-constants';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CustomIcon } from '../src/components/ui/CustomIcon';
 import { SettingsRow, SettingsSection } from '../src/features/settings/SettingsSection';
-import { SettingsSheets, type SettingsSheet } from '../src/features/settings/SettingsSheets';
 
 export default function SettingsScreen() {
-  const [sheet, setSheet] = useState<SettingsSheet | null>(null);
   return (
     <SafeAreaView style={styles.screen}>
       <SettingsHeader title="Cài đặt" />
@@ -74,7 +71,7 @@ export default function SettingsScreen() {
           accessibilityRole="button"
           accessibilityLabel="Đăng xuất và xoá tài khoản"
           style={styles.account}
-          onPress={() => setSheet('account')}
+          onPress={() => router.push('/account-settings')}
         >
           <CustomIcon name="settingsLogout" size={18} />
           <Text className="font-sans-black" style={styles.accountText}>
@@ -90,7 +87,6 @@ export default function SettingsScreen() {
           </Text>
         </View>
       </ScrollView>
-      <SettingsSheets sheet={sheet} onClose={() => setSheet(null)} />
     </SafeAreaView>
   );
 }

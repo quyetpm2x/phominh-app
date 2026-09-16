@@ -63,6 +63,7 @@ export default function RootLayout() {
           <Stack.Screen name="post/[id]" />
           <Stack.Screen name="post/statistics/[id]" />
           <Stack.Screen name="post/edit/[id]" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="edit-area" />
           <Stack.Screen name="profile" options={{ gestureEnabled: false }} />
           <Stack.Screen name="invite" />
           <Stack.Screen name="messages" />
@@ -74,6 +75,9 @@ export default function RootLayout() {
           <Stack.Screen name="privacy-policy" />
           <Stack.Screen name="community-policy" />
           <Stack.Screen name="help-faq" />
+          <Stack.Screen name="account-settings" />
+          <Stack.Screen name="delete-account" />
+          <Stack.Screen name="delete-account-sent" />
           <Stack.Screen name="hidden-items" />
           <Stack.Screen name="privacy-settings" />
           <Stack.Screen name="priority-neighbors" />

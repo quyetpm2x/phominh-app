@@ -1,14 +1,11 @@
-import { useState } from 'react';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { BottomSheet } from '../../components/ui/BottomSheet';
-import { Button, GradientButton } from '../../components/ui/Button';
+import { GradientButton } from '../../components/ui/Button';
 import { colors } from '../../constants/design-tokens';
 
 export function ShopRegistrationBanner() {
-  const [open, setOpen] = useState(false);
   return (
     <>
       <View className="flex-row items-center gap-2 rounded-[20px] border border-primary/15 bg-[#FFF4F7] p-3">
@@ -22,7 +19,7 @@ export function ShopRegistrationBanner() {
               accessibilityRole="button"
               accessibilityLabel="Thông tin tính năng quán"
               hitSlop={8}
-              onPress={() => setOpen(true)}
+              onPress={() => router.push('/shop/features')}
             >
               <Ionicons name="information-circle-outline" size={14} color={colors.primary.DEFAULT} />
             </Pressable>
@@ -33,17 +30,6 @@ export function ShopRegistrationBanner() {
         </View>
         <GradientButton label="Đăng ký ›" compact onPress={() => router.push('/shop/register')} />
       </View>
-      <BottomSheet visible={open} onClose={() => setOpen(false)} variant="actions">
-        <View className="gap-4 py-4">
-          <Text accessibilityRole="header" className="font-sans-bold text-lg text-ink">
-            Đăng ký Chủ quán
-          </Text>
-          <Text className="font-sans text-sm leading-6 text-muted">
-            Ghim bài ưu tiên, đăng khuyến mãi và theo dõi hiệu quả tiếp cận của quán.
-          </Text>
-          <Button label="Đóng" variant="outline" onPress={() => setOpen(false)} />
-        </View>
-      </BottomSheet>
     </>
   );
 }

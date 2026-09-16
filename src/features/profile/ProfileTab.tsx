@@ -39,8 +39,7 @@ export function ProfileTab({
       : `${workAddress} · Bán kính ${controller.work.radiusKm}km`
     : 'Chưa thiết lập khu vực chỗ làm';
   const openArea = (tab: 'home' | 'work') => {
-    controller.changeTab(tab);
-    if (tab === 'home' || controller.work) controller.setSheet('map');
+    router.push({ pathname: '/edit-area', params: { place: tab } });
   };
   return (
     <>

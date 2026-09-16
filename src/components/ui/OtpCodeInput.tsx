@@ -8,8 +8,16 @@ interface OtpCodeInputProps {
   value: string;
   onChange: (value: string) => void;
   error?: boolean;
+  variant?: 'default' | 'plain';
+  autoFocus?: boolean;
 }
-export function OtpCodeInput({ value, onChange, error = false }: OtpCodeInputProps) {
+export function OtpCodeInput({
+  value,
+  onChange,
+  error = false,
+  variant = 'default',
+  autoFocus = true,
+}: OtpCodeInputProps) {
   const pulse = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     const animation = Animated.loop(
@@ -32,6 +40,17 @@ export function OtpCodeInput({ value, onChange, error = false }: OtpCodeInputPro
         {Array.from({ length: OTP_LENGTH }, (_, index) => {
           const active = index === value.length;
           const highlighted = active || Boolean(value[index]) || error;
+          if (variant === 'plain')
+            return (
+              <View
+                key={index}
+                style={[styles.plainCell, highlighted && styles.plainHighlighted, error && styles.plainError]}
+              >
+                <Text className="font-sans-black" style={styles.digit}>
+                  {value[index] ?? ''}
+                </Text>
+              </View>
+            );
           return (
             <LinearGradient
               key={index}
@@ -69,8 +88,8 @@ export function OtpCodeInput({ value, onChange, error = false }: OtpCodeInputPro
         keyboardType="number-pad"
         textContentType="oneTimeCode"
         autoComplete="sms-otp"
-        showSoftInputOnFocus={false}
-        autoFocus
+        showSoftInputOnFocus={variant === 'plain'}
+        autoFocus={autoFocus}
         caretHidden
         style={styles.input}
       />
@@ -78,6 +97,20 @@ export function OtpCodeInput({ value, onChange, error = false }: OtpCodeInputPro
   );
 }
 const styles = StyleSheet.create({
+  plainCell: {
+    flex: 1,
+    maxWidth: 48,
+    height: 48,
+    borderRadius: 13.333,
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    backgroundColor: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  plainHighlighted: { borderWidth: 2, borderColor: '#FF416C' },
+  plainError: { borderColor: '#E63946' },
+  digit: { fontSize: 22, color: '#1A1A1A' },
   cell: { flex: 1, maxWidth: 48, height: 48, padding: 1.5, borderRadius: 13.5 },
   glow: {
     shadowColor: colors.primary.DEFAULT,
