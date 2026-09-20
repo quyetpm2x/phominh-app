@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { CustomIcon, type CustomIconProps } from '../../components/ui/CustomIcon';
 import { LegalCard } from '../legal/LegalCard';
@@ -127,7 +128,7 @@ export function MonetizationSettings() {
               0987••••892 (NGUYEN VAN QUYET)
             </Text>
           </View>
-          <Pressable accessibilityRole="button" accessibilityLabel="Đổi ngân hàng">
+          <Pressable accessibilityRole="button" accessibilityLabel="Đổi ngân hàng" onPress={() => router.push('/bank-accounts')}>
             <Text className="font-sans-bold" style={styles.change}>
               Đổi
             </Text>

@@ -22,11 +22,13 @@ export function SettingsHeader({
   subtitleStyle,
   backStyle,
   backIcon,
+  backIconSize,
 }: {
   titleStyle?: StyleProp<TextStyle>;
   subtitleStyle?: StyleProp<TextStyle>;
   backStyle?: StyleProp<ViewStyle>;
   backIcon?: CustomIconProps['name'];
+  backIconSize?: number;
   style?: StyleProp<ViewStyle>;
   subtitle?: string;
   title: string;
@@ -60,7 +62,7 @@ export function SettingsHeader({
                   ? 'appPermissionBack'
                   : 'settingsBack')
           }
-          size={backIcon ? 18 : subtitle ? 16 : whiteBack ? 18 : 20}
+          size={backIconSize ?? (backIcon ? 18 : subtitle ? 16 : whiteBack ? 18 : 20)}
         />
       </Pressable>
       {subtitle ? (

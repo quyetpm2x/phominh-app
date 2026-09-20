@@ -29,14 +29,14 @@ export function ShopTab({
   onSelectPosts: (show: boolean) => void;
 }) {
   const { profile } = controller;
-  const scroll = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const [dateRange, setDateRange] = useState<ShopDateRange>(7);
   const [action, setAction] = useState<ShopAction | null>(null);
   const registered = profile.isShopRegistered === true;
   const myPosts = posts.filter((item) => registered || item.id !== 'my-clearance');
   const selectTab = (posts: boolean) => {
     onSelectPosts(posts);
-    scroll.current?.scrollTo({ y: 0, animated: false });
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
   };
   return (
     <>
@@ -56,7 +56,7 @@ export function ShopTab({
         />
       ) : (
         <ScrollView
-          ref={scroll}
+          ref={scrollRef}
           className="flex-1 bg-[#F8F9FA]"
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}

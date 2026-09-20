@@ -1,4 +1,4 @@
-import { SvgUri, SvgXml } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 
 import { icons } from '../../constants/icons';
 import type { IconProps } from './icon/types';
@@ -12,12 +12,6 @@ export type CustomIconProps = IconProps & {
 export function CustomIcon({ name, size, color, forceColor = false, ...svgProps }: CustomIconProps) {
   const icon = icons[name];
   const resolvedSize = size ?? icon.size;
-
-  if ('uri' in icon) {
-    return (
-      <SvgUri uri={icon.uri} width={resolvedSize} height={resolvedSize * icon.heightRatio} {...svgProps} />
-    );
-  }
 
   return (
     <SvgXml

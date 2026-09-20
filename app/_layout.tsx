@@ -70,6 +70,8 @@ export default function RootLayout() {
           <Stack.Screen name="balance-history" />
           <Stack.Screen name="monetization-settings" />
           <Stack.Screen name="reward-ranking" />
+          <Stack.Screen name="bank-accounts" />
+          <Stack.Screen name="withdrawal" />
           <Stack.Screen name="messages" />
           <Stack.Screen name="report" />
           <Stack.Screen name="report-success" options={{ gestureEnabled: false }} />

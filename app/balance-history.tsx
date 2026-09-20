@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SettingsHeader } from '../src/features/settings/SettingsHeader';
 import { CustomIcon } from '../src/components/ui/CustomIcon';
+import { SettingsHeader } from '../src/features/settings/SettingsHeader';
 import { BalanceFilterSheet } from '../src/features/wallet/BalanceFilterSheet';
-import { defaultBalanceOptions } from '../src/features/wallet/balanceFilterOptions';
 import { BalanceFilters } from '../src/features/wallet/BalanceFilters';
 import { BalanceHistoryGroups } from '../src/features/wallet/BalanceHistoryGroups';
+import { defaultBalanceOptions } from '../src/features/wallet/balanceFilterOptions';
 import { type BalanceFilter } from '../src/features/wallet/balanceHistory';
 export default function BalanceHistoryScreen() {
   const [filter, setFilter] = useState<BalanceFilter>('all');
@@ -54,7 +54,7 @@ export default function BalanceHistoryScreen() {
 }
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F8F9FA' },
-  header: { backgroundColor: '#FFFFFFF2', paddingTop: 4, paddingBottom: 14 },
+  header: { backgroundColor: '#F8F9FA', paddingTop: 4, paddingBottom: 14 },
   headerButton: {
     width: 40,
     height: 40,

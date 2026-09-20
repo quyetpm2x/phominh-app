@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Switch } from 'react-native';
+import { colors } from '../../constants/design-tokens';
 
 export function Toggle({
   value,
@@ -14,26 +15,14 @@ export function Toggle({
   disabled?: boolean;
 }) {
   return (
-    <Pressable
-      accessibilityRole="switch"
-      accessibilityLabel={label}
-      accessibilityState={{ checked: value, disabled }}
-      hitSlop={10}
+    <Switch
+      value={value}
+      onValueChange={onValueChange}
       disabled={disabled}
-      onPress={() => onValueChange(!value)}
-      style={variant === 'privacy' ? styles.privacyTrack : variant === 'settings' ? styles.track : undefined}
-      className={`h-6 w-10 justify-center rounded-full px-0.5 ${value ? 'bg-primary' : 'bg-[#D1D5DB]'}`}
-    >
-      <View
-        style={variant === 'settings' ? styles.thumb : undefined}
-        className={`h-5 w-5 rounded-full bg-white ${value ? 'self-end' : 'self-start'}`}
-      />
-    </Pressable>
+      trackColor={{ false: '#E9ECEF', true: colors.primary.DEFAULT }}
+      thumbColor="#FFFFFF"
+      ios_backgroundColor="#E9ECEF"
+      accessibilityLabel={label}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  privacyTrack: { width: 44, height: 24, flexShrink: 0 },
-  track: { width: 48, height: 24, paddingHorizontal: 4, flexShrink: 0 },
-  thumb: { width: 16, height: 16 },
-});

@@ -60,7 +60,7 @@ export function PrizeStructureSheet({ visible, onClose }: { visible: boolean; on
               </Text>
             </View>
             <Text className="font-sans-black" style={styles.totalAmount}>
-              {'15.000.000\nVNĐ'}
+              {'15.000.000 VNĐ'}
             </Text>
             <Text className="font-sans" style={styles.totalHint}>
               Trao thưởng tự động vào ngày 01 mỗi tháng

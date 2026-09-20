@@ -2,12 +2,12 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { SettingsHeader } from '../src/features/settings/SettingsHeader';
-import { CustomIcon } from '../src/components/ui/CustomIcon';
 import { BottomSheet } from '../src/components/ui/BottomSheet';
 import { Button } from '../src/components/ui/Button';
-import { WalletBalance } from '../src/features/wallet/WalletBalance';
+import { CustomIcon } from '../src/components/ui/CustomIcon';
+import { SettingsHeader } from '../src/features/settings/SettingsHeader';
 import { WalletActions } from '../src/features/wallet/WalletActions';
+import { WalletBalance } from '../src/features/wallet/WalletBalance';
 import { WalletMission } from '../src/features/wallet/WalletMission';
 import { WalletTransactions } from '../src/features/wallet/WalletTransactions';
 const notices: Record<string, string> = {
@@ -49,6 +49,8 @@ export default function WalletScreen() {
           onPress={(label) => {
             if (label === 'Lịch sử') router.push('/balance-history');
             else if (label === 'Bảng XH') router.push('/reward-ranking');
+            else if (label === 'Ngân hàng') router.push('/bank-accounts');
+            else if (label === 'Rút tiền') router.push('/withdrawal');
             else setSheet(label);
           }}
         />
@@ -69,7 +71,7 @@ export default function WalletScreen() {
 }
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F8F9FA' },
-  header: { paddingTop: 4, paddingBottom: 14, backgroundColor: '#FFFFFFF2', gap: 8 },
+  header: { paddingTop: 4, paddingBottom: 14, backgroundColor: '#F8F9FA', gap: 8 },
   headerButton: {
     width: 40,
     height: 40,

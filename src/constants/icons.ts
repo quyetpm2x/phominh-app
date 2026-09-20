@@ -1,6 +1,8 @@
 // SVG geometry migrated from the original welcome icon components.
 // Keep the existing default sizes and height ratios to preserve the layout.
 import { profileIcons } from './profile-icons';
+import { bankIcons } from './bank-icons';
+import { withdrawalIcons } from './withdrawal-icons';
 import { profileEditIcons } from './profile-edit-icons';
 import { inviteIcons } from './invite-icons';
 import { settingsIcons } from './settings-icons';
@@ -25,6 +27,8 @@ import { monetizationIcons } from './monetization-icons';
 import { rewardRankingIcons } from './reward-ranking-icons';
 import { prizeIcons } from './prize-icons';
 export const icons = {
+  ...withdrawalIcons,
+  ...bankIcons,
   ...prizeIcons,
   ...rewardRankingIcons,
   ...monetizationIcons,
