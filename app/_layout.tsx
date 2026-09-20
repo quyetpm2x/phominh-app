@@ -66,6 +66,10 @@ export default function RootLayout() {
           <Stack.Screen name="edit-area" />
           <Stack.Screen name="profile" options={{ gestureEnabled: false }} />
           <Stack.Screen name="invite" />
+          <Stack.Screen name="wallet" />
+          <Stack.Screen name="balance-history" />
+          <Stack.Screen name="monetization-settings" />
+          <Stack.Screen name="reward-ranking" />
           <Stack.Screen name="messages" />
           <Stack.Screen name="report" />
           <Stack.Screen name="report-success" options={{ gestureEnabled: false }} />

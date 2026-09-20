@@ -80,7 +80,7 @@ export function SettingsHeader({
         <Text
           accessibilityRole="header"
           className="font-sans-black"
-          style={[styles.title, compact && styles.compactTitle]}
+          style={[styles.title, compact && styles.compactTitle, titleStyle]}
         >
           {title}
         </Text>

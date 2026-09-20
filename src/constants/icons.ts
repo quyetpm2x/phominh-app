@@ -18,7 +18,19 @@ import { deleteAccountIcons } from './delete-account-icons';
 import { deletionSentIcons } from './deletion-sent-icons';
 import { editAreaIcons } from './edit-area-icons';
 import { shopFeatureIcons } from './shop-feature-icons';
+import { walletIcons } from './wallet-icons';
+import { balanceIcons } from './balance-icons';
+import { balanceFilterIcons } from './balance-filter-icons';
+import { monetizationIcons } from './monetization-icons';
+import { rewardRankingIcons } from './reward-ranking-icons';
+import { prizeIcons } from './prize-icons';
 export const icons = {
+  ...prizeIcons,
+  ...rewardRankingIcons,
+  ...monetizationIcons,
+  ...balanceFilterIcons,
+  ...balanceIcons,
+  ...walletIcons,
   ...shopFeatureIcons,
   ...editAreaIcons,
   ...deletionSentIcons,

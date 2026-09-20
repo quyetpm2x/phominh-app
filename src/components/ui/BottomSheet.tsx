@@ -1,5 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Animated, Modal, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import {
+  Animated,
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -9,6 +18,8 @@ interface BottomSheetProps {
   onDismiss?: () => void;
   children: ReactNode;
   variant?: 'default' | 'actions' | 'dialog';
+  contentStyle?: StyleProp<ViewStyle>;
+  showHandle?: boolean;
 }
 export function BottomSheet({
   visible,
@@ -16,6 +27,8 @@ export function BottomSheet({
   onDismiss,
   children,
   variant = 'default',
+  contentStyle,
+  showHandle = true,
 }: BottomSheetProps) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -65,10 +78,12 @@ export function BottomSheet({
             dialog
               ? 'rounded-[44px] border border-[#E9ECEF]/80 bg-white p-6'
               : actions
-                ? 'rounded-t-[40px] border-t border-[#E9ECEF] bg-white px-5 pt-5'
+                ? contentStyle
+                  ? 'border-t border-[#E9ECEF] bg-white'
+                  : 'rounded-t-[40px] border-t border-[#E9ECEF] bg-white px-5 pt-5'
                 : 'rounded-t-3xl bg-cream px-5 pb-8 pt-4'
           }
-          style={
+          style={[
             dialog
               ? { maxHeight: height - insets.top - insets.bottom - 32 }
               : actions
@@ -77,10 +92,11 @@ export function BottomSheet({
                     maxHeight: height - insets.top,
                     transform: [{ translateY }],
                   }
-                : undefined
-          }
+                : undefined,
+            contentStyle,
+          ]}
         >
-          {!dialog ? (
+          {!dialog && showHandle ? (
             <View
               className={
                 actions

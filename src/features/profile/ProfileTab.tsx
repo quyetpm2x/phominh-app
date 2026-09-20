@@ -14,10 +14,6 @@ const DETAILS = {
     'Điểm uy tín cộng đồng',
     '842 điểm · Bậc 4/10 · Rất tin cậy. Dữ liệu mẫu theo thiết kế; lịch sử và quyền lợi sẽ có khi kết nối dịch vụ điểm uy tín.',
   ],
-  wallet: [
-    'Ví thưởng & Thu nhập',
-    'Số dư 350.000đ đang là dữ liệu mẫu theo thiết kế. Chức năng ví chưa được kết nối.',
-  ],
 } as const;
 
 export function ProfileTab({
@@ -84,7 +80,7 @@ export function ProfileTab({
                 title="Ví thưởng & Thu nhập"
                 value="350.000đ"
                 tone="orange"
-                onPress={() => setDetail('wallet')}
+                onPress={() => router.push('/wallet')}
               />
               <ProfileMenuRow
                 icon="meGift"
