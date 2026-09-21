@@ -3,6 +3,11 @@
 import { profileIcons } from './profile-icons';
 import { bankIcons } from './bank-icons';
 import { withdrawalIcons } from './withdrawal-icons';
+import { captureIcons } from './capture-icons';
+import { captureReviewIcons } from './capture-review-icons';
+import { newPostIcons } from './new-post-icons';
+import { postCompleteIcons } from './post-complete-icons';
+import { statusIcons } from './status-icons';
 import { profileEditIcons } from './profile-edit-icons';
 import { inviteIcons } from './invite-icons';
 import { settingsIcons } from './settings-icons';
@@ -27,6 +32,11 @@ import { monetizationIcons } from './monetization-icons';
 import { rewardRankingIcons } from './reward-ranking-icons';
 import { prizeIcons } from './prize-icons';
 export const icons = {
+  ...statusIcons,
+  ...postCompleteIcons,
+  ...newPostIcons,
+  ...captureReviewIcons,
+  ...captureIcons,
   ...withdrawalIcons,
   ...bankIcons,
   ...prizeIcons,

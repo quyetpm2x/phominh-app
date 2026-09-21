@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button } from '../../components/ui/Button';
 import { POSTS } from './data';
 import { FeedComposer } from './FeedComposer';
+import { useNewPostDraft } from '../new-post/draft';
 import { FeedPostCard } from './FeedPostCard';
 import { HomeHeader } from './HomeHeader';
 import { ReportedPostCard } from './ReportedPostCard';
@@ -40,7 +41,13 @@ export function HomeFeedTab({
         onContentSizeChange={destination.onContentSizeChange}
         onScrollBeginDrag={destination.onScrollBeginDrag}
       >
-        <FeedComposer profile={profile} onCompose={() => setSheet('compose')} />
+        <FeedComposer
+          profile={profile}
+          onCompose={() => {
+            useNewPostDraft.getState().startStatus();
+            router.push('/write-status');
+          }}
+        />
         {visiblePosts.map((post) => {
           if (controller.reports[post.id]) {
             const topic = post.merchant ? 'shops' : 'neighbors';

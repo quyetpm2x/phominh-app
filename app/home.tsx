@@ -1,4 +1,4 @@
-import { Redirect, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -92,7 +92,7 @@ export default function HomeScreen() {
         }}
         onNotifications={() => setActiveTab('notifications')}
         onShop={() => setActiveTab('shop')}
-        onCompose={() => setSheet('compose')}
+        onCompose={() => router.push('/capture')}
         onProfile={() => setActiveTab('profile')}
       />
       <HomeSheets controller={controller} />
