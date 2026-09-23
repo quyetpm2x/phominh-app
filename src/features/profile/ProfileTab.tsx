@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { router } from 'expo-router';
-import { StyleSheet, ScrollView, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BottomSheet } from '../../components/ui/BottomSheet';
 import { Button } from '../../components/ui/Button';
 import type { HomeFeedController } from '../home/useHomeFeed';
@@ -74,7 +74,7 @@ export function ProfileTab({
               TIỆN ÍCH & LAN TOẢ
             </Text>
             <View className="overflow-hidden rounded-[20px] border border-[#E9ECEF] bg-white">
-              <ProfileMenuRow icon="mePosts" title="Bài đăng của tôi" value="42 bài" onPress={onMyPosts} />
+              <ProfileMenuRow icon="mePosts" title="Quản lý tin" value="42 bài" onPress={onMyPosts} />
               <ProfileMenuRow
                 icon="meWallet"
                 title="Ví thưởng & Thu nhập"

@@ -74,7 +74,7 @@ export function ReportedPostCard({
       </View>
     );
   return (
-    <View style={styles.card}>
+    <View style={[styles.card]}>
       <View className="flex-row items-center gap-3 border-b border-[#E9ECEF]/60 pb-3.5">
         <View className="h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
           <CustomIcon name="reportedHide" size={20} />
@@ -178,9 +178,10 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: 'white',
-    borderWidth: 1,
+    borderWidth: 0,
     borderLeftWidth: 4,
     borderColor: colors.primary.DEFAULT,
+    borderStyle: 'dashed',
     borderRadius: 31,
     paddingLeft: 20,
     paddingRight: 17,

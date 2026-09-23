@@ -11,6 +11,7 @@ import { useHomeDestination } from '../src/features/home/useHomeDestination';
 import { useHomeFeed } from '../src/features/home/useHomeFeed';
 import { NotificationsTab } from '../src/features/notifications/NotificationsTab';
 import { useNotifications } from '../src/features/notifications/useNotifications';
+import { MessagesTab } from '../src/features/messages/MessagesTab';
 import { ShopTab } from '../src/features/shop/ShopTab';
 import { ProfileTab } from '../src/features/profile/ProfileTab';
 
@@ -36,7 +37,10 @@ export default function HomeScreen() {
       ? 'profile'
       : !params.focusPost &&
           !params.feedFilter &&
-          (params.tab === 'notifications' || params.tab === 'shop' || params.tab === 'profile')
+          (params.tab === 'notifications' ||
+            params.tab === 'shop' ||
+            params.tab === 'messages' ||
+            params.tab === 'profile')
         ? params.tab
         : 'feed';
   const [selection, setSelection] = useState<{ routeKey: string; tab: HomeTab }>({
@@ -82,6 +86,9 @@ export default function HomeScreen() {
           }}
         />
       </View>
+      <View className="flex-1" style={activeTab === 'messages' ? styles.visible : styles.hidden}>
+        <MessagesTab />
+      </View>
       <HomeNavigation
         activeTab={activeTab}
         unread={notifications.unread}
@@ -91,7 +98,7 @@ export default function HomeScreen() {
           scroll.current?.scrollTo({ y: 0, animated: true });
         }}
         onNotifications={() => setActiveTab('notifications')}
-        onShop={() => setActiveTab('shop')}
+        onMessages={() => setActiveTab('messages')}
         onCompose={() => router.push('/capture')}
         onProfile={() => setActiveTab('profile')}
       />

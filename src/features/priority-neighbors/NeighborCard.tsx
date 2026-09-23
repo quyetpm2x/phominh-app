@@ -5,6 +5,7 @@ import { Avatar } from '../../components/ui/Avatar';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { NeighborStats } from './NeighborStats';
 import type { PriorityNeighbor } from './data';
+import { openResidentProfile } from '../resident-profile/resident';
 export function NeighborCard({
   neighbor,
   priority,
@@ -35,6 +36,9 @@ export function NeighborCard({
         <View style={styles.copy}>
           <View style={styles.titleRow}>
             <Text
+              accessibilityRole="link"
+              accessibilityLabel={`Xem hồ sơ ${neighbor.name}`}
+              onPress={() => openResidentProfile(neighbor.id)}
               numberOfLines={1}
               className="font-sans-bold"
               style={[styles.name, !priority && styles.smallName]}

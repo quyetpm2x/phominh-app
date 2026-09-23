@@ -8,7 +8,7 @@ interface Props {
   unread: number;
   onFilterChange: (filter: Filter) => void;
   onNotifications: () => void;
-  onShop: () => void;
+  onMessages: () => void;
   onCompose: () => void;
   onProfile: () => void;
 }
@@ -17,7 +17,7 @@ export function HomeNavigation({
   unread,
   onFilterChange,
   onNotifications,
-  onShop,
+  onMessages,
   onCompose,
   onProfile,
 }: Props) {
@@ -122,20 +122,20 @@ export function HomeNavigation({
       </Pressable>
       <Pressable
         accessibilityRole="tab"
-        accessibilityState={{ selected: activeTab === 'shop' }}
-        onPress={onShop}
+        accessibilityState={{ selected: activeTab === 'messages' }}
+        onPress={onMessages}
         style={styles.navItem}
       >
         <CustomIcon
-          name="feedShop"
+          name="feedComment"
           size={24}
-          color={activeTab === 'shop' ? colors.primary.DEFAULT : '#A0A0A0'}
+          color={activeTab === 'messages' ? colors.primary.DEFAULT : '#A0A0A0'}
         />
         <Text
           className="font-sans-medium text-[10px]"
-          style={activeTab === 'shop' ? styles.activeNav : styles.inactiveNav}
+          style={activeTab === 'messages' ? styles.activeNav : styles.inactiveNav}
         >
-          Quán
+          Tin nhắn
         </Text>
       </Pressable>
       <Pressable

@@ -5,6 +5,7 @@ import { Avatar } from '../../components/ui/Avatar';
 import { CustomIcon } from '../../components/ui/CustomIcon';
 import { HighlightedText } from '../../components/ui/HighlightedText';
 import { colors } from '../../constants/design-tokens';
+import { openResidentProfile } from '../resident-profile/resident';
 import { PostMedia } from './PostMedia';
 import type { FeedPost } from './types';
 interface Props {
@@ -59,7 +60,15 @@ export function FeedPostCard({
         </View>
         <View className="flex-1 gap-1">
           <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
-            <Text className="font-sans-bold text-[15px] leading-[22.5px] text-primary-darker">
+            <Text
+              accessibilityRole="link"
+              accessibilityLabel={`Xem hồ sơ ${post.name}`}
+              onPress={(event) => {
+                event.stopPropagation();
+                openResidentProfile(post.authorId);
+              }}
+              className="font-sans-bold text-[15px] leading-[22.5px] text-primary-darker"
+            >
               {post.name}
             </Text>
             <View
@@ -172,7 +181,7 @@ const styles = StyleSheet.create({
 
   metaText: { color: '#4A4A4A' },
 
-  post: { backgroundColor: '#fff', borderWidth: 1, borderLeftWidth: 5, borderRadius: 20, overflow: 'hidden' },
+  post: { backgroundColor: '#fff', borderWidth: 0, borderLeftWidth: 5, borderRadius: 20, overflow: 'hidden' },
 
   contact: {
     flexDirection: 'row',

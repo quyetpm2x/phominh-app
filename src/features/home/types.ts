@@ -1,6 +1,6 @@
 import type { ImageSourcePropType } from 'react-native';
 export type AreaTab = 'nearby' | 'home' | 'work';
-export type HomeTab = 'feed' | 'notifications' | 'shop' | 'profile';
+export type HomeTab = 'feed' | 'notifications' | 'shop' | 'messages' | 'profile';
 export type Filter = 'all' | 'shops' | 'neighbors';
 export type Sheet =
   'preferences' | 'filter' | 'map' | 'gallery' | 'comments' | 'contact' | 'details' | 'compose' | null;

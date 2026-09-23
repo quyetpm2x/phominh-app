@@ -74,9 +74,11 @@ export default function RootLayout() {
           <Stack.Screen name="withdrawal" />
           <Stack.Screen name="capture" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="new-post" />
+          <Stack.Screen name="resident/[id]" />
           <Stack.Screen name="write-status" />
           <Stack.Screen name="post-complete" options={{ gestureEnabled: false }} />
           <Stack.Screen name="messages" />
+          <Stack.Screen name="chat/[id]" />
           <Stack.Screen name="report" />
           <Stack.Screen name="report-success" options={{ gestureEnabled: false }} />
           <Stack.Screen name="merchant" />

@@ -5,6 +5,7 @@ import { CustomIcon } from '../../components/ui/CustomIcon';
 import { HighlightedText } from '../../components/ui/HighlightedText';
 import { colors } from '../../constants/design-tokens';
 import type { FeedPost } from '../home/types';
+import { openResidentProfile } from '../resident-profile/resident';
 
 interface Props {
   post: FeedPost;
@@ -24,7 +25,14 @@ export function PostDetailContent({ post, useful, onUseful, onContact, onImage }
           imageUrl={Image.resolveAssetSource(post.avatar).uri}
         />
         <View className="flex-1 gap-1">
-          <Text className="font-sans-bold text-[15px] leading-[22.5px] text-[#1C1917]">{post.name}</Text>
+          <Text
+            accessibilityRole="link"
+            accessibilityLabel={`Xem hồ sơ ${post.name}`}
+            onPress={() => openResidentProfile(post.authorId)}
+            className="font-sans-bold text-[15px] leading-[22.5px] text-[#1C1917]"
+          >
+            {post.name}
+          </Text>
           <View className="flex-row flex-wrap items-center gap-2">
             <View className="rounded-sm bg-primary/10 px-1.5 py-0.5">
               <Text className="font-sans-black text-[9px] text-primary">
