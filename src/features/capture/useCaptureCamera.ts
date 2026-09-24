@@ -3,6 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { Alert, AppState, Linking } from 'react-native';
+import { checkCameraAvailability } from './cameraAvailability';
 import { createCapturedPhoto, type CapturedPhoto, type CapturePlace } from './capturePhoto';
 
 export function useCaptureCamera(camera: RefObject<CameraView | null>, place: CapturePlace | null) {
@@ -30,7 +31,7 @@ export function useCaptureCamera(camera: RefObject<CameraView | null>, place: Ca
 
   useEffect(() => {
     mounted.current = true;
-    CameraView.isAvailableAsync()
+    checkCameraAvailability()
       .then((value) => {
         if (mounted.current) setAvailable(value);
       })
@@ -39,7 +40,8 @@ export function useCaptureCamera(camera: RefObject<CameraView | null>, place: Ca
       });
     const subscription = AppState.addEventListener('change', (state) => {
       setForeground(state === 'active');
-      setReady(false);
+      // Repeated active events must not disable an already mounted camera.
+      if (state !== 'active') setReady(false);
       if (state === 'active') void refreshPermission().catch(() => {});
     });
     return () => {
